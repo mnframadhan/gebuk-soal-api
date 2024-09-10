@@ -1,0 +1,154 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Administrator {
+  id String @id @unique
+  username String @unique
+  password String
+  token String?
+
+  @@map("administrators")
+}
+
+
+
+model Contributor {
+
+  id String @id @unique
+  username String @unique
+  email String @unique
+  password String
+  contribution_points Int @default(0)
+  n_soal Int @default(0)
+  created_at DateTime @default(now())
+  soals Soal[]
+  token String?
+
+  @@map("contributors")
+
+}
+
+model Student {
+
+  id String @id @unique
+  username String @unique
+  email String @unique
+  password String
+  points Int @default(0)
+  n_soal Int @default(0)
+  n_soal_tiu Int @default(0)
+  n_soal_twk Int @default(0)
+  n_soal_tkp Int @default(0)
+  quota Int @default(5)
+  created_at DateTime @default(now())
+  token String?
+  membership String @default("Basic")
+  avatar String?
+  works Work[]
+  result Result[]
+  order Order[]
+
+  @@map("students")
+
+}
+
+model Order {
+
+  id String @id @unique
+  student_id String?
+  user Student? @relation(fields: [student_id], references: [id], onDelete: SetNull)
+  qty Int @default(0)
+  price Int @default(2000)
+  discount Float @default(0)
+  sub_total Int
+  order_date DateTime @default(now())
+  payment_date DateTime?
+  status String @default("Menunggu Pembayaran")
+
+  @@map("orders")
+
+}
+
+model Soal {
+
+  id String @id @unique
+  category String // Tes Intelegensi Umum, Tes Wawasan Kebangsaan, Tes Karakteristik Pribadi 
+  label String 
+  type String
+  text String @db.LongText
+  text2 String? @db.LongText
+  text3 String? @db.LongText
+  text4 String? @db.LongText
+  text5 String? @db.LongText
+  image1 String?
+  image2 String?
+  image3 String?
+  image4 String?
+  image5 String?
+  question String @db.LongText
+  option1 String? @db.LongText 
+  option2 String? @db.LongText
+  option3 String? @db.LongText
+  option4 String? @db.LongText
+  option5 String? @db.LongText
+  option_image1 String?
+  option_image2 String?
+  option_image3 String?
+  option_image4 String?
+  option_image5 String?
+  option_point1 Int?
+  option_point2 Int?
+  option_point3 Int?
+  option_point4 Int?
+  option_point5 Int?
+  answer String
+  explanation String? @db.LongText
+  explanation_image1 String?
+  explanation_image2 String?
+  explanation_image3 String?
+  explanation_image4 String?
+  explanation_image5 String?
+  created_by String?
+  contributor Contributor? @relation(fields: [created_by], references: [username], onDelete: SetNull, onUpdate: Cascade)
+  created_at DateTime @default(now())
+  Works Work[]
+
+  @@map("soals")
+  
+}
+
+
+model Work {
+
+  id String @id @unique
+  username String
+  students Student @relation(fields: [username], references: [username], onDelete: Cascade)
+  soal_id String
+  soal Soal @relation(fields: [soal_id], references: [id], onDelete: Cascade)
+  answer String
+  result Boolean
+  created_at DateTime @default(now())
+
+  @@map("works")
+
+}
+
+model Result {
+
+  id String @id @unique
+  username String
+  students Student @relation(fields: [username], references: [username], onDelete: Cascade)
+  today_works Int
+  number_of_true Int
+  number_of_false Int
+  created_at DateTime @default(now())
+
+  @@map("results")
+  
+}
