@@ -93,6 +93,23 @@ export class AdministratorController {
         }
     }
 
+    static async updatePremiumStudent(req: Request, res: Response, next: NextFunction) {
+
+        try {
+            const student_id : string = req.query.student_id as string;
+            const response = await AdministratorService.updatePremiumStudent(student_id);
+
+            res.status(200);
+            res.json(response);
+
+        } catch (error) {
+            console.log(error);
+            next(error);
+
+        }
+
+    }
+
     static async returnLimit(req: Request, res: Response, next: NextFunction) {
 
         try {

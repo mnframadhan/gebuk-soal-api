@@ -89,3 +89,4 @@ app.get('/api/admin/all-students/orders', authAdminMiddleware, AdministratorCont
 app.put('/api/admin/student', authAdminMiddleware, AdministratorController.updateStudentLimit) // query student_id and order_id
 app.put('/api/admin/student/return', authAdminMiddleware, AdministratorController.returnLimit) // query student_id and order_id
 app.delete('/api/admin/logout', authAdminMiddleware, AdministratorController.logoutAdmin)
+app.put('api/admin/student/membership', authAdminMiddleware, AdministratorController.updatePremiumStudent) // query student_id

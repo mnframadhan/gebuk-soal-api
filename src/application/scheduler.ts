@@ -32,6 +32,45 @@ export function startScheduler() : void {
     console.log('Scheduler started!');
     console.log('Limit dari setiap student tanpa membership akan di reset ke 5 soal per hari pada pukul 18:45 WIB')
   } else {
-    console.log('Scheduler is already running.');
+    console.log('Basic Scheduler is already running.');
   }
+}
+
+
+export function premiumScheduler() : void  {
+
+  if (!scheduledTask) {
+    scheduledTask = cron.schedule(
+      '45 18 * * *',
+      async () => {
+        const currentTime = moment().tz('Asia/Jakarta').format();
+        console.log(`Running scheduled task at: ${currentTime}`);
+        console.log('Status premium telah diupdate')
+
+        const now = new Date();
+        const oneMonthAgo = new Date(now.setMonth(now.getMonth() - 1));
+        // Your task logic here
+        const result = await prismaClient.student.updateMany({
+          where: {
+            membership: 'Premium',
+            premium_at: {
+              lt: oneMonthAgo,
+            },
+          },
+          data: {
+            membership: 'Basic',
+            premium_at: null,
+          },
+        });
+      },
+      {
+        scheduled: true,
+        timezone: 'Asia/Jakarta',
+      }
+    );
+  } else {
+    console.log('PremiumScheduler is already running.');
+  }
+
+
 }

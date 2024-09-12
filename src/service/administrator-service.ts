@@ -179,6 +179,21 @@ export class AdministratorService {
         return response
     }
 
+    static async updatePremiumStudent(student_id: string) : Promise<void> {
+
+        const date = Date.now()
+
+        await prismaClient.student.update({
+            where: {
+                id: student_id
+            },
+            data: {
+                membership: "Premium",
+                premium_at: new Date(date)
+            },
+        })
+    }
+
     static async logoutCurrentAdmin(admin: Administrator) : Promise<void> {
 
         await prismaClient.administrator.update({
