@@ -14,9 +14,7 @@ export class WorksController {
             res.json(response);
 
         } catch (err) {
-
-            res.status(429);
-            res.json({message: "Reached Limit, Upgrade Now"});
+            next(err)
 
         }
 
@@ -34,7 +32,6 @@ export class WorksController {
             res.json(response)
 
         } catch (err) {
-            console.log(err)
             next(err);
         }
     }
@@ -44,9 +41,12 @@ export class WorksController {
         try {
 
 
+            const category = req.query.category as string;
             const page : number = Number(req.query.page);
             const remaining_limit : number = Number(req.query.remaining_limit);
-            const response = await WorksService.getSoalForWorks(page, remaining_limit)
+
+            const response = await WorksService.getSoalForWorks(category, page, remaining_limit)
+
             res.status(200);
             res.json(response);
 
@@ -62,7 +62,6 @@ export class WorksController {
             res.status(201);
             res.json(response)
         } catch (err) {
-            console.log(err)
             next(err)
         }
     }

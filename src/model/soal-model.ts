@@ -155,7 +155,7 @@ export function toSoalResponse(soal: Soal) : SoalResponse {
     }
 }
 
-export function toSoalResponsePagination(soal: Soal[], pagination: Paging) {
+export function toSoalResponsePagination(soal: ShowedSoalResponse[], pagination: Paging) {
 
     return {
 

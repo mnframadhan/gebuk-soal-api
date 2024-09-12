@@ -46,7 +46,7 @@ app.get('/api/contributor/current/soal', authMiddleware, ContributorController.g
 app.get('/api/student/current', authStudentMiddleware, StudentController.currentStudent)
 app.delete('/api/student/current', authStudentMiddleware, StudentController.logoutStudent)
 app.put('/api/student/current', authStudentMiddleware, StudentController.updateStudent)
-app.get('/api/student/soal', authStudentMiddleware, SoalController.getSoalPagination) // query limit
+// app.get('/api/student/soal', authStudentMiddleware, SoalController.getSoalPagination) // query limit
 
 // student api works
 app.get('/api/student/works/limit', authStudentMiddleware, WorksController.getRemainingLimit)
@@ -61,21 +61,18 @@ app.get(
     '/api/student/works', 
     authStudentMiddleware, 
     limiter,
-    WorksController.getSoalForWorks) // query page //
+    WorksController.getSoalForWorks) //  query page, remaining_limit,
     
 app.get(
     '/api/student/works/limit-plus', 
     authStudentMiddleware, 
     plusLimiter, 
-    WorksController.getSoalForWorks)
+    WorksController.getSoalForWorks) //  category, query page, remaining_limit,
 
 app.get(
     '/api/student/works/premium', 
     authStudentMiddleware,
-    WorksController.getSoalForWorks)
-
-
-app.get('/api/student/works/limit-')
+    WorksController.getSoalForWorks) //  category, query page, remaining_limit,
 
 // student api works results
 app.post('/api/student/results', authStudentMiddleware, WorksController.createTodayResults) // maximum n of request 20 per 15 minutes

@@ -22,21 +22,21 @@ export class SoalController {
         }
     }
 
-    static async getSoalPagination(req: StudentReq, res: Response, next: NextFunction) {
+    // static async getSoalPagination(req: StudentReq, res: Response, next: NextFunction) {
 
-        try {
+    //     try {
 
-            const limit = req.query.limit
-            const response = await SoalService.getSoal(Number(limit))
+    //         const limit = req.query.limit
+    //         const response = await SoalService.getSoal(Number(limit))
             
-            res.status(200);
-            res.json(response);
+    //         res.status(200);
+    //         res.json(response);
 
-        } catch (err) {
+    //     } catch (err) {
 
-            console.log(err)
-            next(err)
+    //         console.log(err)
+    //         next(err)
 
-        }
-    }
+    //     }
+    // }
 }

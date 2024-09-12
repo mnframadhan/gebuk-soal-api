@@ -15,8 +15,6 @@ const soal_model_1 = require("../model/soal-model");
 const soal_validation_1 = require("../validation/soal-validation");
 const Validation_1 = require("../validation/Validation");
 const uuid_1 = require("uuid");
-const get_random_integer_1 = require("../helpers/get-random-integer");
-const response_error_1 = require("../error/response-error");
 class SoalService {
     static createSoal(request, contributor) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -40,28 +38,6 @@ class SoalService {
                 }
             });
             return (0, soal_model_1.toSoalResponse)(soal);
-        });
-    }
-    static getSoal(limit) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const random_page = (0, get_random_integer_1.getRandomInt)(Number(yield database_1.prismaClient.soal.count()) / limit);
-            const skip = (random_page - 1) * limit;
-            const pagination = {
-                size: limit,
-                total_page: Math.ceil(Number(yield database_1.prismaClient.soal.count()) / limit),
-                current_page: random_page
-            };
-            const soal = yield database_1.prismaClient.soal.findMany({
-                orderBy: {
-                    created_at: "desc"
-                },
-                skip: skip,
-                take: limit
-            });
-            if (!soal) {
-                throw new response_error_1.ResponseError(404, 'Not Found');
-            }
-            return (0, soal_model_1.toSoalResponsePagination)(soal, pagination);
         });
     }
 }

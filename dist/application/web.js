@@ -45,15 +45,14 @@ exports.app.get('/api/contributor/current/soal', auth_middleware_1.authMiddlewar
 exports.app.get('/api/student/current', auth_student_middleware_1.authStudentMiddleware, student_controller_1.StudentController.currentStudent);
 exports.app.delete('/api/student/current', auth_student_middleware_1.authStudentMiddleware, student_controller_1.StudentController.logoutStudent);
 exports.app.put('/api/student/current', auth_student_middleware_1.authStudentMiddleware, student_controller_1.StudentController.updateStudent);
-exports.app.get('/api/student/soal', auth_student_middleware_1.authStudentMiddleware, soal_controller_1.SoalController.getSoalPagination); // query limit
+// app.get('/api/student/soal', authStudentMiddleware, SoalController.getSoalPagination) // query limit
 // student api works
 exports.app.get('/api/student/works/limit', auth_student_middleware_1.authStudentMiddleware, works_controller_1.WorksController.getRemainingLimit);
 exports.app.post('/api/student/works', auth_student_middleware_1.authStudentMiddleware, works_controller_1.WorksController.createWorks); // query soal (uuid) //
 // student api works by membership
-exports.app.get('/api/student/works', auth_student_middleware_1.authStudentMiddleware, request_limiter_1.limiter, works_controller_1.WorksController.getSoalForWorks); // query page //
-exports.app.get('/api/student/works/limit-plus', auth_student_middleware_1.authStudentMiddleware, request_limiter_1.plusLimiter, works_controller_1.WorksController.getSoalForWorks);
-exports.app.get('/api/student/works/premium', auth_student_middleware_1.authStudentMiddleware, works_controller_1.WorksController.getSoalForWorks);
-exports.app.get('/api/student/works/limit-');
+exports.app.get('/api/student/works', auth_student_middleware_1.authStudentMiddleware, request_limiter_1.limiter, works_controller_1.WorksController.getSoalForWorks); //  query page, remaining_limit,
+exports.app.get('/api/student/works/limit-plus', auth_student_middleware_1.authStudentMiddleware, request_limiter_1.plusLimiter, works_controller_1.WorksController.getSoalForWorks); //  category, query page, remaining_limit,
+exports.app.get('/api/student/works/premium', auth_student_middleware_1.authStudentMiddleware, works_controller_1.WorksController.getSoalForWorks); //  category, query page, remaining_limit,
 // student api works results
 exports.app.post('/api/student/results', auth_student_middleware_1.authStudentMiddleware, works_controller_1.WorksController.createTodayResults); // maximum n of request 20 per 15 minutes
 exports.app.get('/api/student/results', auth_student_middleware_1.authStudentMiddleware, works_controller_1.WorksController.getTodayResults); // maximum n of request 20 per 15 minutes

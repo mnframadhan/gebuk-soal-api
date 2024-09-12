@@ -13,7 +13,6 @@ exports.WorksService = void 0;
 const database_1 = require("../application/database");
 const works_model_1 = require("../model/works-model");
 const uuid_1 = require("uuid");
-const get_random_integer_1 = require("../helpers/get-random-integer");
 const soal_model_1 = require("../model/soal-model");
 const create_works_update_1 = require("../helpers/create-works-update");
 class WorksService {
@@ -23,28 +22,37 @@ class WorksService {
             return response;
         });
     }
-    static getSoalForWorks(page, remaining_limit) {
+    static getSoalForWorks(category, page, remaining_limit) {
         return __awaiter(this, void 0, void 0, function* () {
-            const total_pages = remaining_limit;
-            const limit = 1;
-            const random_page = (0, get_random_integer_1.getRandomInt)(Number(yield database_1.prismaClient.soal.count()));
-            const skip = (random_page - 1) * limit;
             const pagination = {
-                size: limit,
-                total_page: total_pages,
+                size: 1,
+                total_page: remaining_limit,
                 current_page: page
             };
-            const soal = yield database_1.prismaClient.soal.findMany({
-                orderBy: {
-                    created_at: "desc"
-                },
-                skip: skip,
-                take: limit
-            });
-            if (!soal) {
-                throw new Error('Something Error');
+            let soal = [];
+            if (category === "TIU") {
+                soal = yield database_1.prismaClient.$queryRaw `
+                SELECT * FROM soals
+                WHERE category="Tes Intelegensi Umum"
+                ORDER BY RAND()
+                LIMIT 1`;
+                return (0, soal_model_1.toSoalResponsePagination)(soal.map(({ category, type, label, question, option1, option2, option3, option4, option5, id, text }) => ({ category, type, label, question, option1, option2, option3, option4, option5, id, text })), pagination);
             }
-            return (0, soal_model_1.toSoalResponsePagination)(soal, pagination);
+            else if (category === "TWK") {
+                soal = yield database_1.prismaClient.$queryRaw `
+                SELECT * FROM soals
+                WHERE category="Tes Wawasan Kebangsaan"
+                ORDER BY RAND()
+                LIMIT 1`;
+                return (0, soal_model_1.toSoalResponsePagination)(soal.map(({ category, type, label, question, option1, option2, option3, option4, option5, id, text }) => ({ category, type, label, question, option1, option2, option3, option4, option5, id, text })), pagination);
+            }
+            else if (!category) {
+                soal = yield database_1.prismaClient.$queryRaw `
+                SELECT * FROM soals
+                ORDER BY RAND()
+                LIMIT 1`;
+                return (0, soal_model_1.toSoalResponsePagination)(soal.map(({ category, type, label, question, option1, option2, option3, option4, option5, id, text }) => ({ category, type, label, question, option1, option2, option3, option4, option5, id, text })), pagination);
+            }
         });
     }
     static createWorks(request, student, soal) {

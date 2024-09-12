@@ -3,7 +3,7 @@ import { prismaClient } from "../application/database";
 import { ResultsResponse, toWorkResponse, toWorksResultsResponse, WorksRequest, WorksResultsResponse } from "../model/works-model";
 import { v4 as uuid, v4 } from "uuid";
 import { Pageable } from "../model/pages";
-import { ShowedSoalResponse } from "../model/soal-model";
+import { ShowedSoalResponse, SoalResponse } from "../model/soal-model";
 import { getRandomInt } from "../helpers/get-random-integer";
 import { Paging } from "../model/pages";
 import { toSoalResponsePagination } from "../model/soal-model";
@@ -11,45 +11,55 @@ import { updateStudentNSoal } from "../helpers/create-works-update";
 
 export class WorksService {
 
-    static async getRemainingLimit(student: Student): Promise<{ remaining_limit: number, membership:string }> {
+    static async getRemainingLimit(student: Student): Promise<{ remaining_limit: number, membership: string }> {
 
-        const response = { remaining_limit: student.quota, membership: student.membership  }
+        const response = { remaining_limit: student.quota, membership: student.membership }
         return response
 
     }
 
-    static async getSoalForWorks(page: number, remaining_limit: number): Promise<Pageable<ShowedSoalResponse>> {
+    static async getSoalForWorks(category: string, page: number, remaining_limit: number) {
 
-        const total_pages = remaining_limit
-        const limit = 1
-
-        const random_page = getRandomInt(Number(await prismaClient.soal.count()))
-        const skip = (random_page - 1) * limit;
 
         const pagination: Paging = {
-
-            size: limit,
-            total_page: total_pages,
+            size: 1,
+            total_page: remaining_limit,
             current_page: page
         }
 
+        let soal: ShowedSoalResponse[] = []
 
-        const soal = await prismaClient.soal.findMany({
-            orderBy: {
-                created_at: "desc"
-            },
-            skip: skip,
-            take: limit
-        })
 
-        if (!soal) {
-            throw new Error('Something Error')
+        if (category === "TIU") {
+            soal = await prismaClient.$queryRaw`
+                SELECT * FROM soals
+                WHERE category="Tes Intelegensi Umum"
+                ORDER BY RAND()
+                LIMIT 1`;
+            
+            return toSoalResponsePagination(soal.map(({ category, type, label, question, option1, option2, option3, option4, option5, id, text }) => ({ category, type, label, question, option1, option2, option3, option4, option5, id, text })), pagination)
+
+        } else if (category === "TWK") {
+
+            soal = await prismaClient.$queryRaw`
+                SELECT * FROM soals
+                WHERE category="Tes Wawasan Kebangsaan"
+                ORDER BY RAND()
+                LIMIT 1`;
+            
+            return toSoalResponsePagination(soal.map(({ category, type, label, question, option1, option2, option3, option4, option5, id, text }) => ({ category, type, label, question, option1, option2, option3, option4, option5, id, text })), pagination)
+
+        } else if (!category) {
+
+            soal = await prismaClient.$queryRaw`
+                SELECT * FROM soals
+                ORDER BY RAND()
+                LIMIT 1`;
+            
+            return toSoalResponsePagination(soal.map(({ category, type, label, question, option1, option2, option3, option4, option5, id, text }) => ({ category, type, label, question, option1, option2, option3, option4, option5, id, text })), pagination)
+
         }
-
-
-        return toSoalResponsePagination(soal, pagination)
-
-    }
+}
 
     static async createWorks(request: WorksRequest, student: Student, soal: string) {
 
@@ -104,7 +114,7 @@ export class WorksService {
         })
 
         updateStudentNSoal(student.id, current_soal?.category!);
-    
+
         return toWorkResponse(works);
     }
 

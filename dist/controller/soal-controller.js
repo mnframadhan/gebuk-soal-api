@@ -26,19 +26,5 @@ class SoalController {
             }
         });
     }
-    static getSoalPagination(req, res, next) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const limit = req.query.limit;
-                const response = yield soal_service_1.SoalService.getSoal(Number(limit));
-                res.status(200);
-                res.json(response);
-            }
-            catch (err) {
-                console.log(err);
-                next(err);
-            }
-        });
-    }
 }
 exports.SoalController = SoalController;
