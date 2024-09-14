@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { StudentService } from "../service/student-service";
-import { StudentRequest, StudentResponse, StudentUpdateRequest } from "../model/student-model";
+import { StudentRequest, StudentUpdateRequest } from "../model/student-model";
 import { StudentReq } from "../types/student-request";
 
 export class StudentController {

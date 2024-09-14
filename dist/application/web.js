@@ -60,9 +60,11 @@ exports.app.get('/api/student/results', auth_student_middleware_1.authStudentMid
 exports.app.post('/api/student/order', auth_student_middleware_1.authStudentMiddleware, order_controller_1.OrderController.createOrder);
 exports.app.put('/api/student/order', auth_student_middleware_1.authStudentMiddleware, order_controller_1.OrderController.cancelOrder);
 exports.app.get('/api/student/order', auth_student_middleware_1.authStudentMiddleware, order_controller_1.OrderController.getOrderHistory);
+exports.app.put('/api/student/order/premium', auth_student_middleware_1.authStudentMiddleware, order_controller_1.OrderController.premiumOrder);
 // administrator
 exports.app.get('/api/admin/all-students', auth_admin_middleware_1.authAdminMiddleware, administrator_controller_1.AdministratorController.getAllStudents); // query page and limit
 exports.app.get('/api/admin/all-students/orders', auth_admin_middleware_1.authAdminMiddleware, administrator_controller_1.AdministratorController.getAllOrders); // query page and limit
 exports.app.put('/api/admin/student', auth_admin_middleware_1.authAdminMiddleware, administrator_controller_1.AdministratorController.updateStudentLimit); // query student_id and order_id
 exports.app.put('/api/admin/student/return', auth_admin_middleware_1.authAdminMiddleware, administrator_controller_1.AdministratorController.returnLimit); // query student_id and order_id
 exports.app.delete('/api/admin/logout', auth_admin_middleware_1.authAdminMiddleware, administrator_controller_1.AdministratorController.logoutAdmin);
+exports.app.put('api/admin/student/membership', auth_admin_middleware_1.authAdminMiddleware, administrator_controller_1.AdministratorController.updatePremiumStudent); // query student_id

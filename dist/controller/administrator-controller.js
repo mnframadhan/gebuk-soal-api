@@ -91,6 +91,20 @@ class AdministratorController {
             }
         });
     }
+    static updatePremiumStudent(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const student_id = req.query.student_id;
+                const response = yield administrator_service_1.AdministratorService.updatePremiumStudent(student_id);
+                res.status(200);
+                res.json(response);
+            }
+            catch (error) {
+                console.log(error);
+                next(error);
+            }
+        });
+    }
     static returnLimit(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

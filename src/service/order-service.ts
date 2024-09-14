@@ -35,6 +35,23 @@ export class OrderService {
 
     }
 
+    static async premiumOrder(student: Student) : Promise<{message: string, status_updated: string}> {
+
+        await prismaClient.student.update({
+            where: {
+                id: student.id
+            },
+            data: {
+                premium_request : "Menunggu Pembayaran"
+            }
+        })
+
+        return {
+            message: "Success",
+            status_updated: "Menunggu Pembayaran"
+        }
+    }
+
     static async cancelOrder(orderID: string, student: Student) {
 
         // update order status to cancelled

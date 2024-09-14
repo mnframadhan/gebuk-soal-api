@@ -32,6 +32,22 @@ class OrderService {
             return (0, order_model_1.toOrderResonse)(response);
         });
     }
+    static premiumOrder(student) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield database_1.prismaClient.student.update({
+                where: {
+                    id: student.id
+                },
+                data: {
+                    premium_request: "Menunggu Pembayaran"
+                }
+            });
+            return {
+                message: "Success",
+                status_updated: "Menunggu Pembayaran"
+            };
+        });
+    }
     static cancelOrder(orderID, student) {
         return __awaiter(this, void 0, void 0, function* () {
             // update order status to cancelled

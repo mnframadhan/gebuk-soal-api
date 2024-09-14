@@ -189,7 +189,8 @@ export class AdministratorService {
             },
             data: {
                 membership: "Premium",
-                premium_at: new Date(date)
+                premium_at: new Date(date),
+                premium_request: "Completed"
             },
         })
     }

@@ -82,6 +82,7 @@ app.get('/api/student/results', authStudentMiddleware, WorksController.getTodayR
 app.post('/api/student/order', authStudentMiddleware, OrderController.createOrder)
 app.put('/api/student/order', authStudentMiddleware, OrderController.cancelOrder)
 app.get('/api/student/order', authStudentMiddleware, OrderController.getOrderHistory)
+app.put('/api/student/order/premium', authStudentMiddleware, OrderController.premiumOrder)
 
 // administrator
 app.get('/api/admin/all-students', authAdminMiddleware, AdministratorController.getAllStudents) // query page and limit

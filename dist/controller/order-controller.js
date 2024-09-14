@@ -54,5 +54,18 @@ class OrderController {
             }
         });
     }
+    static premiumOrder(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const response = yield order_service_1.OrderService.premiumOrder(req.student);
+                res.status(200);
+                res.json(response);
+            }
+            catch (err) {
+                console.log(err);
+                next(err);
+            }
+        });
+    }
 }
 exports.OrderController = OrderController;

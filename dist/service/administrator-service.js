@@ -167,6 +167,21 @@ class AdministratorService {
             return response;
         });
     }
+    static updatePremiumStudent(student_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const date = Date.now();
+            yield database_1.prismaClient.student.update({
+                where: {
+                    id: student_id
+                },
+                data: {
+                    membership: "Premium",
+                    premium_at: new Date(date),
+                    premium_request: "Completed"
+                },
+            });
+        });
+    }
     static logoutCurrentAdmin(admin) {
         return __awaiter(this, void 0, void 0, function* () {
             yield database_1.prismaClient.administrator.update({

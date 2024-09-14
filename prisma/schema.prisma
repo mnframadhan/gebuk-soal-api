@@ -50,6 +50,7 @@ model Student {
   token String?
   membership String @default("Basic")
   avatar String?
+  premium_request String @default("None")
   premium_at DateTime?
   works Work[]
   result Result[]

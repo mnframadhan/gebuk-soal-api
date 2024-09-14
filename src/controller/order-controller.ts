@@ -53,4 +53,17 @@ export class OrderController {
             next(err);
         }
     }
+
+    static async premiumOrder(req: StudentReq, res: Response, next: NextFunction) {
+
+        try {
+            const response = await OrderService.premiumOrder(req.student!)
+            res.status(200);
+            res.json(response);
+        } catch (err) {
+            console.log(err)
+            next(err);
+        }
+
+    }
 }
