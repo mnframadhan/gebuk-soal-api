@@ -77,5 +77,4 @@ export function toWorkResponse(works: Work) {
         result: works.result,
         created_at: works.created_at,
     }
-
 }

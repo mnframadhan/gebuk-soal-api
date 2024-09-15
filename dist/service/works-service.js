@@ -15,6 +15,7 @@ const works_model_1 = require("../model/works-model");
 const uuid_1 = require("uuid");
 const soal_model_1 = require("../model/soal-model");
 const create_works_update_1 = require("../helpers/create-works-update");
+const get_soal_works_1 = require("../helpers/get-soal-works");
 class WorksService {
     static getRemainingLimit(student) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -52,6 +53,25 @@ class WorksService {
                 ORDER BY RAND()
                 LIMIT 1`;
                 return (0, soal_model_1.toSoalResponsePagination)(soal.map(({ category, type, label, question, option1, option2, option3, option4, option5, id, text }) => ({ category, type, label, question, option1, option2, option3, option4, option5, id, text })), pagination);
+            }
+        });
+    }
+    static getWorks(student, category, page, remaining_limit) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const pagination = {
+                size: 1,
+                total_page: remaining_limit,
+                current_page: page
+            };
+            if (category === "none") {
+                const soals = yield (0, get_soal_works_1.getSoalWithExcludedIds)(student.username);
+                console.log("none");
+                return { pagination: pagination, data: [soals] };
+            }
+            else {
+                console.log("by category");
+                const soals = yield (0, get_soal_works_1.getSoalWithExcludedIdsbyCat)(student.username, category);
+                return { pagination: pagination, data: [soals] };
             }
         });
     }

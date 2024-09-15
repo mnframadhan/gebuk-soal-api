@@ -20,6 +20,23 @@ export class WorksController {
 
     }
 
+    static async getWorks(req: StudentReq, res: Response, next: NextFunction) {
+        try {
+
+            const category : string = req.query.category as string;
+            const page : number = Number(req.query.page);
+
+            const remaining_limit : number = Number(req.query.remaining_limit);
+            const response = await WorksService.getWorks(req.student!, category, page, remaining_limit)
+            
+            res.status(200);
+            res.json(response);
+
+        } catch (err) {
+            next(err);
+        }
+    }
+
     static async createWorks(req: StudentReq, res: Response, next: NextFunction) {
 
         try {

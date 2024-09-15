@@ -61,18 +61,18 @@ app.get(
     '/api/student/works', 
     authStudentMiddleware, 
     limiter,
-    WorksController.getSoalForWorks) //  query page, remaining_limit,
+    WorksController.getWorks) //  query page, remaining_limit,
     
 app.get(
     '/api/student/works/limit-plus', 
     authStudentMiddleware, 
     plusLimiter, 
-    WorksController.getSoalForWorks) //  category, query page, remaining_limit,
+    WorksController.getWorks) //  category, query page, remaining_limit,
 
 app.get(
     '/api/student/works/premium', 
     authStudentMiddleware,
-    WorksController.getSoalForWorks) //  category, query page, remaining_limit,
+    WorksController.getWorks) //  category, query page, remaining_limit,
 
 // student api works results
 app.post('/api/student/results', authStudentMiddleware, WorksController.createTodayResults) // maximum n of request 20 per 15 minutes

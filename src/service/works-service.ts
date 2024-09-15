@@ -2,12 +2,11 @@ import { Student } from "@prisma/client";
 import { prismaClient } from "../application/database";
 import { ResultsResponse, toWorkResponse, toWorksResultsResponse, WorksRequest, WorksResultsResponse } from "../model/works-model";
 import { v4 as uuid, v4 } from "uuid";
-import { Pageable } from "../model/pages";
-import { ShowedSoalResponse, SoalResponse } from "../model/soal-model";
-import { getRandomInt } from "../helpers/get-random-integer";
+import { ShowedSoalResponse } from "../model/soal-model";
 import { Paging } from "../model/pages";
 import { toSoalResponsePagination } from "../model/soal-model";
 import { updateStudentNSoal } from "../helpers/create-works-update";
+import { getSoalWithExcludedIds, getSoalWithExcludedIdsbyCat } from "../helpers/get-soal-works";
 
 export class WorksService {
 
@@ -36,7 +35,7 @@ export class WorksService {
                 WHERE category="Tes Intelegensi Umum"
                 ORDER BY RAND()
                 LIMIT 1`;
-            
+
             return toSoalResponsePagination(soal.map(({ category, type, label, question, option1, option2, option3, option4, option5, id, text }) => ({ category, type, label, question, option1, option2, option3, option4, option5, id, text })), pagination)
 
         } else if (category === "TWK") {
@@ -46,7 +45,7 @@ export class WorksService {
                 WHERE category="Tes Wawasan Kebangsaan"
                 ORDER BY RAND()
                 LIMIT 1`;
-            
+
             return toSoalResponsePagination(soal.map(({ category, type, label, question, option1, option2, option3, option4, option5, id, text }) => ({ category, type, label, question, option1, option2, option3, option4, option5, id, text })), pagination)
 
         } else if (!category) {
@@ -55,14 +54,32 @@ export class WorksService {
                 SELECT * FROM soals
                 ORDER BY RAND()
                 LIMIT 1`;
-            
+
             return toSoalResponsePagination(soal.map(({ category, type, label, question, option1, option2, option3, option4, option5, id, text }) => ({ category, type, label, question, option1, option2, option3, option4, option5, id, text })), pagination)
 
         }
-}
+    }
+
+    static async getWorks(student: Student, category: string, page: number, remaining_limit: number) {
+
+        const pagination: Paging = {
+            size: 1,
+            total_page: remaining_limit,
+            current_page: page
+        }
+
+        if (category==="none") {
+            const soals = await getSoalWithExcludedIds(student.username)
+            console.log("none")
+            return {pagination: pagination, data: [soals]}
+        } else {
+            console.log("by category")
+            const soals = await getSoalWithExcludedIdsbyCat(student.username, category!)
+            return {pagination: pagination, data: [soals]}
+        }
+    }
 
     static async createWorks(request: WorksRequest, student: Student, soal: string) {
-
 
         // get currentSoal
         const currentSoal = await prismaClient.soal.findFirst({

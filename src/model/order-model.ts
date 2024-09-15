@@ -48,5 +48,4 @@ export function toOrderResponsePagination(data: OrderResponse[], pagination: Pag
         data: data as Array<OrderResponse>,
         pagination: pagination
     }
-
 }
