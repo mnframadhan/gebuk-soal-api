@@ -60,6 +60,111 @@ model Student {
 
 }
 
+model Company {
+  id String @id @unique @default(uuid())
+  brand_name String
+  legal_name String
+  email String
+  phone String
+  address String
+  password String
+  sector String
+  sub_sector String?
+  n_employee String
+  n_package Int @default(0)
+  n_applicant Int @default(0)
+  token String?
+  created_at DateTime @default(now())
+  PackageTestUnit PackageTestUnit[]
+
+  @@map("companies")
+}
+
+model PackageTestUnit {
+  id String @id @unique @default(uuid())
+  package_name String
+  company_id String
+  company Company @relation(fields: [company_id], references: [id])
+  label String?
+  category String?
+  section String?
+  text String? @db.LongText
+  text_image String?
+  queston String?
+  option1 String? @db.LongText
+  option1_point Int?
+  option1_image String?
+  option2 String? @db.LongText
+  option2_point Int?
+  option2_image String?
+  option3 String? @db.LongText
+  option3_point Int?
+  option3_image String?
+  option4 String? @db.LongText
+  option4_point Int?
+  option4_image String?
+  option5 String? @db.LongText
+  option5_point Int?
+  option5_image String?
+  unique_answer String?
+  token String?
+  expired_date DateTime
+  max_duration Int
+  created_at DateTime @default(now())
+  packageTestWorks PackageTestWorks[]
+
+  @@map("package_units")
+  
+}
+
+model Candidate {
+
+  id String @id @unique @default(uuid())
+  full_name String
+  email String
+  address String
+  phone String
+  password String
+  cv String?
+  token String?
+  created_at DateTime @default(now())
+  PackageTestWorks PackageTestWorks[]
+  PackageTestResults PackageTestResults[]
+
+  @@map("candidates")
+}
+
+model PackageTestWorks {
+
+  id String @id @default(uuid())
+  package_test_id String
+  package_test_unit PackageTestUnit @relation(fields: [package_test_id], references: [id])
+  candidate_id String 
+  candidate Candidate @relation(fields: [candidate_id], references: [id])
+  answer String
+  start_time Int
+  point Int
+
+  @@map("packageTestUnitWorks")
+}
+
+model PackageTestResults {
+
+  id String @id @default(uuid())
+  package_test_unit_id String
+  candidate_id String
+  Candidate Candidate @relation(fields: [candidate_id], references: [id])
+  duration Int
+  start_time Int
+  end_time Int
+  n_true Int
+  n_false Int
+  points Int
+  results Boolean
+  
+  @@map("packageTestResults")
+}
+
 model Order {
 
   id String @id @unique

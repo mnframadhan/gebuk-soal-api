@@ -94,39 +94,6 @@ export class StudentService {
         return toStudentResponse(student)
     }
 
-    static async getStudentLeaderBoard(page: number, limit: number) : Promise<StudentLeaderboardResponse<LeaderboardStudentData>> {
-
-        // get the leaderboard from database
-        const skip = (page - 1) * limit;
-        const pagination: Paging = {
-            size: limit,
-            total_page: Math.ceil(Number(await prismaClient.student.count({})) / limit),
-            current_page: page
-        };
-
-        const student = await prismaClient.student.findMany({
-
-            orderBy: {
-                points: "desc"
-            },
-            skip: skip,
-            take: limit
-        });
-
-        if(!student) {
-            throw new ResponseError(404, "Not Found")
-        };
-
-        const data = student.map((
-
-            ({username, points}) => ({username, points})
-        
-        ))
-        
-        return toStudentLeaderboardResponse(data, pagination)
-
-    }
-
     static async updateStudent(request: StudentUpdateRequest, student: Student) : Promise<{id: string, avatar: string,  message: string}> {
 
         // validation

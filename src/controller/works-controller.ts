@@ -53,25 +53,6 @@ export class WorksController {
         }
     }
 
-    static async getSoalForWorks(req: StudentReq,  res: Response, next: NextFunction) {
-
-        try {
-
-
-            const category = req.query.category as string;
-            const page : number = Number(req.query.page);
-            const remaining_limit : number = Number(req.query.remaining_limit);
-
-            const response = await WorksService.getSoalForWorks(category, page, remaining_limit)
-
-            res.status(200);
-            res.json(response);
-
-        } catch (err) {
-            next(err);
-        }
-    } 
-
     static async createTodayResults(req: StudentReq, res: Response, next: NextFunction) {
 
         try {

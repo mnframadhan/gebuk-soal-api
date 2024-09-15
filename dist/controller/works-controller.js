@@ -53,21 +53,6 @@ class WorksController {
             }
         });
     }
-    static getSoalForWorks(req, res, next) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const category = req.query.category;
-                const page = Number(req.query.page);
-                const remaining_limit = Number(req.query.remaining_limit);
-                const response = yield works_service_1.WorksService.getSoalForWorks(category, page, remaining_limit);
-                res.status(200);
-                res.json(response);
-            }
-            catch (err) {
-                next(err);
-            }
-        });
-    }
     static createTodayResults(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

@@ -119,29 +119,6 @@ class ContributoService {
             return (0, contributor_model_1.toMinimizedSoalCreatedResponse)(data, pagination);
         });
     }
-    static getLeaderboard(page, limit) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const skip = (page - 1) * limit;
-            const pagination = {
-                size: limit,
-                total_page: Math.ceil(Number(yield database_1.prismaClient.contributor.count()) / limit),
-                current_page: page
-            };
-            const contributors = yield database_1.prismaClient.contributor.findMany({
-                orderBy: {
-                    contribution_points: "desc"
-                },
-                skip: skip,
-                take: limit
-            });
-            if (!contributors) {
-                throw new response_error_1.ResponseError(404, "Not Found");
-            }
-            ;
-            const data = contributors.map((({ username, contribution_points, n_soal }) => ({ username, contribution_points, n_soal })));
-            return (0, contributor_model_1.toContributorLeaderboard)(data, pagination);
-        });
-    }
     static logoutCurrentContributor(contributor) {
         return __awaiter(this, void 0, void 0, function* () {
             yield database_1.prismaClient.contributor.update({

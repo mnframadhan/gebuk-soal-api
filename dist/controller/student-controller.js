@@ -69,20 +69,6 @@ class StudentController {
             }
         });
     }
-    static getStudentLeaderBoard(req, res, next) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const page = parseInt(req.params.page) | 1;
-                const limit = parseInt(req.params.limit) | 5;
-                const response = yield student_service_1.StudentService.getStudentLeaderBoard(page, limit);
-                res.status(200);
-                res.json(response);
-            }
-            catch (err) {
-                next(err);
-            }
-        });
-    }
     static logoutStudent(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

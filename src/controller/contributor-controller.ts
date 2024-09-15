@@ -62,25 +62,6 @@ export class ContributorController {
 
     }
 
-    static async getContributorLeaderboard(req: ContributorReq, res: Response, next: NextFunction) {
-
-        try {
-            // define request and response
-            const page : number = parseInt(req.query.page as string) || 1;
-            const limit : number = parseInt(req.query.limit as string) || 10;
-
-            const response = await ContributoService.getLeaderboard(page, limit);
-            
-            res.status(200);
-            res.json(response);
-
-        } catch (err) {
-
-            console.log(err);
-            next(err)
-        }
-    }
-
     static async currentContributor (req: ContributorReq, res: Response, next: NextFunction) {
 
         try {

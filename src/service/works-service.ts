@@ -2,9 +2,7 @@ import { Student } from "@prisma/client";
 import { prismaClient } from "../application/database";
 import { ResultsResponse, toWorkResponse, toWorksResultsResponse, WorksRequest, WorksResultsResponse } from "../model/works-model";
 import { v4 as uuid, v4 } from "uuid";
-import { ShowedSoalResponse } from "../model/soal-model";
 import { Paging } from "../model/pages";
-import { toSoalResponsePagination } from "../model/soal-model";
 import { updateStudentNSoal } from "../helpers/create-works-update";
 import { getSoalWithExcludedIds, getSoalWithExcludedIdsbyCat } from "../helpers/get-soal-works";
 
@@ -15,49 +13,6 @@ export class WorksService {
         const response = { remaining_limit: student.quota, membership: student.membership }
         return response
 
-    }
-
-    static async getSoalForWorks(category: string, page: number, remaining_limit: number) {
-
-
-        const pagination: Paging = {
-            size: 1,
-            total_page: remaining_limit,
-            current_page: page
-        }
-
-        let soal: ShowedSoalResponse[] = []
-
-
-        if (category === "TIU") {
-            soal = await prismaClient.$queryRaw`
-                SELECT * FROM soals
-                WHERE category="Tes Intelegensi Umum"
-                ORDER BY RAND()
-                LIMIT 1`;
-
-            return toSoalResponsePagination(soal.map(({ category, type, label, question, option1, option2, option3, option4, option5, id, text }) => ({ category, type, label, question, option1, option2, option3, option4, option5, id, text })), pagination)
-
-        } else if (category === "TWK") {
-
-            soal = await prismaClient.$queryRaw`
-                SELECT * FROM soals
-                WHERE category="Tes Wawasan Kebangsaan"
-                ORDER BY RAND()
-                LIMIT 1`;
-
-            return toSoalResponsePagination(soal.map(({ category, type, label, question, option1, option2, option3, option4, option5, id, text }) => ({ category, type, label, question, option1, option2, option3, option4, option5, id, text })), pagination)
-
-        } else if (!category) {
-
-            soal = await prismaClient.$queryRaw`
-                SELECT * FROM soals
-                ORDER BY RAND()
-                LIMIT 1`;
-
-            return toSoalResponsePagination(soal.map(({ category, type, label, question, option1, option2, option3, option4, option5, id, text }) => ({ category, type, label, question, option1, option2, option3, option4, option5, id, text })), pagination)
-
-        }
     }
 
     static async getWorks(student: Student, category: string, page: number, remaining_limit: number) {

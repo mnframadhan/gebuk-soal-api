@@ -10,6 +10,7 @@ import { globalLimiter, limiter, plusLimiter } from '../middleware/request-limit
 import { OrderController } from '../controller/order-controller';
 import { AdministratorController } from '../controller/administrator-controller';
 import { authAdminMiddleware } from '../middleware/auth-admin-middleware';
+import { PublicInfoController } from '../controller/public-info-controller';
 
 export const app = express();
 
@@ -21,14 +22,15 @@ app.use(cors({
 app.use(globalLimiter)  // limited maximum only 100 requests per minute
   
 // PUBLIC API
+//public info
+app.get('/api/info', PublicInfoController.getPublicInfo)
+
 // contributors
 app.post('/api/contrib/register', ContributorController.createContributor)
 app.post('/api/contrib/login', ContributorController.loginContributor)
-app.get('/api/contrib/leaderboard', ContributorController.getContributorLeaderboard)
 // students
 app.post('/api/stud/register', StudentController.createStudent )
 app.post('/api/stud/login', StudentController.loginStudent)
-app.get('/api/stud/leaderboard', StudentController.getStudentLeaderBoard) // query page and limit
 // admin
 // app.post('/api/admin/register', AdministratorController.createAdmin)
 app.post('/api/admin/login', AdministratorController.loginAdmin)

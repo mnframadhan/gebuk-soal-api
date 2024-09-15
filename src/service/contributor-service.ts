@@ -145,40 +145,6 @@ export class ContributoService {
         return toMinimizedSoalCreatedResponse(data, pagination)
     }
 
-    static async getLeaderboard(page: number, limit: number) : Promise<Pageable<SmallContributorResponse>> {
-
-        const skip = (page - 1) * limit;
-        
-        const pagination: Paging = {
-
-            size: limit,
-            total_page: Math.ceil(Number(await prismaClient.contributor.count()) / limit),
-            current_page: page
-
-        };
-
-        const contributors = await prismaClient.contributor.findMany({
-
-            orderBy: {
-                contribution_points: "desc"
-            },
-            skip: skip,
-            take: limit
-        });
-
-        if (!contributors) {
-            throw new ResponseError(404, "Not Found")
-        };
-
-        const data = contributors.map((
-
-            ({username, contribution_points, n_soal}) => ({username, contribution_points, n_soal})
-        
-        ))
-        
-        return toContributorLeaderboard( data, pagination);
-    }
-
     static async logoutCurrentContributor(contributor: Contributor) : Promise<void> {
 
         await prismaClient.contributor.update({

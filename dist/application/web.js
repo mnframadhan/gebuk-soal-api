@@ -16,6 +16,7 @@ const request_limiter_1 = require("../middleware/request-limiter");
 const order_controller_1 = require("../controller/order-controller");
 const administrator_controller_1 = require("../controller/administrator-controller");
 const auth_admin_middleware_1 = require("../middleware/auth-admin-middleware");
+const public_info_controller_1 = require("../controller/public-info-controller");
 exports.app = (0, express_1.default)();
 exports.app.use(express_1.default.json());
 exports.app.use((0, cors_1.default)({
@@ -24,14 +25,14 @@ exports.app.use((0, cors_1.default)({
 }));
 exports.app.use(request_limiter_1.globalLimiter); // limited maximum only 100 requests per minute
 // PUBLIC API
+//public info
+exports.app.get('/api/info', public_info_controller_1.PublicInfoController.getPublicInfo);
 // contributors
 exports.app.post('/api/contrib/register', contributor_controller_1.ContributorController.createContributor);
 exports.app.post('/api/contrib/login', contributor_controller_1.ContributorController.loginContributor);
-exports.app.get('/api/contrib/leaderboard', contributor_controller_1.ContributorController.getContributorLeaderboard);
 // students
 exports.app.post('/api/stud/register', student_controller_1.StudentController.createStudent);
 exports.app.post('/api/stud/login', student_controller_1.StudentController.loginStudent);
-exports.app.get('/api/stud/leaderboard', student_controller_1.StudentController.getStudentLeaderBoard); // query page and limit
 // admin
 // app.post('/api/admin/register', AdministratorController.createAdmin)
 exports.app.post('/api/admin/login', administrator_controller_1.AdministratorController.loginAdmin);

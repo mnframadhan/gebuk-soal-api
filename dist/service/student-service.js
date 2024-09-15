@@ -84,30 +84,6 @@ class StudentService {
             return (0, student_model_1.toStudentResponse)(student);
         });
     }
-    static getStudentLeaderBoard(page, limit) {
-        return __awaiter(this, void 0, void 0, function* () {
-            // get the leaderboard from database
-            const skip = (page - 1) * limit;
-            const pagination = {
-                size: limit,
-                total_page: Math.ceil(Number(yield database_1.prismaClient.student.count({})) / limit),
-                current_page: page
-            };
-            const student = yield database_1.prismaClient.student.findMany({
-                orderBy: {
-                    points: "desc"
-                },
-                skip: skip,
-                take: limit
-            });
-            if (!student) {
-                throw new response_error_1.ResponseError(404, "Not Found");
-            }
-            ;
-            const data = student.map((({ username, points }) => ({ username, points })));
-            return (0, student_model_1.toStudentLeaderboardResponse)(data, pagination);
-        });
-    }
     static updateStudent(request, student) {
         return __awaiter(this, void 0, void 0, function* () {
             // validation

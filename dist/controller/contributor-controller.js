@@ -60,22 +60,6 @@ class ContributorController {
             }
         });
     }
-    static getContributorLeaderboard(req, res, next) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                // define request and response
-                const page = parseInt(req.query.page) || 1;
-                const limit = parseInt(req.query.limit) || 10;
-                const response = yield contributor_service_1.ContributoService.getLeaderboard(page, limit);
-                res.status(200);
-                res.json(response);
-            }
-            catch (err) {
-                console.log(err);
-                next(err);
-            }
-        });
-    }
     static currentContributor(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

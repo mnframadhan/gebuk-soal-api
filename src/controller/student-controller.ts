@@ -71,22 +71,6 @@ export class StudentController {
         }   
     }
 
-    static async getStudentLeaderBoard(req: StudentReq, res: Response, next: NextFunction) {
-
-        try {
-
-            const page : number = parseInt(req.params.page) | 1;
-            const limit : number = parseInt(req.params.limit) | 5;
-            const response = await StudentService.getStudentLeaderBoard(page, limit);
-
-            res.status(200);
-            res.json(response);
-        } catch (err) {
-            next(err);
-        }
-
-    }
-
     static async logoutStudent (req: StudentReq, res: Response, next: NextFunction) {
 
         try {

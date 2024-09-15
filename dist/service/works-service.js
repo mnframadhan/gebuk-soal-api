@@ -13,7 +13,6 @@ exports.WorksService = void 0;
 const database_1 = require("../application/database");
 const works_model_1 = require("../model/works-model");
 const uuid_1 = require("uuid");
-const soal_model_1 = require("../model/soal-model");
 const create_works_update_1 = require("../helpers/create-works-update");
 const get_soal_works_1 = require("../helpers/get-soal-works");
 class WorksService {
@@ -21,39 +20,6 @@ class WorksService {
         return __awaiter(this, void 0, void 0, function* () {
             const response = { remaining_limit: student.quota, membership: student.membership };
             return response;
-        });
-    }
-    static getSoalForWorks(category, page, remaining_limit) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const pagination = {
-                size: 1,
-                total_page: remaining_limit,
-                current_page: page
-            };
-            let soal = [];
-            if (category === "TIU") {
-                soal = yield database_1.prismaClient.$queryRaw `
-                SELECT * FROM soals
-                WHERE category="Tes Intelegensi Umum"
-                ORDER BY RAND()
-                LIMIT 1`;
-                return (0, soal_model_1.toSoalResponsePagination)(soal.map(({ category, type, label, question, option1, option2, option3, option4, option5, id, text }) => ({ category, type, label, question, option1, option2, option3, option4, option5, id, text })), pagination);
-            }
-            else if (category === "TWK") {
-                soal = yield database_1.prismaClient.$queryRaw `
-                SELECT * FROM soals
-                WHERE category="Tes Wawasan Kebangsaan"
-                ORDER BY RAND()
-                LIMIT 1`;
-                return (0, soal_model_1.toSoalResponsePagination)(soal.map(({ category, type, label, question, option1, option2, option3, option4, option5, id, text }) => ({ category, type, label, question, option1, option2, option3, option4, option5, id, text })), pagination);
-            }
-            else if (!category) {
-                soal = yield database_1.prismaClient.$queryRaw `
-                SELECT * FROM soals
-                ORDER BY RAND()
-                LIMIT 1`;
-                return (0, soal_model_1.toSoalResponsePagination)(soal.map(({ category, type, label, question, option1, option2, option3, option4, option5, id, text }) => ({ category, type, label, question, option1, option2, option3, option4, option5, id, text })), pagination);
-            }
         });
     }
     static getWorks(student, category, page, remaining_limit) {
