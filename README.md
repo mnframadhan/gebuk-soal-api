@@ -139,6 +139,22 @@ app.listen(3000, () => {
 DATABASE_URL="mysql://<username>:<password>@localhost:<PORT>/<database-name>"
 ```
 
+## Set up your credentials/serviceAccount.json
+```json 
+{
+  "type": "service_account",
+  "project_id": "<your-project-id>",
+  "private_key_id": "<your-private-key-id>",
+  "private_key": "<your-private-key>",
+  "client_email": "<your-client-email>",
+  "client_id": "<your-client-id>",
+  "auth_uri": "<your-auth-uri>",
+  "token_uri": "<your-token-uri>",
+  "auth_provider_x509_cert_url": "<your-cert-url>",
+  "client_x509_cert_url": "<your-client-url>",
+  "universe_domain": "googleapis.com"
+}
+```
 
 ## Install Dependencies
 ```
