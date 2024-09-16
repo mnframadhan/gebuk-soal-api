@@ -1,26 +1,27 @@
-import express from 'express';
-import { ContributorController } from '../controller/contributor-controller';
-import { StudentController } from '../controller/student-controller';
-import { authMiddleware } from '../middleware/auth-middleware';
-import { SoalController } from '../controller/soal-controller';
-import { authStudentMiddleware } from '../middleware/auth-student-middleware';
-import { WorksController } from '../controller/works-controller';
 import cors from 'cors';
-import { globalLimiter, limiter, plusLimiter } from '../middleware/request-limiter';
-import { OrderController } from '../controller/order-controller';
+import express, { Request, Response } from 'express';
 import { AdministratorController } from '../controller/administrator-controller';
-import { authAdminMiddleware } from '../middleware/auth-admin-middleware';
+import { ContributorController } from '../controller/contributor-controller';
+import { OrderController } from '../controller/order-controller';
 import { PublicInfoController } from '../controller/public-info-controller';
+import { SoalController } from '../controller/soal-controller';
+import { StudentController } from '../controller/student-controller';
+import { WorksController } from '../controller/works-controller';
+import { authAdminMiddleware } from '../middleware/auth-admin-middleware';
+import { authMiddleware } from '../middleware/auth-middleware';
+import { authStudentMiddleware } from '../middleware/auth-student-middleware';
+import { globalLimiter, limiter, plusLimiter } from '../middleware/request-limiter';
+import { upload } from '../middleware/upload-file-middleware';
+import { bucket } from './firebase';
 
 export const app = express();
-
 app.use(express.json());
 app.use(cors({
   origin: 'http://localhost:5173', // Specify the allowed origin
   credentials: true                // Allow credentials (cookies, authorization headers)
 }));
 app.use(globalLimiter)  // limited maximum only 100 requests per minute
-  
+
 // PUBLIC API
 //public info
 app.get('/api/info', PublicInfoController.getPublicInfo)
@@ -92,4 +93,40 @@ app.get('/api/admin/all-students/orders', authAdminMiddleware, AdministratorCont
 app.put('/api/admin/student', authAdminMiddleware, AdministratorController.updateStudentLimit) // query student_id and order_id
 app.put('/api/admin/student/return', authAdminMiddleware, AdministratorController.returnLimit) // query student_id and order_id
 app.delete('/api/admin/logout', authAdminMiddleware, AdministratorController.logoutAdmin)
-app.put('api/admin/student/membership', authAdminMiddleware, AdministratorController.updatePremiumStudent) // query student_id
+app.put('/api/admin/student/membership', authAdminMiddleware, AdministratorController.updatePremiumStudent) // query student_id
+
+app.post('/api/uploads', upload.single('image'), async(req: Request, res: Response) => {
+
+    try {
+        if(!req.file) {
+            return res.status(400).json({message: "No file uploaded"});
+        }
+
+        const file = req.file;
+
+        const blob = bucket.file(`${Date.now()}_${file.originalname}`);
+
+        const blobStream = blob.createWriteStream({
+            metadata: {
+                contentType: file.mimetype,
+            }
+        });
+
+        blobStream.on('error', (err) => {
+
+            console.log(err)
+            return res.status(500).json({message: "Unable to upload file."});
+        });
+
+        blobStream.on('finish', () => {
+            const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
+            res.status(200).send({fileName: file.originalname, url: publicUrl})
+        })
+
+        blobStream.end(file.buffer);
+    } catch (err) {
+
+        console.log(err);
+        res.status(500).json({message: "Error uploading file."});
+    }
+})

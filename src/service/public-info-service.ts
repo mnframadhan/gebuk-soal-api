@@ -1,17 +1,7 @@
 import { prismaClient } from "../application/database";
 import { ResponseError } from "../error/response-error";
-import { SmallContributorResponse, toContributorLeaderboard } from "../model/contributor-model";
-import { Pageable, Paging } from "../model/pages";
-import { LeaderboardStudentData, StudentLeaderboardResponse, toStudentLeaderboardResponse } from "../model/student-model";
-
-type PublicInfo = {
-
-    n_soal: number;
-    student_leaderboard: StudentLeaderboardResponse<LeaderboardStudentData>;
-    contributor_leaderboard: Promise<Pageable<SmallContributorResponse>>;
-
-
-}
+import { SmallContributorResponse } from "../model/contributor-model";
+import { LeaderboardStudentData } from "../model/student-model";
 
 export class PublicInfoServices {
 

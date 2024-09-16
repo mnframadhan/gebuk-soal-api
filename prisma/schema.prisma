@@ -74,7 +74,7 @@ model Company {
   n_package Int @default(0)
   n_applicant Int @default(0)
   token String?
-  created_at DateTime @default(now())
+  created_at Int
   PackageTestUnit PackageTestUnit[]
 
   @@map("companies")
@@ -110,7 +110,7 @@ model PackageTestUnit {
   token String?
   expired_date DateTime
   max_duration Int
-  created_at DateTime @default(now())
+  created_at Int
   packageTestWorks PackageTestWorks[]
 
   @@map("package_units")
@@ -127,7 +127,7 @@ model Candidate {
   password String
   cv String?
   token String?
-  created_at DateTime @default(now())
+  created_at Int
   PackageTestWorks PackageTestWorks[]
   PackageTestResults PackageTestResults[]
 
