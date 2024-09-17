@@ -13,6 +13,8 @@ import { authStudentMiddleware } from '../middleware/auth-student-middleware';
 import { globalLimiter, limiter, plusLimiter } from '../middleware/request-limiter';
 import { upload } from '../middleware/upload-file-middleware';
 import { bucket } from './firebase';
+import { CompanyController } from '../controller/company-controller';
+import { authCompanyMiddleware } from '../middleware/auth-company-middleware';
 
 export const app = express();
 app.use(express.json());
@@ -36,6 +38,9 @@ app.post('/api/stud/login', StudentController.loginStudent)
 // app.post('/api/admin/register', AdministratorController.createAdmin)
 app.post('/api/admin/login', AdministratorController.loginAdmin)
 
+// companies
+app.post('/api/comp/register', CompanyController.createCompany);
+app.post('/api/comp/login', CompanyController.loginCompany);
 
 // PRIVATE API
 // contributor api
@@ -43,7 +48,6 @@ app.get('/api/contributor/current', authMiddleware, ContributorController.curren
 app.delete('/api/contributor/current', authMiddleware, ContributorController.logoutContributor)
 app.post('/api/contributor/soal', authMiddleware, SoalController.createSoal)
 app.get('/api/contributor/current/soal', authMiddleware, ContributorController.getSoalCreated)
-
 
 // student api
 app.get('/api/student/current', authStudentMiddleware, StudentController.currentStudent)
@@ -53,29 +57,12 @@ app.put('/api/student/current', authStudentMiddleware, StudentController.updateS
 
 // student api works
 app.get('/api/student/works/limit', authStudentMiddleware, WorksController.getRemainingLimit)
-
-app.post(
-    '/api/student/works',  
-    authStudentMiddleware, 
-    WorksController.createWorks) // query soal (uuid) //
+app.post('/api/student/works', authStudentMiddleware, WorksController.createWorks) // query soal (uuid) //
 
 // student api works by membership
-app.get(
-    '/api/student/works', 
-    authStudentMiddleware, 
-    limiter,
-    WorksController.getWorks) //  query page, remaining_limit,
-    
-app.get(
-    '/api/student/works/limit-plus', 
-    authStudentMiddleware, 
-    plusLimiter, 
-    WorksController.getWorks) //  category, query page, remaining_limit,
-
-app.get(
-    '/api/student/works/premium', 
-    authStudentMiddleware,
-    WorksController.getWorks) //  category, query page, remaining_limit,
+app.get('/api/student/works', authStudentMiddleware, limiter,WorksController.getWorks) //  query page, remaining_limit,    
+app.get('/api/student/works/limit-plus', authStudentMiddleware, plusLimiter, WorksController.getWorks) //  category, query page, remaining_limit,
+app.get('/api/student/works/premium', authStudentMiddleware,WorksController.getWorks) //  category, query page, remaining_limit,
 
 // student api works results
 app.post('/api/student/results', authStudentMiddleware, WorksController.createTodayResults) // maximum n of request 20 per 15 minutes
@@ -95,6 +82,11 @@ app.put('/api/admin/student/return', authAdminMiddleware, AdministratorControlle
 app.delete('/api/admin/logout', authAdminMiddleware, AdministratorController.logoutAdmin)
 app.put('/api/admin/student/membership', authAdminMiddleware, AdministratorController.updatePremiumStudent) // query student_id
 
+// company
+app.get('/api/company/current', authCompanyMiddleware, CompanyController.getCurrentCompany);
+app.delete('/api/company/current', authCompanyMiddleware, CompanyController.logoutCompany);
+
+// percobaan upload
 app.post('/api/uploads', upload.single('image'), async(req: Request, res: Response) => {
 
     try {

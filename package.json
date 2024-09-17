@@ -5,7 +5,7 @@
   "scripts": {
     "test": "jest",
     "build": "npx tsc",
-    "dev": "node dist/index.js"
+    "dev": "nodemon src/index.ts"
   },
   "jest": {
     "transform": {

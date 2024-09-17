@@ -64,7 +64,7 @@ model Company {
   id String @id @unique @default(uuid())
   brand_name String
   legal_name String
-  email String
+  email String @unique
   phone String
   address String
   password String
@@ -74,7 +74,7 @@ model Company {
   n_package Int @default(0)
   n_applicant Int @default(0)
   token String?
-  created_at Int
+  created_at String
   PackageTestUnit PackageTestUnit[]
 
   @@map("companies")
