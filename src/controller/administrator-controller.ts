@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { AdministratorRequest, AdministratorResponse } from "../model/administrator.model";
+import { AdministratorRequest, AdministratorResponse } from "../model/administrator-model";
 import { AdministratorService } from "../service/administrator-service";
 import { AdminReq } from "../types/admin-request";
 

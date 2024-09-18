@@ -55,6 +55,7 @@ model Student {
   works Work[]
   result Result[]
   order Order[]
+  candidate Candidate?
 
   @@map("students")
 
@@ -76,15 +77,14 @@ model Company {
   token String?
   created_at String
   banner_image String?
+  PackageBundle PackageBundle[]
   PackageTestUnit PackageTestUnit[]
-
 
   @@map("companies")
 }
 
 model PackageTestUnit {
   id String @id @unique @default(uuid())
-  package_name String
   company_id String
   company Company @relation(fields: [company_id], references: [id])
   label String?
@@ -110,42 +110,63 @@ model PackageTestUnit {
   option5_image String?
   unique_answer String?
   token String?
-  expired_date DateTime
-  max_duration Int
-  created_at Int
-  packageTestWorks PackageTestWorks[]
+  created_at String
+  package_bundle_id String
 
-  @@map("package_units")
+  packageBundle PackageBundle @relation(fields: [package_bundle_id], references: [id])
+  packageTestWorks PackageTestWorks[]
   
+  @@map("packageTestUnits")
+  
+}
+
+model PackageBundle {
+
+  id String @id @default(uuid())
+  package_name String
+  expired_date String
+  created_at String
+  token String?
+
+  company_id String
+  company Company @relation(fields: [company_id], references: [id])
+  packageTestUnit PackageTestUnit[]
+  packageTestResult PackageTestResults[]
+
+  @@map("packageBundles")
+
 }
 
 model Candidate {
 
   id String @id @unique @default(uuid())
+  student_id String @unique
+  student Student @relation(fields: [student_id], references: [id])
   full_name String
   email String
   address String
   phone String
-  password String
   cv String?
-  token String?
-  created_at Int
-  PackageTestWorks PackageTestWorks[]
-  PackageTestResults PackageTestResults[]
+  created_at String
+
+  packageTestWorks PackageTestWorks[]
+  packageTestResults PackageTestResults[]
+  
 
   @@map("candidates")
+
 }
 
 model PackageTestWorks {
 
   id String @id @default(uuid())
-  package_test_id String
-  package_test_unit PackageTestUnit @relation(fields: [package_test_id], references: [id])
-  candidate_id String 
-  candidate Candidate @relation(fields: [candidate_id], references: [id])
   answer String
   start_time Int
   point Int
+  candidate_id String
+  Candidate Candidate @relation(fields: [candidate_id], references: [id])
+  package_test_unit_id String
+  packageTestUnit PackageTestUnit @relation(fields: [package_test_unit_id], references: [id])
 
   @@map("packageTestUnitWorks")
 }
@@ -155,7 +176,6 @@ model PackageTestResults {
   id String @id @default(uuid())
   package_test_unit_id String
   candidate_id String
-  Candidate Candidate @relation(fields: [candidate_id], references: [id])
   duration Int
   start_time Int
   end_time Int
@@ -163,6 +183,9 @@ model PackageTestResults {
   n_false Int
   points Int
   results Boolean
+  package_bundle_id String
+  packageBundle PackageBundle @relation(fields: [package_bundle_id], references: [id])
+  Candidate Candidate @relation(fields: [candidate_id], references: [id])
   
   @@map("packageTestResults")
 }

@@ -119,4 +119,6 @@ export class CompanyController {
             next(error);
         }
     }
+
+    
 }

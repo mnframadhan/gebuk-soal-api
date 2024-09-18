@@ -1,5 +1,5 @@
 import { prismaClient } from "../application/database";
-import { AdministratorRequest, AdministratorResponse, StudentPagination } from "../model/administrator.model";
+import { AdministratorRequest, AdministratorResponse, StudentPagination } from "../model/administrator-model";
 import { v4 as uuid } from "uuid";
 
 import bcrypt from "bcrypt";

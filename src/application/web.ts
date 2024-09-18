@@ -15,6 +15,8 @@ import { upload } from '../middleware/upload-file-middleware';
 import { bucket } from './firebase';
 import { CompanyController } from '../controller/company-controller';
 import { authCompanyMiddleware } from '../middleware/auth-company-middleware';
+import { PackageBundleController } from '../controller/package-bundle-controller';
+import { PackageTestUnitController } from '../controller/package-test-unit-controller';
 
 export const app = express();
 app.use(express.json());
@@ -86,6 +88,17 @@ app.put('/api/admin/student/membership', authAdminMiddleware, AdministratorContr
 app.get('/api/company/current', authCompanyMiddleware, CompanyController.getCurrentCompany);
 app.delete('/api/company/current', authCompanyMiddleware, CompanyController.logoutCompany);
 app.put('/api/company/current/banner', authCompanyMiddleware, upload.single('image'), CompanyController.updateProfileBanner);
+
+// company test-bundle
+app.post('/api/company/bundle-test', authCompanyMiddleware, PackageBundleController.createPackageBundle)
+app.get('/api/company/bundle-test', authCompanyMiddleware, PackageBundleController.getPackageBundle)
+app.put('/api/company/bundle-test', authCompanyMiddleware, PackageBundleController.updatePackageBundle) // query id
+
+// company package-test-unit
+app.post('/api/company/bundle-test/test-unit', authCompanyMiddleware, PackageTestUnitController.createPackageTestUnit) // query package_bundle_id
+app.put('/api/company/bundle-test/test-unit', authCompanyMiddleware, PackageTestUnitController.updatePackageTestUnit) // query package_test_unit_id
+app.delete('/api/company/bundle-test/test-unit', authCompanyMiddleware, PackageTestUnitController.deletePackageTestUnit)
+app.get('/api/company/bundle-test/test-unit', authCompanyMiddleware, PackageTestUnitController.getPackageTestUnitByPackageBundleId) // query package_test_unit_id
 
 // percobaan upload
 app.post('/api/uploads', upload.single('image'), async(req: Request, res: Response) => {
