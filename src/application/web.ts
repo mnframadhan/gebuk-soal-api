@@ -85,6 +85,7 @@ app.put('/api/admin/student/membership', authAdminMiddleware, AdministratorContr
 // company
 app.get('/api/company/current', authCompanyMiddleware, CompanyController.getCurrentCompany);
 app.delete('/api/company/current', authCompanyMiddleware, CompanyController.logoutCompany);
+app.put('/api/company/current/banner', authCompanyMiddleware, upload.single('image'), CompanyController.updateProfileBanner);
 
 // percobaan upload
 app.post('/api/uploads', upload.single('image'), async(req: Request, res: Response) => {
@@ -96,7 +97,7 @@ app.post('/api/uploads', upload.single('image'), async(req: Request, res: Respon
 
         const file = req.file;
 
-        const blob = bucket.file(`${Date.now()}_${file.originalname}`);
+        const blob = bucket.file(`company/banner/${Date.now()}_${file.originalname}`);
 
         const blobStream = blob.createWriteStream({
             metadata: {
@@ -112,10 +113,11 @@ app.post('/api/uploads', upload.single('image'), async(req: Request, res: Respon
 
         blobStream.on('finish', () => {
             const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
-            res.status(200).send({fileName: file.originalname, url: publicUrl})
+            res.status(200).json({fileName: file.originalname, url: publicUrl})
         })
 
         blobStream.end(file.buffer);
+        
     } catch (err) {
 
         console.log(err);

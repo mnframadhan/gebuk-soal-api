@@ -9,7 +9,7 @@ import { v4 as uuid } from "uuid";
 
 export class CompanyService {
 
-    static async createCompany(request: CompanyRegisterRequest): Promise<CompanyResponse> {
+    static async createCompany(request: CompanyRegisterRequest) : Promise<CompanyResponse> {
 
         const validatedRequest = Validation.validate(CompanyValidation.REGISTER, request);
 
@@ -58,7 +58,7 @@ export class CompanyService {
 
     }
 
-    static async loginCompany(request: CompanyLoginRequest): Promise<CompanyResponse> {
+    static async loginCompany(request: CompanyLoginRequest) : Promise<CompanyResponse> {
 
         const validatedRequest = Validation.validate(CompanyValidation.LOGIN, request);
 
@@ -107,7 +107,7 @@ export class CompanyService {
 
     }
 
-    static async logoutCompany(company: Company) {
+    static async logoutCompany(company: Company) : Promise<{message: string}> {
 
         await prismaClient.company.update({
 
@@ -121,9 +121,10 @@ export class CompanyService {
 
     }
 
-    static async getCurrentCompany(company: Company) {
+    static async getCurrentCompany(company: Company) : Promise<CompanyResponse> {
 
         return {
+            id: company.id,
             brand_name: company.brand_name,
             legal_name: company.legal_name,
             email: company.email,
@@ -135,6 +136,21 @@ export class CompanyService {
             n_package: company.n_package,
             n_applicant: company.n_applicant,
             created_at: company.created_at,
+            banner_image: company.banner_image,
+        }
+
+    }
+    
+    static async updateProfileBanner(request: {imageUrl: string}, company: Company) : Promise<{message: string}> {
+
+        // logic here
+        await prismaClient.company.update({
+            where: {id: company.id},
+            data: {banner_image: request.imageUrl}
+        })
+
+        return {
+            message: "Profile banner updated successfully"
         }
 
     }

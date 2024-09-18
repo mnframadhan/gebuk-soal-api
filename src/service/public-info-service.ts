@@ -38,7 +38,7 @@ export class PublicInfoServices {
     }
 
     static async countCompany() : Promise<{n_company: number}>{
-        const count = 0;
+        const count = await prismaClient.company.count({});
         return {
             n_company: count
         }

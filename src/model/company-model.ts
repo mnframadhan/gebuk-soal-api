@@ -26,7 +26,8 @@ export type CompanyResponse = {
     n_package : number;
     n_applicant : number;
     created_at : string;
-    token : string | null;
+    token? : string | null;
+    banner_image?: string | null;
 
 }
 
