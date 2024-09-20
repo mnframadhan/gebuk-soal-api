@@ -6,7 +6,6 @@ export class PackageBundleValidation {
 
         package_name : z.string().min(3).max(50),
         expired_date : z.string(),
-        created_at : z.string()
 
     })
 

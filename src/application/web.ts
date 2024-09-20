@@ -1,22 +1,21 @@
 import cors from 'cors';
-import express, { Request, Response } from 'express';
+import express from 'express';
 import { AdministratorController } from '../controller/administrator-controller';
+import { CompanyController } from '../controller/company-controller';
 import { ContributorController } from '../controller/contributor-controller';
 import { OrderController } from '../controller/order-controller';
+import { PackageBundleController } from '../controller/package-bundle-controller';
+import { PackageTestUnitController } from '../controller/package-test-unit-controller';
 import { PublicInfoController } from '../controller/public-info-controller';
 import { SoalController } from '../controller/soal-controller';
 import { StudentController } from '../controller/student-controller';
 import { WorksController } from '../controller/works-controller';
 import { authAdminMiddleware } from '../middleware/auth-admin-middleware';
+import { authCompanyMiddleware } from '../middleware/auth-company-middleware';
 import { authMiddleware } from '../middleware/auth-middleware';
 import { authStudentMiddleware } from '../middleware/auth-student-middleware';
 import { globalLimiter, limiter, plusLimiter } from '../middleware/request-limiter';
 import { upload } from '../middleware/upload-file-middleware';
-import { bucket } from './firebase';
-import { CompanyController } from '../controller/company-controller';
-import { authCompanyMiddleware } from '../middleware/auth-company-middleware';
-import { PackageBundleController } from '../controller/package-bundle-controller';
-import { PackageTestUnitController } from '../controller/package-test-unit-controller';
 
 export const app = express();
 app.use(express.json());
@@ -48,7 +47,7 @@ app.post('/api/comp/login', CompanyController.loginCompany);
 // contributor api
 app.get('/api/contributor/current', authMiddleware, ContributorController.currentContributor)
 app.delete('/api/contributor/current', authMiddleware, ContributorController.logoutContributor)
-app.post('/api/contributor/soal', authMiddleware, SoalController.createSoal)
+app.post('/api/contributor/soal', upload.single('image1') , authMiddleware, SoalController.createSoal)
 app.get('/api/contributor/current/soal', authMiddleware, ContributorController.getSoalCreated)
 
 // student api
@@ -99,41 +98,3 @@ app.post('/api/company/bundle-test/test-unit', authCompanyMiddleware, PackageTes
 app.put('/api/company/bundle-test/test-unit', authCompanyMiddleware, PackageTestUnitController.updatePackageTestUnit) // query package_test_unit_id
 app.delete('/api/company/bundle-test/test-unit', authCompanyMiddleware, PackageTestUnitController.deletePackageTestUnit)
 app.get('/api/company/bundle-test/test-unit', authCompanyMiddleware, PackageTestUnitController.getPackageTestUnitByPackageBundleId) // query package_test_unit_id
-
-// percobaan upload
-app.post('/api/uploads', upload.single('image'), async(req: Request, res: Response) => {
-
-    try {
-        if(!req.file) {
-            return res.status(400).json({message: "No file uploaded"});
-        }
-
-        const file = req.file;
-
-        const blob = bucket.file(`company/banner/${Date.now()}_${file.originalname}`);
-
-        const blobStream = blob.createWriteStream({
-            metadata: {
-                contentType: file.mimetype,
-            }
-        });
-
-        blobStream.on('error', (err) => {
-
-            console.log(err)
-            return res.status(500).json({message: "Unable to upload file."});
-        });
-
-        blobStream.on('finish', () => {
-            const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
-            res.status(200).json({fileName: file.originalname, url: publicUrl})
-        })
-
-        blobStream.end(file.buffer);
-        
-    } catch (err) {
-
-        console.log(err);
-        res.status(500).json({message: "Error uploading file."});
-    }
-})

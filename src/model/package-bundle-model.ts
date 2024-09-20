@@ -2,7 +2,6 @@ export type PackageBundleCreateRequest = {
 
     package_name: string;
     expired_date: string;
-    created_at: string;
 
 }
 

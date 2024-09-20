@@ -1,8 +1,8 @@
-import { Response, NextFunction, Request } from "express";
+import { NextFunction, Response } from "express";
+import { bucket } from "../application/firebase";
 import { SoalRequest } from "../model/soal-model";
 import { SoalService } from "../service/soal-service";
 import { ContributorReq } from "../types/contributor-request";
-import { StudentReq } from "../types/student-request";
 
 export class SoalController {
 
@@ -10,33 +10,51 @@ export class SoalController {
 
         try {
 
-            const request : SoalRequest = await req.body as SoalRequest
-            const response = await SoalService.createSoal(request, req.contributor!)
+            const file = req.file;
+
+            if(!file) {
+
+                const request : SoalRequest = await req.body as SoalRequest
+                const response = await SoalService.createSoal(request, req.contributor!)
             
-            res.status(201);
-            res.json(response)
+                res.status(201);
+                res.json(response)
+                
+            } else {
+
+                const blob = bucket.file(`soal/question/${file.originalname}_${Date.now()}`);
+                const blobStream =  blob.createWriteStream({
+                    metadata: {
+                        contentType: file.mimetype,
+                    }
+                });
+
+                blobStream.on('error', (error) => {
+                    next(error);
+                })
+
+                blobStream.on('finish', async () => {
+
+                    try {
+
+                        await blob.makePublic();
+                        const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
+
+                        const request = req.body;
+                        request.image1 = publicUrl;
+
+                        const response = await SoalService.createSoal(request, req.contributor!);
+                        res.status(201).json(response);
+
+                    } catch (err) {
+                        next(err)
+                    }
+                })
+            }
 
         } catch (err) {
             console.log(err)
             next(err)
         }
     }
-
-    // static async getSoalPagination(req: StudentReq, res: Response, next: NextFunction) {
-
-    //     try {
-
-    //         const limit = req.query.limit
-    //         const response = await SoalService.getSoal(Number(limit))
-            
-    //         res.status(200);
-    //         res.json(response);
-
-    //     } catch (err) {
-
-    //         console.log(err)
-    //         next(err)
-
-    //     }
-    // }
 }
