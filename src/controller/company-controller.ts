@@ -30,7 +30,7 @@ export class CompanyController {
             const request: CompanyLoginRequest = req.body as CompanyLoginRequest;
             const response = await CompanyService.loginCompany(request);
 
-            res.cookie('X-API-TOKEN-COMPANY', response.token!, {httpOnly: false, maxAge: 1000*60*60})
+            res.cookie('X-API-TOKEN-COMPANY', response.token!, {httpOnly: false, maxAge: 1000*60*60*24})
             
             res.status(200);
             res.json(response);

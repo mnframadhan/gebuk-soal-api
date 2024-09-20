@@ -35,6 +35,35 @@ export class PackageBundleController {
         }
     }
 
+    static async generateToken (req: CompanyReq, res: Response, next: NextFunction) {
+
+        try {
+            const package_bundle_id = req.query.package_bundle_id as string;
+            const response = await PackageBundleService.generateToken(package_bundle_id, req.company!);
+
+            res.status(200);
+            res.json(response);
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    static async deleteToken (req: CompanyReq, res: Response, next: NextFunction) {
+
+        try {
+
+            const package_bundle_id = req.query.package_bundle_id as string;
+            const response = await PackageBundleService.deleteToken(package_bundle_id, req.company!);
+            
+            res.status(200);
+            res.json(response);
+
+        } catch (err) {
+            next(err);
+        }
+
+    }
+
     static async deletePackageBundle(req: CompanyReq, res: Response, next: NextFunction) { 
 
         try {
@@ -60,6 +89,22 @@ export class PackageBundleController {
             res.json(response);
 
         } catch (err) {
+            next(err);
+        }
+    }
+
+    static async getPackageBundlebyId(req: CompanyReq, res: Response, next: NextFunction) {
+
+        try {
+            
+            const package_bundle_id = req.params.package_bundle_id as string;
+            const response = await PackageBundleService.getPackageBundleById(package_bundle_id, req.company!)
+
+            res.status(200);
+            res.json(response);
+
+        } 
+        catch (err) {
             next(err);
         }
     }

@@ -1,6 +1,7 @@
 export type PackageTestUnitCreateRequest = {
 
     company_id: string;
+    ord: number;
     label: string | null;
     category: string | null;
     section: string | null;
@@ -29,6 +30,7 @@ export type PackageTestUnitCreateRequest = {
 export type PackageTestUnitResponse = {
 
     id: string;
+    ord: number;
     company_id: string;
     label: string | null;
     category: string | null;
@@ -58,6 +60,7 @@ export type PackageTestUnitResponse = {
 
 export type PackageTestUnitUpdateRequest = {
 
+    ord: number;
     label: string | null;
     category: string | null;
     section: string | null;

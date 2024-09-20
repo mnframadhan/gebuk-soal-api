@@ -41,8 +41,9 @@ export class PackageTestUnitController {
 
         try {
 
-            const package_test_unit_id = req.params.package_test_unit_id as string;
-            const response = await PackageTestUnitService.deletePackageTestUnit(package_test_unit_id, req.company!);
+            const package_test_unit_id = req.query.package_test_unit_id as string;
+            const package_bundle_id = req.query.package_bundle_id as string;
+            const response = await PackageTestUnitService.deletePackageTestUnit(package_bundle_id, package_test_unit_id, req.company!);
 
             res.status(200);
             res.json(response);

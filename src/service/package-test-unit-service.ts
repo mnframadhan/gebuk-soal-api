@@ -1,7 +1,7 @@
 import { Company } from "@prisma/client";
 import { PackageTestUnitCreateRequest, PackageTestUnitsResponse } from "../model/package-test-unit-model";
 import { Validation } from "../validation/Validation";
-import { PackageTestUnitValidation } from "../validation/package_test-unit-validation";
+import { PackageTestUnitValidation } from "../validation/package-test-unit-validation";
 import { prismaClient } from "../application/database";
 
 export class PackageTestUnitService {
@@ -18,6 +18,17 @@ export class PackageTestUnitService {
                 package_bundle_id: package_bundle_id,
             }
         })
+        
+        await prismaClient.packageBundle.update({
+            where: {
+                id:package_bundle_id,
+                company_id: company.id
+            },
+            data: {
+                present_n_unit: {increment: 1}
+            }
+        })
+
         return response;
     }
 
@@ -36,7 +47,7 @@ export class PackageTestUnitService {
         return {message: "Updated"};
     }
 
-    static async deletePackageTestUnit(package_test_unit_id: string, company: Company) : Promise<{message: string}> {
+    static async deletePackageTestUnit(package_bundle_id: string, package_test_unit_id: string, company: Company) : Promise<{message: string}> {
 
         await prismaClient.packageTestUnit.delete({
             where: {
@@ -44,6 +55,18 @@ export class PackageTestUnitService {
                 company_id: company.id
             }
         })
+
+        await prismaClient.packageBundle.update({
+            where: {
+                id: package_bundle_id,
+                company_id: company.id
+            },
+            data: {
+                present_n_unit: {decrement: 1}
+            }
+        })
+
+
         return {message: "Deleted"};
     }
 

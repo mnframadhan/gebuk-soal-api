@@ -4,6 +4,7 @@ export class PackageTestUnitValidation {
 
     static readonly CREATE : ZodType = z.object({
 
+        ord : z.number().min(1).max(300),
         company_id: z.string(),
         label: z.string().optional(),
         category: z.string().optional(),
@@ -29,6 +30,7 @@ export class PackageTestUnitValidation {
 
     static readonly UPDATE : ZodType = z.object({
 
+        ord: z.number().min(1).max(300).optional(),
         label: z.string().optional(),
         category: z.string().optional(),
         text: z.string().optional(),

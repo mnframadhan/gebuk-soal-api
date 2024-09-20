@@ -85,6 +85,7 @@ model Company {
 
 model PackageTestUnit {
   id String @id @unique @default(uuid())
+  ord Int
   company_id String
   company Company @relation(fields: [company_id], references: [id])
   label String?
@@ -126,7 +127,10 @@ model PackageBundle {
   package_name String
   expired_date String
   created_at String
+  n_unit Int?
+  max_duration Int?
   token String?
+  present_n_unit Int? @default(0)
 
   company_id String
   company Company @relation(fields: [company_id], references: [id])

@@ -91,7 +91,10 @@ app.put('/api/company/current/banner', authCompanyMiddleware, upload.single('ima
 // company test-bundle
 app.post('/api/company/bundle-test', authCompanyMiddleware, PackageBundleController.createPackageBundle)
 app.get('/api/company/bundle-test', authCompanyMiddleware, PackageBundleController.getPackageBundle)
-app.put('/api/company/bundle-test', authCompanyMiddleware, PackageBundleController.updatePackageBundle) // query id
+app.put('/api/company/bundle-test', authCompanyMiddleware, PackageBundleController.updatePackageBundle)
+app.get('/api/company/bundle-test/:package_bundle_id', authCompanyMiddleware, PackageBundleController.getPackageBundlebyId) // params package_bundle_id
+app.put('/api/company/bundle-test/token', authCompanyMiddleware, PackageBundleController.generateToken) // query package_bundle_id
+app.delete('/api/company/bundle-test/token', authCompanyMiddleware, PackageBundleController.deleteToken);
 
 // company package-test-unit
 app.post('/api/company/bundle-test/test-unit', authCompanyMiddleware, PackageTestUnitController.createPackageTestUnit) // query package_bundle_id
