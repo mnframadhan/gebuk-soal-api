@@ -88,12 +88,9 @@ model PackageTestUnit {
   ord Int
   company_id String
   company Company @relation(fields: [company_id], references: [id])
-  label String?
-  category String?
-  section String?
   text String? @db.LongText
   text_image String?
-  queston String?
+  question String?
   option1 String? @db.LongText
   option1_point Int?
   option1_image String?

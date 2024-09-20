@@ -1,11 +1,9 @@
 export type PackageTestUnitCreateRequest = {
 
-    company_id: string;
     ord: number;
-    label: string | null;
-    category: string | null;
-    section: string | null;
     text: string | null;
+    text_image : string | null;
+    question : string | null;
     option1: string | null;
     option1_point: number | null;
     option1_image : string | null;
@@ -22,8 +20,6 @@ export type PackageTestUnitCreateRequest = {
     option5_point: number | null;
     option5_image : string | null;
     unique_answer: string | null;
-    created_at: string;
-    package_bundle_id: string;
 
 }
 
@@ -32,10 +28,9 @@ export type PackageTestUnitResponse = {
     id: string;
     ord: number;
     company_id: string;
-    label: string | null;
-    category: string | null;
-    section: string | null;
     text: string | null;
+    text_image : string | null;
+    question : string | null;
     option1: string | null;
     option1_point: number | null;
     option1_image : string | null;
@@ -61,10 +56,9 @@ export type PackageTestUnitResponse = {
 export type PackageTestUnitUpdateRequest = {
 
     ord: number;
-    label: string | null;
-    category: string | null;
-    section: string | null;
     text: string | null;
+    text_image: string | null;
+    question : string | null;
     option1: string | null;
     option1_point: number | null;
     option1_image : string | null;
@@ -86,7 +80,6 @@ export type PackageTestUnitUpdateRequest = {
 
 export type PackageTestUnitsResponse = {
     message: string;
-    company_id: string;
     package_bundle_id: string;
     data: PackageTestUnitResponse[];
 }

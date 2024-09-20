@@ -53,7 +53,7 @@ app.get('/api/contributor/current/soal', authMiddleware, ContributorController.g
 // student api
 app.get('/api/student/current', authStudentMiddleware, StudentController.currentStudent)
 app.delete('/api/student/current', authStudentMiddleware, StudentController.logoutStudent)
-app.put('/api/student/current', authStudentMiddleware, StudentController.updateStudent)
+app.patch('/api/student/current', authStudentMiddleware, StudentController.updateStudent)
 // app.get('/api/student/soal', authStudentMiddleware, SoalController.getSoalPagination) // query limit
 
 // student api works
@@ -71,33 +71,34 @@ app.get('/api/student/results', authStudentMiddleware, WorksController.getTodayR
 
 // student order
 app.post('/api/student/order', authStudentMiddleware, OrderController.createOrder)
-app.put('/api/student/order', authStudentMiddleware, OrderController.cancelOrder)
+app.patch('/api/student/order', authStudentMiddleware, OrderController.cancelOrder)
 app.get('/api/student/order', authStudentMiddleware, OrderController.getOrderHistory)
-app.put('/api/student/order/premium', authStudentMiddleware, OrderController.premiumOrder)
+app.patch('/api/student/order/premium', authStudentMiddleware, OrderController.premiumOrder)
 
 // administrator
 app.get('/api/admin/all-students', authAdminMiddleware, AdministratorController.getAllStudents) // query page and limit
 app.get('/api/admin/all-students/orders', authAdminMiddleware, AdministratorController.getAllOrders) // query page and limit
-app.put('/api/admin/student', authAdminMiddleware, AdministratorController.updateStudentLimit) // query student_id and order_id
-app.put('/api/admin/student/return', authAdminMiddleware, AdministratorController.returnLimit) // query student_id and order_id
+app.patch('/api/admin/student', authAdminMiddleware, AdministratorController.updateStudentLimit) // query student_id and order_id
+app.patch('/api/admin/student/return', authAdminMiddleware, AdministratorController.returnLimit) // query student_id and order_id
 app.delete('/api/admin/logout', authAdminMiddleware, AdministratorController.logoutAdmin)
-app.put('/api/admin/student/membership', authAdminMiddleware, AdministratorController.updatePremiumStudent) // query student_id
+app.patch('/api/admin/student/membership', authAdminMiddleware, AdministratorController.updatePremiumStudent) // query student_id
 
 // company
 app.get('/api/company/current', authCompanyMiddleware, CompanyController.getCurrentCompany);
 app.delete('/api/company/current', authCompanyMiddleware, CompanyController.logoutCompany);
-app.put('/api/company/current/banner', authCompanyMiddleware, upload.single('image'), CompanyController.updateProfileBanner);
+app.patch('/api/company/current/banner', authCompanyMiddleware, upload.single('image'), CompanyController.updateProfileBanner);
 
 // company test-bundle
 app.post('/api/company/bundle-test', authCompanyMiddleware, PackageBundleController.createPackageBundle)
 app.get('/api/company/bundle-test', authCompanyMiddleware, PackageBundleController.getPackageBundle)
-app.put('/api/company/bundle-test', authCompanyMiddleware, PackageBundleController.updatePackageBundle)
+app.patch('/api/company/bundle-test', authCompanyMiddleware, PackageBundleController.updatePackageBundle)
 app.get('/api/company/bundle-test/:package_bundle_id', authCompanyMiddleware, PackageBundleController.getPackageBundlebyId) // params package_bundle_id
-app.put('/api/company/bundle-test/token', authCompanyMiddleware, PackageBundleController.generateToken) // query package_bundle_id
+app.patch('/api/company/bundle-test/token', authCompanyMiddleware, PackageBundleController.generateToken) // query package_bundle_id
 app.delete('/api/company/bundle-test/token', authCompanyMiddleware, PackageBundleController.deleteToken);
 
 // company package-test-unit
 app.post('/api/company/bundle-test/test-unit', authCompanyMiddleware, PackageTestUnitController.createPackageTestUnit) // query package_bundle_id
-app.put('/api/company/bundle-test/test-unit', authCompanyMiddleware, PackageTestUnitController.updatePackageTestUnit) // query package_test_unit_id
+app.post('/api/company/bundle-test/test-unit/image', upload.single('text_image'), authCompanyMiddleware, PackageTestUnitController.createPackageTestUnitWithImage) // query package_bundle_id
+app.patch('/api/company/bundle-test/test-unit', authCompanyMiddleware, PackageTestUnitController.updatePackageTestUnit) // query package_test_unit_id
 app.delete('/api/company/bundle-test/test-unit', authCompanyMiddleware, PackageTestUnitController.deletePackageTestUnit)
-app.get('/api/company/bundle-test/test-unit', authCompanyMiddleware, PackageTestUnitController.getPackageTestUnitByPackageBundleId) // query package_test_unit_id
+app.get('/api/company/bundle-test/:package_bundle_id/test-unit', authCompanyMiddleware, PackageTestUnitController.getPackageTestUnitByPackageBundleId) // query package_bundle_test_id

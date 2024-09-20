@@ -1,5 +1,5 @@
 import { Company } from "@prisma/client";
-import { PackageTestUnitCreateRequest, PackageTestUnitsResponse } from "../model/package-test-unit-model";
+import { PackageTestUnitCreateRequest, PackageTestUnitResponse, PackageTestUnitsResponse } from "../model/package-test-unit-model";
 import { Validation } from "../validation/Validation";
 import { PackageTestUnitValidation } from "../validation/package-test-unit-validation";
 import { prismaClient } from "../application/database";
@@ -72,21 +72,22 @@ export class PackageTestUnitService {
 
     static async getPackageTestUnitByPackageBundleId(package_bundle_id: string, company: Company) : Promise<PackageTestUnitsResponse> {
 
-        const response = await prismaClient.packageTestUnit.findMany({
+        const units  = await prismaClient.packageTestUnit.findMany({
             where : {
                 package_bundle_id: package_bundle_id,
                 company_id: company.id
             },
-            orderBy : {
-                created_at: 'desc'
+            orderBy: {
+                ord: 'asc'
             }
         })
 
-        return {
+        const response = {
             message: "Success",
             package_bundle_id: package_bundle_id,
-            company_id: company.id,
-            data: response
-        };
+            data: units
+        }
+
+        return response;
     }
 }
