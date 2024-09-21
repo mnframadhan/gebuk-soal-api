@@ -34,14 +34,31 @@ export class PackageTestUnitService {
 
     static async updatePackageTestUnit (package_test_unit_id: string, request: PackageTestUnitCreateRequest, company: Company) : Promise<{message: string}> {
 
-        const validatedRequest = Validation.validate(PackageTestUnitValidation.CREATE, request);
+        const validatedRequest = Validation.validate(PackageTestUnitValidation.UPDATE, request);
         await prismaClient.packageTestUnit.update({
             where: {
                 id: package_test_unit_id,
                 company_id: company.id
             },
             data: {
-                ...validatedRequest
+                ...(validatedRequest.text !== undefined && {text: validatedRequest.text}),
+                ...(validatedRequest.question !== undefined && {question: validatedRequest.question}),
+                ...(validatedRequest.option1 !== undefined && {option1: validatedRequest.option1}),
+                ...(validatedRequest.option1_point !== undefined && {option1_point: validatedRequest.option1_point}),
+                ...(validatedRequest.option1_image !== undefined && {option1_image: validatedRequest.option1_image}),
+                ...(validatedRequest.option2  !== undefined && {option2: validatedRequest.option2}),
+                ...(validatedRequest.option2_point !== undefined && {option2_point: validatedRequest.option2_point}),
+                ...(validatedRequest.option2_image !== undefined && {option2_image: validatedRequest.option2_image}),
+                ...(validatedRequest.option3 !== undefined && {option3: validatedRequest.option3}),
+                ...(validatedRequest.option3_point !== undefined && {option3_point: validatedRequest.option3_point}),
+                ...(validatedRequest.option3_image !== undefined && {option3_image: validatedRequest.option3_image}),
+                ...(validatedRequest.option4 !== undefined && {option4: validatedRequest.option4}),
+                ...(validatedRequest.option4_point !== undefined && {option4_point: validatedRequest.option4_point}),
+                ...(validatedRequest.option4_image !== undefined && {option4_image: validatedRequest.option4_image}),
+                ...(validatedRequest.option5 !== undefined && {option5: validatedRequest.option5}),
+                ...(validatedRequest.option5_point !== undefined && {option5_point: validatedRequest.option5_point}),
+                ...(validatedRequest.option5_image !== undefined && {option5_image: validatedRequest.option5_image}),
+                ...(validatedRequest.unique_answer !== undefined && {unique_answer: validatedRequest.unique_answer})
             }
         })
         return {message: "Updated"};
@@ -78,7 +95,7 @@ export class PackageTestUnitService {
                 company_id: company.id
             },
             orderBy: {
-                ord: 'asc'
+                created_at: 'asc'
             }
         })
 

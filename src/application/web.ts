@@ -99,6 +99,6 @@ app.delete('/api/company/bundle-test/token', authCompanyMiddleware, PackageBundl
 // company package-test-unit
 app.post('/api/company/bundle-test/test-unit', authCompanyMiddleware, PackageTestUnitController.createPackageTestUnit) // query package_bundle_id
 app.post('/api/company/bundle-test/test-unit/image', upload.single('text_image'), authCompanyMiddleware, PackageTestUnitController.createPackageTestUnitWithImage) // query package_bundle_id
-app.patch('/api/company/bundle-test/test-unit', authCompanyMiddleware, PackageTestUnitController.updatePackageTestUnit) // query package_test_unit_id
+app.patch('/api/company/bundle-test/test-unit/:package_test_unit_id', authCompanyMiddleware, PackageTestUnitController.updatePackageTestUnit) // params package_test_unit_id
 app.delete('/api/company/bundle-test/test-unit', authCompanyMiddleware, PackageTestUnitController.deletePackageTestUnit)
 app.get('/api/company/bundle-test/:package_bundle_id/test-unit', authCompanyMiddleware, PackageTestUnitController.getPackageTestUnitByPackageBundleId) // query package_bundle_test_id

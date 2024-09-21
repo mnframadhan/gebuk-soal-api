@@ -85,7 +85,6 @@ model Company {
 
 model PackageTestUnit {
   id String @id @unique @default(uuid())
-  ord Int
   company_id String
   company Company @relation(fields: [company_id], references: [id])
   text String? @db.LongText
