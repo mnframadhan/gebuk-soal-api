@@ -20,6 +20,18 @@ export type PackageBundleResponse = {
 
 }
 
+export type PackageBundleResponseDetails = {
+
+    package_name: string;
+    company_brand_name: string;
+    company_legal_name : string;
+    present_n_unit: number;
+    max_duration: number;
+    authorized_student: string;
+    token: string;
+
+}
+
 export type PackageBundleUpdateRequest = {
 
     package_name?: string;

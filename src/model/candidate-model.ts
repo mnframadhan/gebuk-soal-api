@@ -4,7 +4,6 @@ export type CandidateCreateRequest = {
     email: string;
     address: string;
     phone: string;
-    cv: string | null;
 
 }
 
@@ -16,7 +15,6 @@ export type CandidateResponse = {
     email: string;
     address: string;
     phone: string;
-    cv: string | null;
     created_at: string;
 
 }
@@ -27,6 +25,5 @@ export type CandidateUpdateRequest = {
     full_name: string | undefined;
     address: string | undefined;
     phone: string | undefined;
-    cv: string | undefined;
 
 }

@@ -21,7 +21,7 @@ export const authStudentMiddleware = async (req: StudentReq , res: Response, nex
         }
 
         res.status(401).json({
-            errors: "Unauthorized"
+            message: "Unauthorized"
         }).end();
     }
 }

@@ -16,6 +16,9 @@ import { authMiddleware } from '../middleware/auth-middleware';
 import { authStudentMiddleware } from '../middleware/auth-student-middleware';
 import { globalLimiter, limiter, plusLimiter } from '../middleware/request-limiter';
 import { upload } from '../middleware/upload-file-middleware';
+import { CandidateController } from '../controller/candidate-controller';
+import { errorMiddleware } from '../middleware/error-middleware';
+import { packageBundleMiddleware } from '../middleware/package-bundle-middleware';
 
 export const app = express();
 app.use(express.json());
@@ -24,6 +27,7 @@ app.use(cors({
   credentials: true                // Allow credentials (cookies, authorization headers)
 }));
 app.use(globalLimiter)  // limited maximum only 100 requests per minute
+app.use(errorMiddleware);
 
 // PUBLIC API
 //public info
@@ -102,3 +106,9 @@ app.post('/api/company/bundle-test/test-unit/image', upload.single('text_image')
 app.patch('/api/company/bundle-test/test-unit/:package_test_unit_id', authCompanyMiddleware, PackageTestUnitController.updatePackageTestUnit) // params package_test_unit_id
 app.delete('/api/company/bundle-test/test-unit', authCompanyMiddleware, PackageTestUnitController.deletePackageTestUnit)
 app.get('/api/company/bundle-test/:package_bundle_id/test-unit', authCompanyMiddleware, PackageTestUnitController.getPackageTestUnitByPackageBundleId) // query package_bundle_test_id
+
+// candidate (one-to-one relation with students)
+app.post('/api/candidate/register',  authStudentMiddleware, CandidateController.createCandidate);
+app.get('/api/candidate/current', authStudentMiddleware, CandidateController.getCurrentCandidate);
+app.get('/api/candidate/token', authStudentMiddleware, CandidateController.checkPackageBundleToken); // query package_bundle_token
+app.get('/api/candidate/bundle-test', authStudentMiddleware, packageBundleMiddleware, CandidateController.getPackageBundleById ) // params package_bundle_id

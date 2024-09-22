@@ -146,7 +146,6 @@ model Candidate {
   email String
   address String
   phone String
-  cv String?
   created_at String
 
   packageTestWorks PackageTestWorks[]
