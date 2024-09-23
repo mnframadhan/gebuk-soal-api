@@ -55,7 +55,8 @@ model Student {
   works Work[]
   result Result[]
   order Order[]
-  candidate Candidate?
+  packageTestWorks PackageTestWorks[]
+  candidate Candidate? // one to one relationship
 
   @@map("students")
 
@@ -148,7 +149,6 @@ model Candidate {
   phone String
   created_at String
 
-  packageTestWorks PackageTestWorks[]
   packageTestResults PackageTestResults[]
   
 
@@ -159,11 +159,13 @@ model Candidate {
 model PackageTestWorks {
 
   id String @id @default(uuid())
-  answer String
-  start_time Int
-  point Int
-  candidate_id String
-  Candidate Candidate @relation(fields: [candidate_id], references: [id])
+  text String?
+  question String?
+  selected_answer String?
+  start_time String?
+  end_time String?
+  student_id String
+  Student Student @relation(fields: [student_id], references: [id])
   package_test_unit_id String
   packageTestUnit PackageTestUnit @relation(fields: [package_test_unit_id], references: [id])
 

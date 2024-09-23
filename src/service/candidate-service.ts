@@ -5,6 +5,7 @@ import { CandidateValidation } from "../validation/candidate-validation";
 import { prismaClient } from "../application/database";
 import { ResponseError } from "../error/response-error";
 import { PackageBundleResponseDetails } from "../model/package-bundle-model";
+import { packageTestUnitsPagination, PackageTestUnitsWorksRequest, PackageTestUnitWorksResponse } from "../model/package-test-unit-model";
 
 export class CandidateService {
 
@@ -83,6 +84,75 @@ export class CandidateService {
         }
 
         return response;
+    }
+
+    static async getPackageTestUnitByPackageBundleIdPagination(page: number, package_bundle: PackageBundle, student: Student) : Promise<packageTestUnitsPagination> {
+
+        const pageNum : number = page;
+        const size : number = 1;
+
+        const testUnits = await prismaClient.packageTestUnit.findMany({
+            where: {
+                package_bundle_id: package_bundle.id,
+                company_id: package_bundle.company_id
+            },
+            select: {
+                id: true,
+                text: true,
+                question: true,
+                option1: true,
+                option2: true,
+                option3: true,
+                option4: true,
+                option5: true
+            },
+            skip: (pageNum - 1) * size,
+            take: size
+        })
+
+        const totalPages = await prismaClient.packageTestUnit.count({
+            where: {
+                package_bundle_id: package_bundle.id,
+                company_id: package_bundle.company_id
+            }
+        })
+
+        const response = {
+
+            pagination: {
+                current_page: pageNum,
+                total_page: totalPages,
+                size: size
+            },
+            data: testUnits
+        }
+
+        return response;
+
+    }
+
+    static async createWorks(request: PackageTestUnitsWorksRequest, package_test_unit_id: string, student: Student, ) : Promise<PackageTestUnitWorksResponse> {
+
+        const validatedRequest = Validation.validate(CandidateValidation.WORKORUPDATE, request);
+
+        const end_time : string = String(Date.now());
+        const response = await prismaClient.packageTestWorks.create({
+
+            data: {
+                ...validatedRequest,
+                end_time: end_time,
+                student_id: student.id,
+                package_test_unit_id: package_test_unit_id,
+            },
+            select: {
+                id: true,
+                selected_answer: true,
+                end_time: true,
+            }
+        })
+
+        return response;
+
     }
 
     static async updateCandidate(request: CandidateUpdateRequest, student: Student) : Promise<{message: string}> {

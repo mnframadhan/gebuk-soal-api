@@ -4,6 +4,7 @@ import { CandidateCreateRequest, CandidateUpdateRequest } from "../model/candida
 import { CandidateService } from "../service/candidate-service";
 import { PackageBundleResponseDetails } from "../model/package-bundle-model";
 import { PackageBundleReq } from "../types/package-bundle-request";
+import { PackageTestUnitsWorksRequest } from "../model/package-test-unit-model";
 
 export class CandidateController {
 
@@ -74,6 +75,37 @@ export class CandidateController {
 
     }
 
+    static async getPackageTestUnitsByPackageBundleIdPagination(req: PackageBundleReq, res: Response, next: NextFunction) {
+
+        try {
+
+            const page = parseInt(req.query.page as string);
+            const response = await CandidateService.getPackageTestUnitByPackageBundleIdPagination(page, req.packageBundle!, req.student!);
+
+            res.status(200);
+            res.json(response);
+
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    static async createWorks(req: StudentReq, res: Response, next: NextFunction ) {
+
+        try {
+
+            const package_test_unit_id : string =  req.query.package_test_unit_id as string;
+            const request: PackageTestUnitsWorksRequest = req.body as PackageTestUnitsWorksRequest;
+            const response = await CandidateService.createWorks(request, package_test_unit_id, req.student!)
+
+            res.status(201);
+            res.json(response);
+
+        } catch (err) {
+            next(err);
+        }
+    }
+    
     static async updateCandidate(req: StudentReq, res: Response, next: NextFunction) {
 
         try {

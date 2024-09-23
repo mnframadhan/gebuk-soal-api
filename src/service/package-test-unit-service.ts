@@ -1,8 +1,8 @@
 import { Company } from "@prisma/client";
-import { PackageTestUnitCreateRequest, PackageTestUnitResponse, PackageTestUnitsResponse } from "../model/package-test-unit-model";
+import { prismaClient } from "../application/database";
+import { PackageTestUnitCreateRequest, PackageTestUnitsResponse } from "../model/package-test-unit-model";
 import { Validation } from "../validation/Validation";
 import { PackageTestUnitValidation } from "../validation/package-test-unit-validation";
-import { prismaClient } from "../application/database";
 
 export class PackageTestUnitService {
 

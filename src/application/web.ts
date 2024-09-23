@@ -112,3 +112,7 @@ app.post('/api/candidate/register',  authStudentMiddleware, CandidateController.
 app.get('/api/candidate/current', authStudentMiddleware, CandidateController.getCurrentCandidate);
 app.get('/api/candidate/token', authStudentMiddleware, CandidateController.checkPackageBundleToken); // query package_bundle_token
 app.get('/api/candidate/bundle-test', authStudentMiddleware, packageBundleMiddleware, CandidateController.getPackageBundleById ) // params package_bundle_id
+
+// candidate works
+app.get('/api/candidate/bundle-test/works', authStudentMiddleware, packageBundleMiddleware, CandidateController.getPackageTestUnitsByPackageBundleIdPagination) // query page
+app.post('/api/candidate/bundle-test/test-unit/works', authStudentMiddleware, CandidateController.createWorks) // query package_test_unit_id

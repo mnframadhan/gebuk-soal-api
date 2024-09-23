@@ -81,3 +81,39 @@ export type PackageTestUnitsResponse = {
     data: PackageTestUnitResponse[];
 }
 
+export type PackageTestUnitsWorksRequest = {
+
+    selected_answer: string | null;
+
+}
+
+export type PackageTestUnitWorksResponse = {
+
+    id: string;
+    selected_answer: string | null;
+    end_time: string | null;
+
+}
+
+export type ShowedSingleUnit = {
+
+    id: string | null;
+    text: string | null;
+    question: string | null;
+    option1: string | null;
+    option2: string | null;
+    option3: string | null;
+    option4: string | null;
+    option5: string | null;
+
+}
+
+export type packageTestUnitsPagination = {
+
+    pagination: {
+        current_page: number;
+        total_page: number;
+        size: number | 1;
+    },
+    data: ShowedSingleUnit[]
+}
