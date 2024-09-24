@@ -29,6 +29,15 @@ app.use(cors({
 app.use(globalLimiter)  // limited maximum only 100 requests per minute
 app.use(errorMiddleware);
 
+// sayHello
+
+app.get('/', (req, res) => {
+
+    res.status(200);
+    res.send("Hello, This is Cipta Talenta API");
+
+});
+
 // PUBLIC API
 //public info
 app.get('/api/info', PublicInfoController.getPublicInfo)
@@ -91,6 +100,7 @@ app.patch('/api/admin/student/membership', authAdminMiddleware, AdministratorCon
 app.get('/api/company/current', authCompanyMiddleware, CompanyController.getCurrentCompany);
 app.delete('/api/company/current', authCompanyMiddleware, CompanyController.logoutCompany);
 app.patch('/api/company/current/banner', authCompanyMiddleware, upload.single('image'), CompanyController.updateProfileBanner);
+app.patch('/api/company/orders/standard-package', authCompanyMiddleware, CompanyController.orderStandardPackage);
 
 // company test-bundle
 app.post('/api/company/bundle-test', authCompanyMiddleware, PackageBundleController.createPackageBundle)

@@ -120,5 +120,14 @@ export class CompanyController {
         }
     }
 
-    
+	static async orderStandardPackage(req: CompanyReq, res: Response, next: NextFunction) {
+
+			try {
+				const response = await CompanyService.orderStandardPackage(req.company!)
+				res.status(200);
+				res.json(response);
+
+			} catch (err) { next(err) }
+
+	} 
 }

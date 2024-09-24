@@ -154,4 +154,17 @@ export class CompanyService {
         }
 
     }
+	
+	static async orderStandardPackage(company: Company) : Promise<{message: string}> {
+
+			await prismaClient.company.update({
+
+					where: {id : company.id},
+					data: {
+							status: "Standard"
+					}
+			})
+			
+			return {message: "Success"}
+	}
 }

@@ -6,8 +6,8 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
-
 model Administrator {
+
   id String @id @unique
   username String @unique
   password String
@@ -80,6 +80,7 @@ model Company {
   banner_image String?
   PackageBundle PackageBundle[]
   PackageTestUnit PackageTestUnit[]
+  status String? @default("Free")
 
   @@map("companies")
 }

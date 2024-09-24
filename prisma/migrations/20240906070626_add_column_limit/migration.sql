@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE `students` ADD COLUMN `limit` INTEGER NOT NULL DEFAULT 5;

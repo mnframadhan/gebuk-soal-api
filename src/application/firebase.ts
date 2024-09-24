@@ -1,7 +1,7 @@
 import * as admin from 'firebase-admin';
 import path from 'path';
 
-const serviceAccount = require(path.join(process.cwd(), process.env.ACCOUNT_SERVICE_PATH!));
+const serviceAccount = require("../../credentials/serviceAccount.json");
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
