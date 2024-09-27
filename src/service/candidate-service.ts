@@ -1,11 +1,12 @@
 import { PackageBundle, Student } from "@prisma/client";
-import { CandidateCreateRequest, CandidateResponse, CandidateUpdateRequest } from "../model/candidate-model";
-import { Validation } from "../validation/Validation";
-import { CandidateValidation } from "../validation/candidate-validation";
 import { prismaClient } from "../application/database";
 import { ResponseError } from "../error/response-error";
+import { CandidateCreateRequest, CandidateResponse, CandidateUpdateRequest } from "../model/candidate-model";
 import { PackageBundleResponseDetails } from "../model/package-bundle-model";
 import { packageTestUnitsPagination, PackageTestUnitsWorksRequest, PackageTestUnitWorksResponse } from "../model/package-test-unit-model";
+import { Validation } from "../validation/Validation";
+import { CandidateValidation } from "../validation/candidate-validation";
+import { v4 as uuid } from "uuid"; 
 
 export class CandidateService {
 
@@ -98,6 +99,7 @@ export class CandidateService {
             },
             select: {
                 id: true,
+                package_bundle_id: true,
                 text: true,
                 question: true,
                 option1: true,
@@ -131,9 +133,9 @@ export class CandidateService {
 
     }
 
-    static async createWorks(request: PackageTestUnitsWorksRequest, package_test_unit_id: string, student: Student, ) : Promise<PackageTestUnitWorksResponse> {
+    static async createWorks(request: PackageTestUnitsWorksRequest, package_bundle_id: string, package_test_unit_id: string, student: Student ) : Promise<PackageTestUnitWorksResponse> {
 
-        const validatedRequest = Validation.validate(CandidateValidation.WORKORUPDATE, request);
+        const validatedRequest = Validation.validate(CandidateValidation.WORK, request);
 
         const end_time : string = String(Date.now());
         const response = await prismaClient.packageTestWorks.create({
@@ -143,6 +145,7 @@ export class CandidateService {
                 end_time: end_time,
                 student_id: student.id,
                 package_test_unit_id: package_test_unit_id,
+                package_bundle_id: package_bundle_id
             },
             select: {
                 id: true,
@@ -152,6 +155,168 @@ export class CandidateService {
         })
 
         return response;
+
+    }
+
+    static async createResult(student: Student, package_bundle_id: string ) : Promise<any> {
+
+
+        // find the last works
+        const latestTestUnits = await prismaClient.packageTestWorks.groupBy({
+            by: ["package_test_unit_id"],
+            where: {
+              package_bundle_id: package_bundle_id,
+              student_id: student.id
+            },
+            _max: {
+              end_time: true,
+            }
+          });
+          
+
+        if(!latestTestUnits) {
+            throw new ResponseError(404, "Records not found");
+        }
+
+        const detailedRecords = await prismaClient.packageTestWorks.findMany({
+            where: {
+              OR: latestTestUnits.map(unit => ({
+                package_test_unit_id: unit.package_test_unit_id,
+                end_time: unit._max.end_time
+              }))
+            },
+            select: {
+              package_test_unit_id: true,
+              end_time: true,
+              selected_answer: true,
+              package_bundle_id: true,
+            }
+          });
+
+        const units = await prismaClient.packageTestUnit.findMany({
+
+            where: {
+                OR: latestTestUnits.map(unit => ({
+                    id: unit.package_test_unit_id,
+                }))
+            },
+            select: {
+                id: true,
+                unique_answer: true,
+            }
+        })
+
+        type Res = Array<{
+            package_test_unit: string;
+            selected_answer: string;
+            correct_answer: string;
+            correct: boolean;
+            end_time: string;
+        }>
+
+        // results
+        const results : Res = units.map((u) => {
+
+            const unitItem = detailedRecords.find(d => d.package_test_unit_id  === u.id );
+
+            return {
+                package_test_unit : u.id!,
+                selected_answer: unitItem?.selected_answer!,
+                correct_answer: u.unique_answer!,
+                correct: unitItem ? unitItem.selected_answer === u.unique_answer : false,
+                end_time: unitItem!.end_time!
+            }
+        })
+
+        const candidate = await prismaClient.candidate.findFirst({
+
+            where: {student_id: student.id},
+            select: {
+                id: true
+            }
+        })
+
+        const endTimes = results.map((r) => Number(r.end_time));
+        const duration = Math.max(...endTimes) - Math.min(...endTimes);
+
+        const end_results = {
+            id: String(uuid()),
+            candidate_id: candidate!.id,
+            total_records : results.length,
+            duration: duration,
+            n_true : results.filter((r) => r.correct ).length,
+            n_false : results.length - results.filter((r) => r.correct ).length,
+            points: results.filter((r) => r.correct ).length/results.length,
+            package_bundle_id: package_bundle_id
+        };
+
+        const response = await prismaClient.packageTestResults.create({
+            data: end_results
+        })
+
+    
+        return response;
+
+    }
+
+    static async getResultsForCandidate(student: Student ) {
+
+        const candidate = await prismaClient.candidate.findFirst({where: {email: student.email}})
+        
+
+        if (!candidate) {
+            throw new ResponseError(404, "Kandidat tidak ditemukan / belum dibuat");
+        }
+        
+        const packageResults = await prismaClient.packageTestResults.findMany({
+
+            where: {
+                candidate_id: candidate.id
+            },
+            select: {
+                id: true,
+                package_bundle_id: true,
+                total_records: true,
+                duration: true,
+                n_true: true,
+                n_false: true
+            }
+        })
+
+        const resultsPackageBundleID = packageResults.map((res) => res.package_bundle_id);
+
+        const packageBundles = await prismaClient.packageBundle.findMany({
+            where: {
+                id: {
+                    in: resultsPackageBundleID
+                }
+            },
+        });
+
+        const packageBundlesCompanyID = packageBundles.map((res) => res.company_id);
+
+        const companies = await prismaClient.company.findMany({
+            where: {
+                id: {
+                    in: packageBundlesCompanyID
+                }
+            }
+        })
+
+        const result = packageResults.map((r) => {
+
+            const pakcageBundlesFind = packageBundles.find((pb) => pb.id === r.package_bundle_id);
+            const companiesFind = companies.find((c) => c.id === pakcageBundlesFind?.company_id);
+
+            return {
+                id: r.id,
+                package_name: pakcageBundlesFind ? pakcageBundlesFind.package_name : null,
+                company: companiesFind ? companiesFind.brand_name : null,
+                duration : r.duration
+            }
+        })
+
+        return result;
 
     }
 

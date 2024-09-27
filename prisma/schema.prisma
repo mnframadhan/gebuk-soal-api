@@ -133,6 +133,7 @@ model PackageBundle {
   company_id String
   company Company @relation(fields: [company_id], references: [id])
   packageTestUnit PackageTestUnit[]
+  packageBundle PackageTestWorks[]
   packageTestResult PackageTestResults[]
 
   @@map("packageBundles")
@@ -167,6 +168,9 @@ model PackageTestWorks {
   end_time String?
   student_id String
   Student Student @relation(fields: [student_id], references: [id])
+  package_bundle_id String
+  PackageBundle PackageBundle @relation(fields: [package_bundle_id], references: [id])
+  
   package_test_unit_id String
   packageTestUnit PackageTestUnit @relation(fields: [package_test_unit_id], references: [id])
 
@@ -176,15 +180,12 @@ model PackageTestWorks {
 model PackageTestResults {
 
   id String @id @default(uuid())
-  package_test_unit_id String
   candidate_id String
+  total_records Int
   duration Int
-  start_time Int
-  end_time Int
   n_true Int
   n_false Int
   points Int
-  results Boolean
   package_bundle_id String
   packageBundle PackageBundle @relation(fields: [package_bundle_id], references: [id])
   Candidate Candidate @relation(fields: [candidate_id], references: [id])

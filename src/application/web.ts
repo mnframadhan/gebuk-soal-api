@@ -125,4 +125,6 @@ app.get('/api/candidate/bundle-test', authStudentMiddleware, packageBundleMiddle
 
 // candidate works
 app.get('/api/candidate/bundle-test/works', authStudentMiddleware, packageBundleMiddleware, CandidateController.getPackageTestUnitsByPackageBundleIdPagination) // query page
-app.post('/api/candidate/bundle-test/test-unit/works', authStudentMiddleware, CandidateController.createWorks) // query package_test_unit_id
+app.post('/api/candidate/bundle-test/test-unit/works', authStudentMiddleware, CandidateController.createWorks) // query package_test_unit_id // query package_bundle_id
+app.post('/api/candidate/bundle-test/results', authStudentMiddleware, packageBundleMiddleware, CandidateController.createResults) // query package_bundle_id
+app.get('/api/candidate/bundle-test/results', authStudentMiddleware, CandidateController.getResults);

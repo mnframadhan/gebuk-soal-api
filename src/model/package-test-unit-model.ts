@@ -97,7 +97,8 @@ export type PackageTestUnitWorksResponse = {
 
 export type ShowedSingleUnit = {
 
-    id: string | null;
+    id: string;
+    package_bundle_id: string;
     text: string | null;
     question: string | null;
     option1: string | null;

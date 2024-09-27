@@ -18,7 +18,7 @@ export class CandidateValidation {
 
     })
 
-    static readonly WORKORUPDATE : ZodType = z.object({
+    static readonly WORK : ZodType = z.object({
 
         selected_answer: z.string().optional(),
 

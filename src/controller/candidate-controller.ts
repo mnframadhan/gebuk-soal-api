@@ -90,13 +90,15 @@ export class CandidateController {
         }
     }
 
-    static async createWorks(req: StudentReq, res: Response, next: NextFunction ) {
+    static async createWorks(req: PackageBundleReq, res: Response, next: NextFunction ) {
 
         try {
 
             const package_test_unit_id : string =  req.query.package_test_unit_id as string;
+            const package_bundle_id : string = req.query.package_bundle_id as string;
+
             const request: PackageTestUnitsWorksRequest = req.body as PackageTestUnitsWorksRequest;
-            const response = await CandidateService.createWorks(request, package_test_unit_id, req.student!)
+            const response = await CandidateService.createWorks(request, package_bundle_id, package_test_unit_id, req.student!)
 
             res.status(201);
             res.json(response);
@@ -105,7 +107,34 @@ export class CandidateController {
             next(err);
         }
     }
-    
+
+    static async createResults(req: PackageBundleReq, res: Response, next: NextFunction) {
+
+        try {
+
+            const package_bundle_id: string = req.query.package_bundle_id as string;
+            const response = await CandidateService.createResult(req.student!, package_bundle_id );
+
+            res.status(201);
+            res.json(response);
+
+
+        } catch (err) {
+            next(err)
+        } 
+    }
+
+    static async getResults(req: StudentReq, res: Response, next: NextFunction) {
+        
+        try {
+            const response = await CandidateService.getResultsForCandidate(req.student!);
+            res.status(200);
+            res.json(response);
+        } catch (err) {
+            next(err);
+        }
+    }
+
     static async updateCandidate(req: StudentReq, res: Response, next: NextFunction) {
 
         try {
