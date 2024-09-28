@@ -24,4 +24,10 @@ export class CandidateValidation {
 
     })
 
+    static readonly DONE : ZodType = z.object({
+
+        start_time: z.string(),
+        end_time: z.string()
+
+    })
 }

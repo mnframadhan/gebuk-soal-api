@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { StudentReq } from "../types/student-request";
-import { CandidateCreateRequest, CandidateUpdateRequest } from "../model/candidate-model";
+import { CandidateCreateRequest, CandidateResultRequest, CandidateUpdateRequest } from "../model/candidate-model";
 import { CandidateService } from "../service/candidate-service";
 import { PackageBundleResponseDetails } from "../model/package-bundle-model";
 import { PackageBundleReq } from "../types/package-bundle-request";
@@ -109,15 +109,15 @@ export class CandidateController {
     }
 
     static async createResults(req: PackageBundleReq, res: Response, next: NextFunction) {
-
+        
         try {
 
             const package_bundle_id: string = req.query.package_bundle_id as string;
-            const response = await CandidateService.createResult(req.student!, package_bundle_id );
+            const request : CandidateResultRequest = req.body as CandidateResultRequest;
+            const response = await CandidateService.createResult(request, req.student!, package_bundle_id );
 
             res.status(201);
             res.json(response);
-
 
         } catch (err) {
             next(err)

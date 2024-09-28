@@ -16,8 +16,6 @@ model Administrator {
   @@map("administrators")
 }
 
-
-
 model Contributor {
 
   id String @id @unique
@@ -81,6 +79,8 @@ model Company {
   PackageBundle PackageBundle[]
   PackageTestUnit PackageTestUnit[]
   status String? @default("Free")
+  requested_to_update_at String?
+  status_updated_at String?
 
   @@map("companies")
 }
@@ -182,6 +182,8 @@ model PackageTestResults {
   id String @id @default(uuid())
   candidate_id String
   total_records Int
+  start_time String?
+  end_time String?
   duration Int
   n_true Int
   n_false Int

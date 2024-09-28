@@ -7,7 +7,7 @@ import { ResponseError } from "../error/response-error";
 import { StudentResponse } from "../model/student-model";
 import { Paging } from "../model/pages";
 import { OrderListPagination } from "../model/order-model";
-import { Administrator } from "@prisma/client";
+import { Administrator, Company } from "@prisma/client";
 
 export class AdministratorService {
 
@@ -192,6 +192,46 @@ export class AdministratorService {
                 premium_at: new Date(date),
                 premium_request: "Completed"
             },
+        })
+    }
+
+    static async getAllCompanies(page: number, limit: number) {
+
+
+        const skip = (page - 1) * limit;
+        const pagination: Paging = {
+            size: limit,
+            total_page: Math.ceil(Number(await prismaClient.company.count({})) / limit),
+            current_page: page
+        }
+
+        const student = await prismaClient.company.findMany({
+            skip: skip,
+            take: limit,
+            orderBy: {
+                created_at: 'desc'
+            }
+        })
+
+        return {
+            pagination: pagination,
+            data: student
+        }
+    }
+
+    static async updatePremiumCompany(company_id: string ) : Promise<void> {
+
+        const statusUpdatedAt = String(Date.now())
+
+        await prismaClient.company.update({
+
+            where: {
+                id: company_id
+            },
+            data: {
+                status: "Premium",
+                status_updated_at: statusUpdatedAt
+            }
         })
     }
 

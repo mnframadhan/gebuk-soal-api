@@ -27,3 +27,10 @@ export type CandidateUpdateRequest = {
     phone: string | undefined;
 
 }
+
+export type CandidateResultRequest = {
+
+    start_time: string;
+    end_time: string;
+
+}

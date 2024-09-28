@@ -154,6 +154,23 @@ export class CompanyService {
         }
 
     }
+
+    static async updateStatus(company: Company) : Promise<{message: string}> {
+
+        const requestUpdatedAt = String(Date.now());
+
+        await prismaClient.company.update({
+            where: {
+                id: company.id
+            },
+            data: {
+                status: "Waiting",
+                request_updated_at: requestUpdatedAt
+            }
+        })
+
+        return {message: "Success"}
+    }
 	
 	static async orderStandardPackage(company: Company) : Promise<{message: string}> {
 

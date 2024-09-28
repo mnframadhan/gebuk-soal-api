@@ -1,7 +1,7 @@
 import { PackageBundle, Student } from "@prisma/client";
 import { prismaClient } from "../application/database";
 import { ResponseError } from "../error/response-error";
-import { CandidateCreateRequest, CandidateResponse, CandidateUpdateRequest } from "../model/candidate-model";
+import { CandidateCreateRequest, CandidateResponse, CandidateResultRequest, CandidateUpdateRequest } from "../model/candidate-model";
 import { PackageBundleResponseDetails } from "../model/package-bundle-model";
 import { packageTestUnitsPagination, PackageTestUnitsWorksRequest, PackageTestUnitWorksResponse } from "../model/package-test-unit-model";
 import { Validation } from "../validation/Validation";
@@ -158,8 +158,9 @@ export class CandidateService {
 
     }
 
-    static async createResult(student: Student, package_bundle_id: string ) : Promise<any> {
+    static async createResult(request: CandidateResultRequest, student: Student, package_bundle_id: string ) : Promise<any> {
 
+        const validatedRequest = Validation.validate(CandidateValidation.DONE, request);
 
         // find the last works
         const latestTestUnits = await prismaClient.packageTestWorks.groupBy({
@@ -236,8 +237,7 @@ export class CandidateService {
             }
         })
 
-        const endTimes = results.map((r) => Number(r.end_time));
-        const duration = Math.max(...endTimes) - Math.min(...endTimes);
+        const duration = Number(validatedRequest.start_time) - Number(validatedRequest.end_time);
 
         const end_results = {
             id: String(uuid()),
@@ -254,7 +254,6 @@ export class CandidateService {
             data: end_results
         })
 
-    
         return response;
 
     }
