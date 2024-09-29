@@ -237,7 +237,7 @@ export class CandidateService {
             }
         })
 
-        const duration = Number(validatedRequest.start_time) - Number(validatedRequest.end_time);
+        const duration = Number(validatedRequest.end_time) - Number(validatedRequest.start_time);
 
         const end_results = {
             id: String(uuid()),
@@ -247,7 +247,9 @@ export class CandidateService {
             n_true : results.filter((r) => r.correct ).length,
             n_false : results.length - results.filter((r) => r.correct ).length,
             points: results.filter((r) => r.correct ).length/results.length,
-            package_bundle_id: package_bundle_id
+            package_bundle_id: package_bundle_id,
+            start_time: String(validatedRequest.start_time),
+            end_time: String(validatedRequest.end_time)
         };
 
         const response = await prismaClient.packageTestResults.create({
@@ -271,14 +273,6 @@ export class CandidateService {
 
             where: {
                 candidate_id: candidate.id
-            },
-            select: {
-                id: true,
-                package_bundle_id: true,
-                total_records: true,
-                duration: true,
-                n_true: true,
-                n_false: true
             }
         })
 
@@ -311,7 +305,9 @@ export class CandidateService {
                 id: r.id,
                 package_name: pakcageBundlesFind ? pakcageBundlesFind.package_name : null,
                 company: companiesFind ? companiesFind.brand_name : null,
-                duration : r.duration
+                duration : r.duration,
+                start_time: r.start_time,
+                end_time: r.end_time
             }
         })
 

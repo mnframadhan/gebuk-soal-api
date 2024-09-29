@@ -187,7 +187,7 @@ model PackageTestResults {
   duration Int
   n_true Int
   n_false Int
-  points Int
+  points Decimal
   package_bundle_id String
   packageBundle PackageBundle @relation(fields: [package_bundle_id], references: [id])
   Candidate Candidate @relation(fields: [candidate_id], references: [id])

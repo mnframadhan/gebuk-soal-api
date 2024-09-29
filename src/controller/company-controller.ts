@@ -130,4 +130,22 @@ export class CompanyController {
 			} catch (err) { next(err) }
 
 	} 
+
+    static async getPackageTestUnitByPackageBundleIdPagination(req: CompanyReq, res: Response, next: NextFunction ) {
+
+        try {
+
+            const page : number = Number(req.query.page);
+            const package_bundle_id : string = String(req.params.package_bundle_id);
+
+            const response = await CompanyService.getPackageTestUnitByPackageBundleIdPagination(page, package_bundle_id, req.company!);
+            res.status(200);
+            res.json(response);
+
+
+        } catch (err) {
+            next(err);
+        }
+
+    }
 }

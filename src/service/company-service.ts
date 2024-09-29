@@ -1,4 +1,4 @@
-import { Company } from "@prisma/client";
+import { Company, PackageBundle } from "@prisma/client";
 import { prismaClient } from "../application/database";
 import { ResponseError } from "../error/response-error";
 import { CompanyLoginRequest, CompanyRegisterRequest, CompanyResponse } from "../model/company-model";
@@ -6,6 +6,7 @@ import { CompanyValidation } from "../validation/company-validation";
 import { Validation } from "../validation/Validation";
 import bcrypt from "bcrypt";
 import { v4 as uuid } from "uuid";
+import { packageTestUnitsPagination } from "../model/package-test-unit-model";
 
 export class CompanyService {
 
@@ -170,6 +171,52 @@ export class CompanyService {
         })
 
         return {message: "Success"}
+    }
+
+    static async getPackageTestUnitByPackageBundleIdPagination(page: number, package_bundle_id: string, company: Company) : Promise<packageTestUnitsPagination> {
+
+        const pageNum : number = page;
+        const size : number = 1;
+
+        const testUnits = await prismaClient.packageTestUnit.findMany({
+            where: {
+                package_bundle_id: package_bundle_id,
+                company_id: company.id
+            },
+            select: {
+                id: true,
+                package_bundle_id: true,
+                text: true,
+                question: true,
+                option1: true,
+                option2: true,
+                option3: true,
+                option4: true,
+                option5: true
+            },
+            skip: (pageNum - 1) * size,
+            take: size
+        })
+
+        const totalPages = await prismaClient.packageTestUnit.count({
+            where: {
+                package_bundle_id: package_bundle_id,
+                company_id: company.id
+            }
+        })
+
+        const response = {
+
+            pagination: {
+                current_page: pageNum,
+                total_page: totalPages,
+                size: size
+            },
+            data: testUnits
+        }
+
+        return response;
+
     }
 	
 	static async orderStandardPackage(company: Company) : Promise<{message: string}> {
