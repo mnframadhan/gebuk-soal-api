@@ -5,6 +5,8 @@ export class StudentValidation {
     static readonly CREATE : ZodType = z.object({
 
         username: z.string().min(3).max(100),
+        full_name: z.string().min(3).max(100),
+        date_of_birth: z.string(),
         email: z.string().email(),
         password: z.string().min(8).max(100),
     

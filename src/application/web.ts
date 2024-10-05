@@ -1,6 +1,7 @@
 import cors from 'cors';
 import express from 'express';
 import { AdministratorController } from '../controller/administrator-controller';
+import { CandidateController } from '../controller/candidate-controller';
 import { CompanyController } from '../controller/company-controller';
 import { ContributorController } from '../controller/contributor-controller';
 import { OrderController } from '../controller/order-controller';
@@ -14,12 +15,10 @@ import { authAdminMiddleware } from '../middleware/auth-admin-middleware';
 import { authCompanyMiddleware } from '../middleware/auth-company-middleware';
 import { authMiddleware } from '../middleware/auth-middleware';
 import { authStudentMiddleware } from '../middleware/auth-student-middleware';
-import { globalLimiter, limiter, plusLimiter } from '../middleware/request-limiter';
-import { upload } from '../middleware/upload-file-middleware';
-import { CandidateController } from '../controller/candidate-controller';
 import { errorMiddleware } from '../middleware/error-middleware';
 import { packageBundleMiddleware } from '../middleware/package-bundle-middleware';
-import { CompanyService } from '../service/company-service';
+import { globalLimiter, limiter, plusLimiter } from '../middleware/request-limiter';
+import { upload } from '../middleware/upload-file-middleware';
 
 export const app = express();
 app.use(express.json());
@@ -28,7 +27,6 @@ app.use(cors({
   credentials: true                // Allow credentials (cookies, authorization headers)
 }));
 app.use(globalLimiter)  // limited maximum only 100 requests per minute
-app.use(errorMiddleware);
 
 // sayHello
 
@@ -130,3 +128,5 @@ app.get('/api/candidate/bundle-test/works', authStudentMiddleware, packageBundle
 app.post('/api/candidate/bundle-test/test-unit/works', authStudentMiddleware, CandidateController.createWorks) // query package_test_unit_id // query package_bundle_id
 app.post('/api/candidate/bundle-test/results', authStudentMiddleware, packageBundleMiddleware, CandidateController.createResults) // query package_bundle_id
 app.get('/api/candidate/bundle-test/results', authStudentMiddleware, CandidateController.getResults);
+
+app.use(errorMiddleware);

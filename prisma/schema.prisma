@@ -6,6 +6,7 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
 model Administrator {
 
   id String @id @unique
@@ -24,7 +25,7 @@ model Contributor {
   password String
   contribution_points Int @default(0)
   n_soal Int @default(0)
-  created_at DateTime @default(now())
+  created_at String
   soals Soal[]
   token String?
 
@@ -36,20 +37,28 @@ model Student {
 
   id String @id @unique
   username String @unique
+  full_name String?
+  date_of_birth String?
   email String @unique
   password String
   points Int @default(0)
   n_soal Int @default(0)
-  n_soal_tiu Int @default(0)
-  n_soal_twk Int @default(0)
-  n_soal_tkp Int @default(0)
+  cognitive_point Int @default(0)
+  math_point Int @default(0)
+  analytical_point Int @default(0)
+  logical_point Int @default(0)
+  text_understanding_point Int @default(0)
+  analogical_accuracy_point Int @default(0)
+  leadership_point Int @default(0)
+  integrity_point Int @default(0)
+  loyalty_point Int @default(0)
   quota Int @default(5)
-  created_at DateTime @default(now())
+  created_at String // unix time
   token String?
   membership String @default("Basic")
   avatar String?
   premium_request String @default("None")
-  premium_at DateTime?
+  premium_at String?
   works Work[]
   result Result[]
   order Order[]
@@ -89,22 +98,22 @@ model PackageTestUnit {
   id String @id @unique @default(uuid())
   company_id String
   company Company @relation(fields: [company_id], references: [id])
-  text String? @db.LongText
+  text String?
   text_image String?
   question String?
-  option1 String? @db.LongText
+  option1 String?
   option1_point Int?
   option1_image String?
-  option2 String? @db.LongText
+  option2 String?
   option2_point Int?
   option2_image String?
-  option3 String? @db.LongText
+  option3 String?
   option3_point Int?
   option3_image String?
-  option4 String? @db.LongText
+  option4 String?
   option4_point Int?
   option4_image String?
-  option5 String? @db.LongText
+  option5 String?
   option5_point Int?
   option5_image String?
   unique_answer String?
@@ -204,8 +213,8 @@ model Order {
   price Int @default(2000)
   discount Float @default(0)
   sub_total Int
-  order_date DateTime @default(now())
-  payment_date DateTime?
+  order_date String
+  payment_date String?
   status String @default("Menunggu Pembayaran")
 
   @@map("orders")
@@ -215,51 +224,30 @@ model Order {
 model Soal {
 
   id String @id @unique
-  category String // Tes Intelegensi Umum, Tes Wawasan Kebangsaan, Tes Karakteristik Pribadi 
-  label String 
-  type String
+  category String
+  label String? 
   text String @db.LongText
-  text2 String? @db.LongText
-  text3 String? @db.LongText
-  text4 String? @db.LongText
-  text5 String? @db.LongText
-  image1 String?
-  image2 String?
-  image3 String?
-  image4 String?
-  image5 String?
-  question String @db.LongText
-  option1 String? @db.LongText 
-  option2 String? @db.LongText
-  option3 String? @db.LongText
-  option4 String? @db.LongText
-  option5 String? @db.LongText
-  option_image1 String?
-  option_image2 String?
-  option_image3 String?
-  option_image4 String?
-  option_image5 String?
-  option_point1 Int?
-  option_point2 Int?
-  option_point3 Int?
-  option_point4 Int?
-  option_point5 Int?
-  answer String
+  question String
+  option1 String? 
+  option2 String?
+  option3 String?
+  option4 String?
+  option5 String?
+  option1_point Int?
+  option2_point Int?
+  option3_point Int?
+  option4_point Int?
+  option5_point Int?
+  correct_answer String
   explanation String? @db.LongText
-  explanation_image1 String?
-  explanation_image2 String?
-  explanation_image3 String?
-  explanation_image4 String?
-  explanation_image5 String?
   created_by String?
   contributor Contributor? @relation(fields: [created_by], references: [username], onDelete: SetNull, onUpdate: Cascade)
-  created_at DateTime @default(now())
+  created_at String
   Works Work[]
 
   @@map("soals")
   
 }
-
 
 model Work {
 
@@ -270,7 +258,7 @@ model Work {
   soal Soal @relation(fields: [soal_id], references: [id], onDelete: Cascade)
   answer String
   result Boolean
-  created_at DateTime @default(now())
+  created_at String
 
   @@map("works")
 
@@ -284,7 +272,7 @@ model Result {
   today_works Int
   number_of_true Int
   number_of_false Int
-  created_at DateTime @default(now())
+  created_at String
 
   @@map("results")
   

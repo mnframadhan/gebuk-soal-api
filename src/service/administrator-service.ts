@@ -181,7 +181,7 @@ export class AdministratorService {
 
     static async updatePremiumStudent(student_id: string) : Promise<void> {
 
-        const date = Date.now()
+        const date = String(Date.now())
 
         await prismaClient.student.update({
             where: {
@@ -189,7 +189,7 @@ export class AdministratorService {
             },
             data: {
                 membership: "Premium",
-                premium_at: new Date(date),
+                premium_at: date,
                 premium_request: "Completed"
             },
         })

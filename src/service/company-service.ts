@@ -166,7 +166,7 @@ export class CompanyService {
             },
             data: {
                 status: "Waiting",
-                request_updated_at: requestUpdatedAt
+                requested_to_update_at: requestUpdatedAt
             }
         })
 

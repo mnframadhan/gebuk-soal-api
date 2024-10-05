@@ -47,10 +47,9 @@ export function premiumScheduler() : void  {
         console.log(`Running scheduled task at: ${currentTime}`);
         console.log('Status premium telah diupdate')
 
-        const now = new Date();
-        const oneMonthAgo = new Date(now.setMonth(now.getMonth() - 1));
+        const oneMonthAgo = String(Date.now() - 2419200)
         // Your task logic here
-        const result = await prismaClient.student.updateMany({
+        await prismaClient.student.updateMany({
           where: {
             membership: 'Premium',
             premium_at: {

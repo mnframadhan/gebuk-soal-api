@@ -4,6 +4,8 @@ import { Paging } from "./pages";
 export type StudentRequest = {
 
     username : string;
+    full_name: string | null;
+    date_of_birth: string | null;
     email : string;
     password : string;
 
@@ -13,13 +15,21 @@ export type StudentResponse = {
 
     id : string;
     username : string;
+    full_name: String | null;
+    date_of_birth: string | null;
     email : string;
     points : number;
     n_soal : number;
-    n_soal_tiu: number;
-    n_soal_twk: number;
-    n_soal_tkp: number;
-    created_at : Date;
+    cognitive_point: number;
+    math_point: number;
+    analytical_point: number;
+    logical_point: number;
+    text_understanding_point: number;
+    analogical_accuracy_point: number;
+    leadership_point: number;
+    integrity_point: number;
+    loyalty_point: number;
+    created_at : string;
     quota: number;
     membership: string;
     token : string | null;
@@ -60,12 +70,20 @@ export function toStudentResponse(student: Student) : StudentResponse {
 
         id: student.id,
         username: student.username,
+        full_name: student.full_name,
+        date_of_birth: student.date_of_birth,
         email: student.email,
         points: student.points,
-        n_soal: student.n_soal, 
-        n_soal_tiu: student.n_soal_tiu,
-        n_soal_twk: student.n_soal_twk,
-        n_soal_tkp: student.n_soal_tkp,
+        n_soal : student.n_soal,
+        cognitive_point: student.cognitive_point,
+        math_point: student.math_point,
+        analytical_point: student.analytical_point,
+        logical_point: student.logical_point,
+        text_understanding_point: student.text_understanding_point,
+        analogical_accuracy_point: student.analogical_accuracy_point,
+        leadership_point: student.leadership_point,
+        integrity_point: student.integrity_point,
+        loyalty_point: student.loyalty_point,
         created_at: student.created_at,
         quota: student.quota,
         membership: student.membership,

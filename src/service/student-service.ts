@@ -1,12 +1,11 @@
+import { Student } from "@prisma/client";
+import bcrypt from "bcrypt";
+import { v4 as uuid } from "uuid";
 import { prismaClient } from "../application/database";
-import { LeaderboardStudentData, StudentLeaderboardResponse, StudentRequest, StudentResponse, StudentUpdateRequest, toStudentLeaderboardResponse, toStudentResponse } from "../model/student-model";
+import { ResponseError } from "../error/response-error";
+import { StudentRequest, StudentResponse, StudentUpdateRequest, toStudentResponse } from "../model/student-model";
 import { StudentValidation } from "../validation/student-validation";
 import { Validation } from "../validation/Validation";
-import { v4 as uuid } from "uuid";
-import bcrypt from "bcrypt"
-import { Student } from "@prisma/client";
-import { ResponseError } from "../error/response-error";
-import { Paging } from "../model/pages";
 
 export class StudentService {
 
@@ -30,6 +29,7 @@ export class StudentService {
 
         // prepare
         const student_id = uuid();
+        const created_at = String(Date.now());
 
         // hasing password
         const hashedPassword = await bcrypt.hash(validatedRequest.password, 10)
@@ -37,7 +37,9 @@ export class StudentService {
 
         const data = {
             ...validatedRequest,
-            id: student_id
+            id: student_id,
+            created_at: created_at,
+
         }
 
         // insert into database

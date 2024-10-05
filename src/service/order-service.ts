@@ -14,6 +14,7 @@ export class OrderService {
         const validatedRequest = Validation.validate(OrderValidation.CREATE, request);
 
         const id = uuid();
+        const order_date = String(Date.now());
 
         // calculate sub_total
         const sub_total = validatedRequest.qty*2000
@@ -22,7 +23,8 @@ export class OrderService {
             id: id,
             ...validatedRequest,
             student_id: student.id,
-            sub_total: sub_total
+            sub_total: sub_total,
+            order_date: order_date,
         }
 
         // insert into database

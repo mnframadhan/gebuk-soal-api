@@ -21,7 +21,7 @@ export type ContributorResponse = {
     id: string;
     username: string;
     email: string;
-    created_at : Date;
+    created_at : string;
     contribution_points: number;
     n_soal : number;
     token? : string | null;
@@ -33,10 +33,9 @@ export type SmallContributorResponse = {
 }
 
 export type minimizedSoalCreatedResponse = {
-    created_at: Date;
+    created_at: string;
     id: string;
     text: string;
-    type: string;
 }
 
 

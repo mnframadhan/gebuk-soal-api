@@ -22,33 +22,18 @@ export type WorksResultsResponse = {
     soal_id : string;
     category: string;
     label: string;
-    type: string;
     text: string;
-    text2?: string | null;
-    text3?: string | null;
-    text4?: string | null;
-    text5?: string | null;
-    image1?: string | null;
-    image2?: string | null;
-    image3?: string | null;
-    image4?: string | null;
-    image5?: string | null;
     question: string;
-    option1?: string | null;
-    option2?: string | null;
-    option3?: string | null;
-    option4?: string | null;
-    option5?: string | null;
-    option_image1?: string | null;
-    option_image2?: string | null;
-    option_image3?: string | null;
-    option_image4?: string | null;
-    option_image5?: string | null;
-    option_point1?: number | null;
-    option_point2?: number | null;
-    option_point3?: number | null;
-    option_point4?: number | null;
-    option_point5?: number | null;
+    option1: string | null;
+    option2: string | null;
+    option3: string | null;
+    option4: string | null;
+    option5: string | null;
+    option1_point: number | null;
+    option2_point: number | null;
+    option3_point: number | null;
+    option4_point: number | null;
+    option5_point: number | null;
     
 }
 

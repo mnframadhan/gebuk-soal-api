@@ -13,12 +13,14 @@ export class SoalService {
         const validatedRequest = Validation.validate(SoalValidation.CREATE, request);
 
         const id = String(uuid());
+        const created_at = String(Date.now());
 
         // prepare insert data
         const data = {
             ...validatedRequest,
             created_by: contributor.username,
-            id: id
+            id: id,
+            created_at: created_at
         }
 
         // insert into database

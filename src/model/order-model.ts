@@ -14,8 +14,8 @@ export type OrderResponse = {
     qty: number;
     price: number;
     sub_total: number;
-    order_date: Date;
-    payment_date: Date | null;
+    order_date: string;
+    payment_date: string | null;
     status: string;
 
 }

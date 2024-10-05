@@ -1,10 +1,9 @@
 import { Student } from "@prisma/client";
-import { prismaClient } from "../application/database";
-import { ResultsResponse, toWorkResponse, toWorksResultsResponse, WorksRequest, WorksResultsResponse } from "../model/works-model";
 import { v4 as uuid, v4 } from "uuid";
-import { Paging } from "../model/pages";
-import { updateStudentNSoal } from "../helpers/create-works-update";
+import { prismaClient } from "../application/database";
 import { getSoalWithExcludedIds, getSoalWithExcludedIdsbyCat } from "../helpers/get-soal-works";
+import { Paging } from "../model/pages";
+import { ResultsResponse, toWorkResponse, toWorksResultsResponse, WorksRequest, WorksResultsResponse } from "../model/works-model";
 
 export class WorksService {
 
@@ -25,10 +24,8 @@ export class WorksService {
 
         if (category==="none") {
             const soals = await getSoalWithExcludedIds(student.username)
-            console.log("none")
             return {pagination: pagination, data: [soals]}
         } else {
-            console.log("by category")
             const soals = await getSoalWithExcludedIdsbyCat(student.username, category!)
             return {pagination: pagination, data: [soals]}
         }
@@ -43,7 +40,7 @@ export class WorksService {
             }
         })
 
-        const currentAnswer = currentSoal?.answer as string
+        const currentAnswer = currentSoal?.correct_answer as string
 
         // set result
         let result: boolean;
@@ -55,6 +52,7 @@ export class WorksService {
 
         // prepare
         const works_uuid = String(uuid());
+        const created_at = String(Date.now());
 
         // insert into database
         const works = await prismaClient.work.create({
@@ -64,7 +62,8 @@ export class WorksService {
                 ...request,
                 username: student.username,
                 result: result,
-                soal_id: soal
+                soal_id: soal,
+                created_at: created_at
             }
         })
 
@@ -79,13 +78,13 @@ export class WorksService {
             }
         });
 
-        const current_soal = await prismaClient.soal.findUnique({
-            where: {
-                id: soal
-            }
-        })
+        // const current_soal = await prismaClient.soal.findUnique({
+        //     where: {
+        //         id: soal
+        //     }
+        // })
 
-        updateStudentNSoal(student.id, current_soal?.category!);
+        // updateStudentNSoal(student.id, current_soal?.category!);
 
         return toWorkResponse(works);
     }
@@ -94,11 +93,9 @@ export class WorksService {
     static async setTodayWorks(student: Student) {
 
         // get Todays Works
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const tomorrow = new Date(today);
-        // Set the time to the start of the next day
-        tomorrow.setDate(tomorrow.getDate() + 1);
+        const today = String(Date.now());
+        const tomorrow = String(Date.now() + 86400)
+        
 
         const works = await prismaClient.work.findMany({
             where: {
@@ -122,6 +119,7 @@ export class WorksService {
             today_works: Number(works.length),
             number_of_true: countTrue,
             number_of_false: works.length - countTrue,
+            created_at: String(Date.now())
         }
 
         // insert into database
@@ -135,11 +133,8 @@ export class WorksService {
     static async getTodayWorks(student: Student): Promise<ResultsResponse<WorksResultsResponse>> {
 
         // get Todays Works
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const tomorrow = new Date(today);
-        // Set the time to the start of the next day
-        tomorrow.setDate(tomorrow.getDate() + 1);
+        const today = String(Date.now());
+        const tomorrow = String(Date.now() + 86400);
 
         const works = await prismaClient.work.findMany({
             where: {
@@ -194,28 +189,13 @@ export class WorksService {
                 category: soal?.category,
                 text: soal?.text,
                 question: soal?.question,
-                type: soal?.type,
-                correct_answer: soal?.answer,
+                correct_answer: soal?.correct_answer,
                 your_answer: w.answer,
-                text2: soal?.text2,
-                text3: soal?.text3,
-                text4: soal?.text4,
-                text5: soal?.text5,
-                image1: soal?.image1,
-                image2: soal?.image2,
-                image3: soal?.image3,
-                image4: soal?.image4,
-                image5: soal?.image5,
-                option_image1: soal?.option_image1,
-                option_image2: soal?.option_image2,
-                option_image3: soal?.option_image3,
-                option_image4: soal?.option_image4,
-                option_image5: soal?.option_image5,
-                option_point1: soal?.option_point1,
-                option_point2: soal?.option_point2,
-                option_point3: soal?.option_point3,
-                option_point4: soal?.option_point4,
-                option_point5: soal?.option_point5,
+                option1_point: soal?.option1_point,
+                option2_point: soal?.option2_point,
+                option3_point: soal?.option3_point,
+                option4_point: soal?.option4_point,
+                option5_point: soal?.option5_point,
                 option1: soal?.option1,
                 option2: soal?.option2,
                 option3: soal?.option3,

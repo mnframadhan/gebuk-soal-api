@@ -44,12 +44,14 @@ export class ContributoService {
 
         // create uuid and datetime now
         const contributorUUID : string = String(uuid());
+        const created_at: string = String(Date.now());
         
 
         // prepare data for database
         const data = {
             ...validatedRequest,
             id : contributorUUID,
+            created_at: created_at
         }
 
         // create contributor
@@ -138,7 +140,7 @@ export class ContributoService {
 
         const data = soal.map((
 
-            ({created_at, id, text, type}) => ({created_at, id, text, type})
+            ({created_at, id, text}) => ({created_at, id, text})
         
         ))
         

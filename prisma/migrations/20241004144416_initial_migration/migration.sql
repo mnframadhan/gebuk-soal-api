@@ -18,7 +18,7 @@ CREATE TABLE `contributors` (
     `password` VARCHAR(191) NOT NULL,
     `contribution_points` INTEGER NOT NULL DEFAULT 0,
     `n_soal` INTEGER NOT NULL DEFAULT 0,
-    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `created_at` VARCHAR(191) NOT NULL,
     `token` VARCHAR(191) NULL,
 
     UNIQUE INDEX `contributors_id_key`(`id`),
@@ -35,16 +35,22 @@ CREATE TABLE `students` (
     `password` VARCHAR(191) NOT NULL,
     `points` INTEGER NOT NULL DEFAULT 0,
     `n_soal` INTEGER NOT NULL DEFAULT 0,
-    `n_soal_tiu` INTEGER NOT NULL DEFAULT 0,
-    `n_soal_twk` INTEGER NOT NULL DEFAULT 0,
-    `n_soal_tkp` INTEGER NOT NULL DEFAULT 0,
+    `cognitive_point` INTEGER NOT NULL DEFAULT 0,
+    `math_point` INTEGER NOT NULL DEFAULT 0,
+    `analytical_point` INTEGER NOT NULL DEFAULT 0,
+    `logical_point` INTEGER NOT NULL DEFAULT 0,
+    `text_understanding_point` INTEGER NOT NULL DEFAULT 0,
+    `analogical_accuracy_point` INTEGER NOT NULL DEFAULT 0,
+    `leadership_point` INTEGER NOT NULL DEFAULT 0,
+    `integrity_point` INTEGER NOT NULL DEFAULT 0,
+    `loyalty_point` INTEGER NOT NULL DEFAULT 0,
     `quota` INTEGER NOT NULL DEFAULT 5,
-    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `created_at` VARCHAR(191) NOT NULL,
     `token` VARCHAR(191) NULL,
     `membership` VARCHAR(191) NOT NULL DEFAULT 'Basic',
     `avatar` VARCHAR(191) NULL,
     `premium_request` VARCHAR(191) NOT NULL DEFAULT 'None',
-    `premium_at` DATETIME(3) NULL,
+    `premium_at` VARCHAR(191) NULL,
 
     UNIQUE INDEX `students_id_key`(`id`),
     UNIQUE INDEX `students_username_key`(`username`),
@@ -69,6 +75,9 @@ CREATE TABLE `companies` (
     `token` VARCHAR(191) NULL,
     `created_at` VARCHAR(191) NOT NULL,
     `banner_image` VARCHAR(191) NULL,
+    `status` VARCHAR(191) NULL DEFAULT 'Free',
+    `requested_to_update_at` VARCHAR(191) NULL,
+    `status_updated_at` VARCHAR(191) NULL,
 
     UNIQUE INDEX `companies_id_key`(`id`),
     UNIQUE INDEX `companies_email_key`(`email`),
@@ -79,22 +88,22 @@ CREATE TABLE `companies` (
 CREATE TABLE `packageTestUnits` (
     `id` VARCHAR(191) NOT NULL,
     `company_id` VARCHAR(191) NOT NULL,
-    `text` LONGTEXT NULL,
+    `text` VARCHAR(191) NULL,
     `text_image` VARCHAR(191) NULL,
     `question` VARCHAR(191) NULL,
-    `option1` LONGTEXT NULL,
+    `option1` VARCHAR(191) NULL,
     `option1_point` INTEGER NULL,
     `option1_image` VARCHAR(191) NULL,
-    `option2` LONGTEXT NULL,
+    `option2` VARCHAR(191) NULL,
     `option2_point` INTEGER NULL,
     `option2_image` VARCHAR(191) NULL,
-    `option3` LONGTEXT NULL,
+    `option3` VARCHAR(191) NULL,
     `option3_point` INTEGER NULL,
     `option3_image` VARCHAR(191) NULL,
-    `option4` LONGTEXT NULL,
+    `option4` VARCHAR(191) NULL,
     `option4_point` INTEGER NULL,
     `option4_image` VARCHAR(191) NULL,
-    `option5` LONGTEXT NULL,
+    `option5` VARCHAR(191) NULL,
     `option5_point` INTEGER NULL,
     `option5_image` VARCHAR(191) NULL,
     `unique_answer` VARCHAR(191) NULL,
@@ -145,6 +154,7 @@ CREATE TABLE `packageTestUnitWorks` (
     `start_time` VARCHAR(191) NULL,
     `end_time` VARCHAR(191) NULL,
     `student_id` VARCHAR(191) NOT NULL,
+    `package_bundle_id` VARCHAR(191) NOT NULL,
     `package_test_unit_id` VARCHAR(191) NOT NULL,
 
     PRIMARY KEY (`id`)
@@ -153,15 +163,14 @@ CREATE TABLE `packageTestUnitWorks` (
 -- CreateTable
 CREATE TABLE `packageTestResults` (
     `id` VARCHAR(191) NOT NULL,
-    `package_test_unit_id` VARCHAR(191) NOT NULL,
     `candidate_id` VARCHAR(191) NOT NULL,
+    `total_records` INTEGER NOT NULL,
+    `start_time` VARCHAR(191) NULL,
+    `end_time` VARCHAR(191) NULL,
     `duration` INTEGER NOT NULL,
-    `start_time` INTEGER NOT NULL,
-    `end_time` INTEGER NOT NULL,
     `n_true` INTEGER NOT NULL,
     `n_false` INTEGER NOT NULL,
-    `points` INTEGER NOT NULL,
-    `results` BOOLEAN NOT NULL,
+    `points` DECIMAL(65, 30) NOT NULL,
     `package_bundle_id` VARCHAR(191) NOT NULL,
 
     PRIMARY KEY (`id`)
@@ -175,8 +184,8 @@ CREATE TABLE `orders` (
     `price` INTEGER NOT NULL DEFAULT 2000,
     `discount` DOUBLE NOT NULL DEFAULT 0,
     `sub_total` INTEGER NOT NULL,
-    `order_date` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `payment_date` DATETIME(3) NULL,
+    `order_date` VARCHAR(191) NOT NULL,
+    `payment_date` VARCHAR(191) NULL,
     `status` VARCHAR(191) NOT NULL DEFAULT 'Menunggu Pembayaran',
 
     UNIQUE INDEX `orders_id_key`(`id`),
@@ -189,22 +198,22 @@ CREATE TABLE `soals` (
     `category` VARCHAR(191) NOT NULL,
     `label` VARCHAR(191) NOT NULL,
     `type` VARCHAR(191) NOT NULL,
-    `text` LONGTEXT NOT NULL,
-    `text2` LONGTEXT NULL,
-    `text3` LONGTEXT NULL,
-    `text4` LONGTEXT NULL,
-    `text5` LONGTEXT NULL,
+    `text` VARCHAR(191) NOT NULL,
+    `text2` VARCHAR(191) NULL,
+    `text3` VARCHAR(191) NULL,
+    `text4` VARCHAR(191) NULL,
+    `text5` VARCHAR(191) NULL,
     `image1` VARCHAR(191) NULL,
     `image2` VARCHAR(191) NULL,
     `image3` VARCHAR(191) NULL,
     `image4` VARCHAR(191) NULL,
     `image5` VARCHAR(191) NULL,
-    `question` LONGTEXT NOT NULL,
-    `option1` LONGTEXT NULL,
-    `option2` LONGTEXT NULL,
-    `option3` LONGTEXT NULL,
-    `option4` LONGTEXT NULL,
-    `option5` LONGTEXT NULL,
+    `question` VARCHAR(191) NOT NULL,
+    `option1` VARCHAR(191) NULL,
+    `option2` VARCHAR(191) NULL,
+    `option3` VARCHAR(191) NULL,
+    `option4` VARCHAR(191) NULL,
+    `option5` VARCHAR(191) NULL,
     `option_image1` VARCHAR(191) NULL,
     `option_image2` VARCHAR(191) NULL,
     `option_image3` VARCHAR(191) NULL,
@@ -216,14 +225,14 @@ CREATE TABLE `soals` (
     `option_point4` INTEGER NULL,
     `option_point5` INTEGER NULL,
     `answer` VARCHAR(191) NOT NULL,
-    `explanation` LONGTEXT NULL,
+    `explanation` VARCHAR(191) NULL,
     `explanation_image1` VARCHAR(191) NULL,
     `explanation_image2` VARCHAR(191) NULL,
     `explanation_image3` VARCHAR(191) NULL,
     `explanation_image4` VARCHAR(191) NULL,
     `explanation_image5` VARCHAR(191) NULL,
     `created_by` VARCHAR(191) NULL,
-    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `created_at` VARCHAR(191) NOT NULL,
 
     UNIQUE INDEX `soals_id_key`(`id`),
     PRIMARY KEY (`id`)
@@ -236,7 +245,7 @@ CREATE TABLE `works` (
     `soal_id` VARCHAR(191) NOT NULL,
     `answer` VARCHAR(191) NOT NULL,
     `result` BOOLEAN NOT NULL,
-    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `created_at` VARCHAR(191) NOT NULL,
 
     UNIQUE INDEX `works_id_key`(`id`),
     PRIMARY KEY (`id`)
@@ -249,7 +258,7 @@ CREATE TABLE `results` (
     `today_works` INTEGER NOT NULL,
     `number_of_true` INTEGER NOT NULL,
     `number_of_false` INTEGER NOT NULL,
-    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `created_at` VARCHAR(191) NOT NULL,
 
     UNIQUE INDEX `results_id_key`(`id`),
     PRIMARY KEY (`id`)
@@ -269,6 +278,9 @@ ALTER TABLE `candidates` ADD CONSTRAINT `candidates_student_id_fkey` FOREIGN KEY
 
 -- AddForeignKey
 ALTER TABLE `packageTestUnitWorks` ADD CONSTRAINT `packageTestUnitWorks_student_id_fkey` FOREIGN KEY (`student_id`) REFERENCES `students`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `packageTestUnitWorks` ADD CONSTRAINT `packageTestUnitWorks_package_bundle_id_fkey` FOREIGN KEY (`package_bundle_id`) REFERENCES `packageBundles`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `packageTestUnitWorks` ADD CONSTRAINT `packageTestUnitWorks_package_test_unit_id_fkey` FOREIGN KEY (`package_test_unit_id`) REFERENCES `packageTestUnits`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
