@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { ContributorLoginRequest, ContributorRequest, ContributorResponse } from "../model/contributor-model";
-import { ContributoService } from "../service/contributor-service";
+import { ContributorServices } from "../service/contributor-service";
 import { ContributorReq } from "../types/contributor-request";
 
 export class ContributorController {
@@ -11,7 +11,7 @@ export class ContributorController {
 
             // define request and response
             const request : ContributorRequest = await req.body as ContributorRequest;
-            const response : ContributorResponse = await ContributoService.createContributor(request)
+            const response : ContributorResponse = await ContributorServices.createContributor(request)
 
             // defined response status and json response
             res.status(201)
@@ -27,7 +27,7 @@ export class ContributorController {
         try {
 
             const request: ContributorLoginRequest = await req.body as ContributorLoginRequest;
-            const response: ContributorResponse = await ContributoService.loginContributor(request);
+            const response: ContributorResponse = await ContributorServices.loginContributor(request);
 
             const token : string = response.token as string;
             res.cookie('X-API-TOKEN', token, {
@@ -52,7 +52,7 @@ export class ContributorController {
         try {
             const limit : number = Number(req.query.limit);
             const page : number = Number(req.query.page);
-            const response = await ContributoService.getSoalCreated(page, limit, req.contributor! )
+            const response = await ContributorServices.getSoalCreated(page, limit, req.contributor! )
 
             res.status(200);
             res.json(response);
@@ -66,7 +66,7 @@ export class ContributorController {
 
         try {
 
-            const response = await ContributoService.getCurrentContributor(req.contributor!)
+            const response = await ContributorServices.getCurrentContributor(req.contributor!)
 
             res.status(200);
             res.json(response);
@@ -77,11 +77,11 @@ export class ContributorController {
         }
     }
 
-    static async logoutContributor (req: ContributorReq, res: Response, next: NextFunction) {
+    static async logoutContributor(req: ContributorReq, res: Response, next: NextFunction) {
 
         try {
             
-            await ContributoService.logoutCurrentContributor(req.contributor!)
+            await ContributorServices.logoutCurrentContributor(req.contributor!)
             res.status(200);
             res.json({message: "OK"})
         } catch (err) {

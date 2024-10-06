@@ -8,7 +8,7 @@ import { Contributor } from "@prisma/client";
 import { Pageable, Paging } from "../model/pages";
 import { ResponseError } from "../error/response-error";
 
-export class ContributoService {
+export class ContributorServices {
 
     static async createContributor(request: ContributorRequest) {
 

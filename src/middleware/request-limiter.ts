@@ -8,7 +8,7 @@ export const globalLimiter = rateLimit({
 
 export const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 20, // Limit maximum 20 request per 3 minutes
+    max: 50, // Limit maximum 20 request per 3 minutes
     message: 'Too many requests from this IP, please try again after 15 minutes',
   });
 

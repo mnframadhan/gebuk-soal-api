@@ -52,6 +52,9 @@ model Student {
   leadership_point Int @default(0)
   integrity_point Int @default(0)
   loyalty_point Int @default(0)
+  cpns_tiu_point Int @default(0)
+  cpns_twk_point Int @default(0)
+  cpns_tkp_point Int @default(0)
   quota Int @default(5)
   created_at String // unix time
   token String?
@@ -225,6 +228,8 @@ model Soal {
 
   id String @id @unique
   category String
+  sub_category String?
+  cpns_category String?
   label String? 
   text String @db.LongText
   question String

@@ -7,6 +7,8 @@ import { Paging } from "./pages";
 export type SoalRequest = {
 
     category: string;
+    sub_category: string | null;
+    cpns_category: string | null;
     label: string | null;
     text: string;
     question: string;
@@ -29,6 +31,8 @@ export type SoalResponse = {
 
     id : string;
     category: string;
+    sub_category: string | null;
+    cpns_category: string | null;
     label: string | null;
     text: string;
     question: string;
@@ -53,6 +57,8 @@ export type ShowedSoalResponse = {
 
     id : string;
     category: string;
+    sub_category: string | null;
+    cpns_category: string | null;
     label: string | null;
     type: string;
     text: string;
@@ -76,6 +82,8 @@ export function toSoalResponse(soal: Soal) : SoalResponse {
         
         id: soal.id,
         category: soal.category,
+        sub_category: soal.sub_category,
+        cpns_category: soal.cpns_category,
         label: soal.label,
         text: soal.text,
         option1: soal.option1,

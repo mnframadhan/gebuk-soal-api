@@ -29,6 +29,9 @@ export type StudentResponse = {
     leadership_point: number;
     integrity_point: number;
     loyalty_point: number;
+    cpns_tiu_point: number;
+    cpns_twk_point: number;
+    cpns_tkp_point: number;
     created_at : string;
     quota: number;
     membership: string;
@@ -84,6 +87,9 @@ export function toStudentResponse(student: Student) : StudentResponse {
         leadership_point: student.leadership_point,
         integrity_point: student.integrity_point,
         loyalty_point: student.loyalty_point,
+        cpns_tiu_point: student.cpns_tiu_point,
+        cpns_twk_point: student.cpns_twk_point,
+        cpns_tkp_point: student.cpns_tkp_point,
         created_at: student.created_at,
         quota: student.quota,
         membership: student.membership,

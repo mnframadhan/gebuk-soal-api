@@ -5,6 +5,8 @@ export class SoalValidation {
     static readonly CREATE : ZodType = z.object({
 
         category: z.string().min(2),
+        sub_category: z.string().optional(),
+        cpns_category: z.string().optional(),
         label: z.string().max(100).optional(),
         text: z.string(),
         question: z.string().max(10000).optional(),

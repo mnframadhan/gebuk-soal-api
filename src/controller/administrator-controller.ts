@@ -4,27 +4,12 @@ import { AdministratorService } from "../service/administrator-service";
 import { AdminReq } from "../types/admin-request";
 
 export class AdministratorController {
-
-    static async createAdmin(req: Request, res: Response, next: NextFunction) { 
-
-        try {
-
-            const request : AdministratorRequest = req.body as AdministratorRequest;
-            const response = await AdministratorService.createAdmin(request)
-
-            res.status(201);
-            res.json(response);
-
-        } catch (error) {
-            console.log(error);
-            next(error);
-        }
-    }
+    
 
     static async loginAdmin(req: Request, res: Response, next: NextFunction) {
+        const request : AdministratorRequest = await req.body as AdministratorRequest;
 
         try {
-            const request : AdministratorRequest = await req.body as AdministratorRequest;
             const response : AdministratorResponse = await AdministratorService.loginAdmin(request)
 
             const token : string = response.token as string;
@@ -47,9 +32,9 @@ export class AdministratorController {
         try {
 
             const page = parseInt(req.query.page as string) || 1;
-            const limit = parseInt(req.query.limit as string) || 10;
+            const limit =  parseInt(req.query.limit as string) || 10;
             const response = await AdministratorService.getAllOrders(page, limit);
-            
+
             res.status(200);
             res.json(response);
 
@@ -139,3 +124,9 @@ export class AdministratorController {
         }
     }
 }
+
+
+
+
+
+

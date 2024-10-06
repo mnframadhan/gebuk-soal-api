@@ -1,9 +1,10 @@
 import { Student } from "@prisma/client";
-import { v4 as uuid, v4 } from "uuid";
+import { v4 as uuid } from "uuid";
 import { prismaClient } from "../application/database";
 import { getSoalWithExcludedIds, getSoalWithExcludedIdsbyCat } from "../helpers/get-soal-works";
 import { Paging } from "../model/pages";
 import { ResultsResponse, toWorkResponse, toWorksResultsResponse, WorksRequest, WorksResultsResponse } from "../model/works-model";
+import { updateStudentNSoal, updateStudentNSoalBySubCategory, updateStudentNSoalByCPNSCategory } from "../helpers/create-works-update";
 
 export class WorksService {
 
@@ -31,12 +32,12 @@ export class WorksService {
         }
     }
 
-    static async createWorks(request: WorksRequest, student: Student, soal: string) {
+    static async createWorks(request: WorksRequest, student: Student, soal_id: string) {
 
         // get currentSoal
         const currentSoal = await prismaClient.soal.findFirst({
             where: {
-                id: soal
+                id: soal_id
             }
         })
 
@@ -62,7 +63,7 @@ export class WorksService {
                 ...request,
                 username: student.username,
                 result: result,
-                soal_id: soal,
+                soal_id: soal_id,
                 created_at: created_at
             }
         })
@@ -78,17 +79,19 @@ export class WorksService {
             }
         });
 
-        // const current_soal = await prismaClient.soal.findUnique({
-        //     where: {
-        //         id: soal
-        //     }
-        // })
+        const current_soal = await prismaClient.soal.findUnique({
+            where: {
+                id: soal_id
+            }
+        })
 
-        // updateStudentNSoal(student.id, current_soal?.category!);
+        console.log(current_soal);
+        updateStudentNSoal(student.id, current_soal?.category!);
+        updateStudentNSoalBySubCategory(student.id, currentSoal?.sub_category!);
+        updateStudentNSoalByCPNSCategory(student.id, currentSoal?.cpns_category!);
 
         return toWorkResponse(works);
     }
-
 
     static async setTodayWorks(student: Student) {
 
@@ -114,7 +117,7 @@ export class WorksService {
 
         // prepare data to insert into result
         const data = {
-            id: String(v4()),
+            id: String(uuid()),
             username: student.username,
             today_works: Number(works.length),
             number_of_true: countTrue,
@@ -133,15 +136,15 @@ export class WorksService {
     static async getTodayWorks(student: Student): Promise<ResultsResponse<WorksResultsResponse>> {
 
         // get Todays Works
-        const today = String(Date.now());
-        const tomorrow = String(Date.now() + 86400);
+        const startOfDay = Math.floor(new Date(new Date().setHours(0, 0, 0, 0)).getTime() / 1000); // Unix time at 00:00:00
+        const endOfDay = Math.floor(new Date(new Date().setHours(23, 59, 59, 999)).getTime() / 1000); // Unix time at 23:59:59
 
         const works = await prismaClient.work.findMany({
             where: {
                 username: student.username,
                 created_at: {
-                    gte: today,   // Greater than or equal to the start of today
-                    lt: tomorrow, // Less than the start of tomorrow
+                    gte: startOfDay.toString(),
+                    lte: endOfDay.toString()
                 },
             },
             orderBy: {
@@ -153,7 +156,7 @@ export class WorksService {
 
         // prepare data to insert into result
         const data = {
-            id: String(v4()),
+            id: String(uuid()),
             username: student.username,
             today_works: Number(works.length),
             number_of_true: countTrue,
@@ -161,17 +164,8 @@ export class WorksService {
             created_at: String(Date.now())
         }
 
-        const worksData = await prismaClient.work.findMany({
-            where: {
-                username: student.username,
-                created_at: {
-                    gte: today,   // Greater than or equal to the start of today
-                    lt: tomorrow, // Less than the start of tomorrow
-                },
-            },
-        });
 
-        const soalID = worksData.map(work => work.soal_id);
+        const soalID = works.map(work => work.soal_id);
         const soals = await prismaClient.soal.findMany({
 
             where: {
@@ -181,7 +175,7 @@ export class WorksService {
             },
         });
 
-        const worksResultsResponse = worksData.map(w => {
+        const worksResultsResponse = works.map(w => {
             const soal = soals.find(s => s.id === w.soal_id);
             return {
                 soal_id: soal?.id,

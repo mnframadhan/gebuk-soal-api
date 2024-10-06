@@ -1,7 +1,6 @@
 import { prismaClient } from "../application/database";
 import { AdministratorRequest, AdministratorResponse, StudentPagination } from "../model/administrator-model";
 import { v4 as uuid } from "uuid";
-
 import bcrypt from "bcrypt";
 import { ResponseError } from "../error/response-error";
 import { StudentResponse } from "../model/student-model";
@@ -234,6 +233,7 @@ export class AdministratorService {
             }
         })
     }
+	
 
     static async logoutCurrentAdmin(admin: Administrator) : Promise<void> {
 
@@ -246,4 +246,5 @@ export class AdministratorService {
             }
         })
     }
+	
 }

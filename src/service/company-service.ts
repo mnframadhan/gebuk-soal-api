@@ -10,225 +10,232 @@ import { packageTestUnitsPagination } from "../model/package-test-unit-model";
 
 export class CompanyService {
 
-    static async createCompany(request: CompanyRegisterRequest) : Promise<CompanyResponse> {
+	static async sayHelloFromCompany() : Promise<{message: string}> {
+		
+		const message = "Hello, From Company";
 
-        const validatedRequest = Validation.validate(CompanyValidation.REGISTER, request);
+		return {message: message};		
+	}
 
-        const countEmail = await prismaClient.company.count({
-            where: {
-                email: validatedRequest.email
-            }
-        })
+	static async createCompany(request: CompanyRegisterRequest) : Promise<CompanyResponse> {
 
-        if (countEmail != 0) {
-            throw new ResponseError(400, "Email already in use, do you mean log in?");
-        }
+		const validatedRequest = Validation.validate(CompanyValidation.REGISTER, request);
 
-        validatedRequest.password = await bcrypt.hash(validatedRequest.password, 8);
+		const countEmail = await prismaClient.company.count({
+			where: {
+				email: validatedRequest.email
+			}
+		})
 
-        const created_at: string = String(Date.now());
+		if (countEmail != 0) {
+			throw new ResponseError(400, "Email already in use, do you mean log in?");
+		}
 
-        const data = {
-            ...validatedRequest,
-            created_at: created_at
-        }
+		validatedRequest.password = await bcrypt.hash(validatedRequest.password, 8);
 
-        const response = await prismaClient.company.create({
-            data: data,
-            select: {
-                id: true,
-                brand_name: true,
-                legal_name: true,
-                email: true,
-                phone: true,
-                address: true,
-                password: false,
-                sector: true,
-                sub_sector: true,
-                n_employee: true,
-                n_package: true,
-                n_applicant: true,
-                token: true,
-                created_at: true,
-            }
-        })
+		const created_at: string = String(Date.now());
 
-        console.log(response);
+		const data = {
+			...validatedRequest,
+			created_at: created_at
+		}
 
-        return response;
+		const response = await prismaClient.company.create({
+			data: data,
+			select: {
+				id: true,
+				brand_name: true,
+				legal_name: true,
+				email: true,
+				phone: true,
+				address: true,
+				password: false,
+				sector: true,
+				sub_sector: true,
+				n_employee: true,
+				n_package: true,
+				n_applicant: true,
+				token: true,
+				created_at: true,
+			}
+		})
 
-    }
+		console.log(response);
 
-    static async loginCompany(request: CompanyLoginRequest) : Promise<CompanyResponse> {
+		return response;
 
-        const validatedRequest = Validation.validate(CompanyValidation.LOGIN, request);
+	}
 
-        const company = await prismaClient.company.findFirst({
-            where: {
-                email: validatedRequest.email
-            }
-        })
+	static async loginCompany(request: CompanyLoginRequest) : Promise<CompanyResponse> {
 
-        if (!company) {
-            throw new ResponseError(400, "Username or Password is incorrect");
-        }
+		const validatedRequest = Validation.validate(CompanyValidation.LOGIN, request);
 
-        const comparedPassword = await bcrypt.compare(validatedRequest.password, company.password);
+		const company = await prismaClient.company.findFirst({
+			where: {
+				email: validatedRequest.email
+			}
+		})
 
-        if (!comparedPassword) {
-            throw new ResponseError(400, "Username or Password is incorrect");
-        }
+		if (!company) {
+			throw new ResponseError(400, "Username or Password is incorrect");
+		}
 
-        const response = await prismaClient.company.update({
-            where: {
-                email: validatedRequest.email
-            },
-            data: {
-                token: uuid()
-            },
-            select: {
-                id: true,
-                brand_name: true,
-                legal_name: true,
-                email: true,
-                phone: true,
-                address: true,
-                password: false,
-                sector: true,
-                sub_sector: true,
-                n_employee: true,
-                n_package: true,
-                n_applicant: true,
-                token: true,
-                created_at: true,
-            }
-        })
+		const comparedPassword = await bcrypt.compare(validatedRequest.password, company.password);
 
-        return response;
+		if (!comparedPassword) {
+			throw new ResponseError(400, "Username or Password is incorrect");
+		}
 
-    }
+		const response = await prismaClient.company.update({
+			where: {
+				email: validatedRequest.email
+			},
+			data: {
+				token: uuid()
+			},
+			select: {
+				id: true,
+				brand_name: true,
+				legal_name: true,
+				email: true,
+				phone: true,
+				address: true,
+				password: false,
+				sector: true,
+				sub_sector: true,
+				n_employee: true,
+				n_package: true,
+				n_applicant: true,
+				token: true,
+				created_at: true,
+			}
+		})
 
-    static async logoutCompany(company: Company) : Promise<{message: string}> {
+		return response;
 
-        await prismaClient.company.update({
+	}
 
-            where: {
-                email: company.email
-            },
-            data: {token: null}
-        })
+	static async logoutCompany(company: Company) : Promise<{message: string}> {
 
-        return {message: "OK"}
+		await prismaClient.company.update({
 
-    }
+			where: {
+				email: company.email
+			},
+			data: {token: null}
+		})
 
-    static async getCurrentCompany(company: Company) : Promise<CompanyResponse> {
+		return {message: "OK"}
 
-        return {
-            id: company.id,
-            brand_name: company.brand_name,
-            legal_name: company.legal_name,
-            email: company.email,
-            phone: company.phone,
-            address: company.address,
-            sector: company.sector,
-            sub_sector: company.sub_sector,
-            n_employee: company.n_employee,
-            n_package: company.n_package,
-            n_applicant: company.n_applicant,
-            created_at: company.created_at,
-            banner_image: company.banner_image,
-        }
+	}
 
-    }
-    
-    static async updateProfileBanner(request: {imageUrl: string}, company: Company) : Promise<{message: string}> {
+	static async getCurrentCompany(company: Company) : Promise<CompanyResponse> {
 
-        // logic here
-        await prismaClient.company.update({
-            where: {id: company.id},
-            data: {banner_image: request.imageUrl}
-        })
+		return {
+			id: company.id,
+			brand_name: company.brand_name,
+			legal_name: company.legal_name,
+			email: company.email,
+			phone: company.phone,
+			address: company.address,
+			sector: company.sector,
+			sub_sector: company.sub_sector,
+			n_employee: company.n_employee,
+			n_package: company.n_package,
+			n_applicant: company.n_applicant,
+			created_at: company.created_at,
+			banner_image: company.banner_image,
+		}
 
-        return {
-            message: "Profile banner updated successfully"
-        }
+	}
 
-    }
+	static async updateProfileBanner(request: {imageUrl: string}, company: Company) : Promise<{message: string}> {
 
-    static async updateStatus(company: Company) : Promise<{message: string}> {
+		// logic here
+		await prismaClient.company.update({
+			where: {id: company.id},
+			data: {banner_image: request.imageUrl}
+		})
 
-        const requestUpdatedAt = String(Date.now());
+		return {
+			message: "Profile banner updated successfully"
+		}
 
-        await prismaClient.company.update({
-            where: {
-                id: company.id
-            },
-            data: {
-                status: "Waiting",
-                requested_to_update_at: requestUpdatedAt
-            }
-        })
+	}
 
-        return {message: "Success"}
-    }
+	static async updateStatus(company: Company) : Promise<{message: string}> {
 
-    static async getPackageTestUnitByPackageBundleIdPagination(page: number, package_bundle_id: string, company: Company) : Promise<packageTestUnitsPagination> {
+		const requestUpdatedAt = String(Date.now());
 
-        const pageNum : number = page;
-        const size : number = 1;
+		await prismaClient.company.update({
+			where: {
+				id: company.id
+			},
+			data: {
+				status: "Waiting",
+				requested_to_update_at: requestUpdatedAt
+			}
+		})
 
-        const testUnits = await prismaClient.packageTestUnit.findMany({
-            where: {
-                package_bundle_id: package_bundle_id,
-                company_id: company.id
-            },
-            select: {
-                id: true,
-                package_bundle_id: true,
-                text: true,
-                question: true,
-                option1: true,
-                option2: true,
-                option3: true,
-                option4: true,
-                option5: true
-            },
-            skip: (pageNum - 1) * size,
-            take: size
-        })
+		return {message: "Success"}
+	}
 
-        const totalPages = await prismaClient.packageTestUnit.count({
-            where: {
-                package_bundle_id: package_bundle_id,
-                company_id: company.id
-            }
-        })
+	static async getPackageTestUnitByPackageBundleIdPagination(page: number, package_bundle_id: string, company: Company) : Promise<packageTestUnitsPagination> {
 
-        const response = {
+		const pageNum : number = page;
+		const size : number = 1;
 
-            pagination: {
-                current_page: pageNum,
-                total_page: totalPages,
-                size: size
-            },
-            data: testUnits
-        }
+		const testUnits = await prismaClient.packageTestUnit.findMany({
+			where: {
+				package_bundle_id: package_bundle_id,
+				company_id: company.id
+			},
+			select: {
+				id: true,
+				package_bundle_id: true,
+				text: true,
+				question: true,
+				option1: true,
+				option2: true,
+				option3: true,
+				option4: true,
+				option5: true
+			},
+			skip: (pageNum - 1) * size,
+			take: size
+		})
 
-        return response;
+		const totalPages = await prismaClient.packageTestUnit.count({
+			where: {
+				package_bundle_id: package_bundle_id,
+				company_id: company.id
+			}
+		})
 
-    }
-	
+		const response = {
+
+			pagination: {
+				current_page: pageNum,
+				total_page: totalPages,
+				size: size
+			},
+			data: testUnits
+		}
+
+		return response;
+
+	}
+
 	static async orderStandardPackage(company: Company) : Promise<{message: string}> {
 
-			await prismaClient.company.update({
+		await prismaClient.company.update({
 
-					where: {id : company.id},
-					data: {
-							status: "Standard"
-					}
-			})
-			
-			return {message: "Success"}
+			where: {id : company.id},
+			data: {
+				status: "Standard"
+			}
+		})
+
+		return {message: "Success"}
 	}
 }
