@@ -203,7 +203,7 @@ model PackageTestResults {
   package_bundle_id String
   packageBundle PackageBundle @relation(fields: [package_bundle_id], references: [id])
   Candidate Candidate @relation(fields: [candidate_id], references: [id])
-  
+ 
   @@map("packageTestResults")
 }
 

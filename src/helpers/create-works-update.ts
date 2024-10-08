@@ -72,6 +72,10 @@ export const updateStudentNSoalBySubCategory = async (id: string, sub_category: 
             })
 
             break;
+
+        default:
+            console.log("No matching case found");
+ 
     }
 };
 

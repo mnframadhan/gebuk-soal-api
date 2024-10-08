@@ -85,7 +85,6 @@ export class WorksService {
             }
         })
 
-        console.log(current_soal);
         updateStudentNSoal(student.id, current_soal?.category!);
         updateStudentNSoalBySubCategory(student.id, currentSoal?.sub_category!);
         updateStudentNSoalByCPNSCategory(student.id, currentSoal?.cpns_category!);

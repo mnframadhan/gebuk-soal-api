@@ -1,6 +1,6 @@
 import { Contributor } from "@prisma/client";
 import { prismaClient } from "../application/database";
-import { ShowedSoalResponse, SoalRequest, SoalResponse, toSoalResponse, toSoalResponsePagination } from "../model/soal-model";
+import { SoalRequest, SoalResponse, toSoalResponse } from "../model/soal-model";
 import { SoalValidation } from "../validation/soal-validation";
 import { Validation } from "../validation/Validation";
 import { v4 as uuid } from "uuid";
