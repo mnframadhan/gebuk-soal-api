@@ -37,6 +37,7 @@ export type StudentResponse = {
     membership: string;
     token : string | null;
     avatar: string | null;
+	verified: boolean | null;
 
 }
 
@@ -94,7 +95,8 @@ export function toStudentResponse(student: Student) : StudentResponse {
         quota: student.quota,
         membership: student.membership,
         token : student.token,
-        avatar: student.avatar
+        avatar: student.avatar,
+		verified: student.verified
 
     }
 }

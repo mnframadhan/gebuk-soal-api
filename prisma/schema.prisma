@@ -67,6 +67,8 @@ model Student {
   order Order[]
   packageTestWorks PackageTestWorks[]
   candidate Candidate? // one to one relationship
+  verified Boolean @default(false)
+  verification_code String?
 
   @@map("students")
 

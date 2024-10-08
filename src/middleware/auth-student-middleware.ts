@@ -15,7 +15,7 @@ export const authStudentMiddleware = async (req: StudentReq , res: Response, nex
         })
 
         if (student) {
-            req.student = student;
+            req.student = student;			
             next();
             return;
         }

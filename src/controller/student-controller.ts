@@ -9,7 +9,7 @@ export class StudentController {
 
         try {
 
-            const request : StudentRequest = await req.body as StudentRequest;
+            const request : StudentRequest =  req.body as StudentRequest;
             const response = await StudentService.createStudent(request);
 
             res.status(201);
@@ -24,7 +24,7 @@ export class StudentController {
 
         try {
 
-            const request = await req.body;
+            const request =  req.body;
             const response = await StudentService.loginStudent(request);
 
             const token : string = response.token as string;
@@ -40,6 +40,21 @@ export class StudentController {
             next(err);
         }
     }
+	
+	static async studentEmailVerification(req: StudentReq, res: Response, next: NextFunction) {
+		
+		try {
+		
+			const request =  req.body as {verificationCode: string};
+			const response = await StudentService.studentEmailVerification(request, req.student!)	
+			
+			res.status(200);
+			res.json(response);
+
+		} catch (err) { 
+			next(err) 
+		}
+	}
 
     static async currentStudent (req: StudentReq, res: Response, next: NextFunction) {
 

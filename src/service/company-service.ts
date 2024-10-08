@@ -1,4 +1,4 @@
-import { Company, PackageBundle } from "@prisma/client";
+import { Company } from "@prisma/client";
 import { prismaClient } from "../application/database";
 import { ResponseError } from "../error/response-error";
 import { CompanyLoginRequest, CompanyRegisterRequest, CompanyResponse } from "../model/company-model";
@@ -9,13 +9,6 @@ import { v4 as uuid } from "uuid";
 import { packageTestUnitsPagination } from "../model/package-test-unit-model";
 
 export class CompanyService {
-
-	static async sayHelloFromCompany() : Promise<{message: string}> {
-		
-		const message = "Hello, From Company";
-
-		return {message: message};		
-	}
 
 	static async createCompany(request: CompanyRegisterRequest) : Promise<CompanyResponse> {
 
