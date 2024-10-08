@@ -28,7 +28,8 @@ export type CompanyResponse = {
     created_at : string;
     token? : string | null;
     banner_image?: string | null;
-
+	verified: boolean | null;
+	verification_code: string | null;
 }
 
 export type CompanyLoginRequest = {

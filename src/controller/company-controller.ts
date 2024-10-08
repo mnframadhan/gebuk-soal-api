@@ -5,112 +5,101 @@ import { CompanyReq } from "../types/company-request";
 import { bucket } from "../application/firebase";
 
 export class CompanyController {
-
     static async createCompany(req: Request, res: Response, next: NextFunction) {
-
         try {
-
-            const request : CompanyRegisterRequest = req.body as CompanyRegisterRequest;
+            const request: CompanyRegisterRequest = req.body as CompanyRegisterRequest;
             const response = await CompanyService.createCompany(request);
 
             res.status(201);
             res.json(response);
-
         } catch (err) {
-
             next(err);
-
         }
     }
 
-    static async loginCompany(req: Request, res: Response, next: NextFunction ) {
-
+    static async loginCompany(req: Request, res: Response, next: NextFunction) {
         try {
-
             const request: CompanyLoginRequest = req.body as CompanyLoginRequest;
             const response = await CompanyService.loginCompany(request);
 
-            res.cookie('X-API-TOKEN-COMPANY', response.token!, {httpOnly: false, maxAge: 1000*60*60*24})
-            
+            res.cookie("X-API-TOKEN-COMPANY", response.token!, { httpOnly: false, maxAge: 1000 * 60 * 60 * 24 });
+
             res.status(200);
             res.json(response);
-
         } catch (err) {
-
             next(err);
+        }
+    }
 
+    static async companyEmailVerification(req: CompanyReq, res: Response, next: NextFunction) {
+        try {
+            const request: { verificationCode: string } = req.body;
+            const response = await CompanyService.companyEmailVerification(request, req.company!);
+            res.status(200);
+            res.json(response);
+        } catch (err) {
+            next(err);
         }
     }
 
     static async logoutCompany(req: CompanyReq, res: Response, next: NextFunction) {
-
         try {
             const response = await CompanyService.logoutCompany(req.company!);
 
-            res.clearCookie('X-API-TOKEN-COMPANY', {path: '/'});
+            res.clearCookie("X-API-TOKEN-COMPANY", { path: "/" });
 
             res.status(200);
             res.json(response);
-
         } catch (err) {
             next(err);
         }
     }
 
-    static async getCurrentCompany(req: CompanyReq, res: Response, next: NextFunction){
-        
-        try{
-
+    static async getCurrentCompany(req: CompanyReq, res: Response, next: NextFunction) {
+        try {
             const response = await CompanyService.getCurrentCompany(req.company!);
             res.status(200);
             res.json(response);
-
         } catch (err) {
             next(err);
         }
-        
     }
 
     static async updateProfileBanner(req: CompanyReq, res: Response, next: NextFunction) {
-
         try {
             const file = req.file;
 
             if (!file) {
                 res.status(400);
-                res.json({message: "No file uploaded"})
+                res.json({ message: "No file uploaded" });
             } else {
-                
-                const blob = bucket.file(`company/banner/${req.company!.brand_name}_${Date.now()}_${file.originalname}`)
+                const blob = bucket.file(`company/banner/${req.company!.brand_name}_${Date.now()}_${file.originalname}`);
 
                 const blobStream = blob.createWriteStream({
                     metadata: {
                         contentType: file.mimetype,
-                    }
+                    },
                 });
 
-                blobStream.on('error', (error) => {
-                    next(error)
+                blobStream.on("error", (error) => {
+                    next(error);
                 });
 
-                blobStream.on('finish', async () => {
-
+                blobStream.on("finish", async () => {
                     try {
-
                         await blob.makePublic();
 
                         const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
-    
-                        const request = req.body as {imageUrl: string}
-                        request.imageUrl = publicUrl;
-    
-                        const response = await CompanyService.updateProfileBanner(request, req.company!)
-                        res.status(200).json(response)
 
+                        const request = req.body as { imageUrl: string };
+                        request.imageUrl = publicUrl;
+
+                        const response = await CompanyService.updateProfileBanner(request, req.company!);
+                        res.status(200).json(response);
                     } catch (err) {
-                        next(err)
+                        next(err);
                     }
-                })
+                });
 
                 blobStream.end(file.buffer);
             }
@@ -120,32 +109,26 @@ export class CompanyController {
         }
     }
 
-	static async orderStandardPackage(req: CompanyReq, res: Response, next: NextFunction) {
-
-			try {
-				const response = await CompanyService.orderStandardPackage(req.company!)
-				res.status(200);
-				res.json(response);
-
-			} catch (err) { next(err) }
-
-	} 
-
-    static async getPackageTestUnitByPackageBundleIdPagination(req: CompanyReq, res: Response, next: NextFunction ) {
-
+    static async orderStandardPackage(req: CompanyReq, res: Response, next: NextFunction) {
         try {
+            const response = await CompanyService.orderStandardPackage(req.company!);
+            res.status(200);
+            res.json(response);
+        } catch (err) {
+            next(err);
+        }
+    }
 
-            const page : number = Number(req.query.page);
-            const package_bundle_id : string = String(req.params.package_bundle_id);
+    static async getPackageTestUnitByPackageBundleIdPagination(req: CompanyReq, res: Response, next: NextFunction) {
+        try {
+            const page: number = Number(req.query.page);
+            const package_bundle_id: string = String(req.params.package_bundle_id);
 
             const response = await CompanyService.getPackageTestUnitByPackageBundleIdPagination(page, package_bundle_id, req.company!);
             res.status(200);
             res.json(response);
-
-
         } catch (err) {
             next(err);
         }
-
     }
 }

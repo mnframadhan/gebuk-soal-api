@@ -6,6 +6,12 @@ export const authStudentMiddleware = async (req: StudentReq , res: Response, nex
 
     const token = req.get('X-API-TOKEN-STUDENT');
 
+	if (!token) {
+		res.status(401).json({
+			message: "Unauthorized"
+		}).end();
+	}
+
     if(token) {
 
         const student = await prismaClient.student.findFirst({

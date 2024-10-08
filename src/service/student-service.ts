@@ -3,26 +3,16 @@ import bcrypt from "bcrypt";
 import { v4 as uuid } from "uuid";
 import { prismaClient } from "../application/database";
 import { ResponseError } from "../error/response-error";
-import {
-    StudentRequest,
-    StudentResponse,
-    StudentUpdateRequest,
-    toStudentResponse,
-} from "../model/student-model";
+import { StudentRequest, StudentResponse, StudentUpdateRequest, toStudentResponse } from "../model/student-model";
 import { StudentValidation } from "../validation/student-validation";
 import { Validation } from "../validation/Validation";
 import nodemailer, { SentMessageInfo } from "nodemailer";
 import { get4RandomDigits } from "../helpers/get-4-random-digit";
 
 export class StudentService {
-    static async createStudent(
-        request: StudentRequest
-    ): Promise<StudentResponse> {
+    static async createStudent(request: StudentRequest): Promise<StudentResponse> {
         // validation
-        const validatedRequest = Validation.validate(
-            StudentValidation.CREATE,
-            request
-        );
+        const validatedRequest = Validation.validate(StudentValidation.CREATE, request);
 
         // check if email already exists
         const numberOfEmail: number = await prismaClient.student.count({
@@ -42,16 +32,15 @@ export class StudentService {
         // hasing password
         const hashedPassword = await bcrypt.hash(validatedRequest.password, 10);
         validatedRequest.password = hashedPassword;
-		
 
-		const auth_digits= get4RandomDigits();
+        const auth_digits = get4RandomDigits();
         const hashed_auth_digits = await bcrypt.hash(auth_digits, 8);
 
-		const data = {
+        const data = {
             ...validatedRequest,
             id: student_id,
             created_at: created_at,
-			verification_code: hashed_auth_digits,
+            verification_code: hashed_auth_digits,
         };
 
         // insert into database
@@ -67,7 +56,6 @@ export class StudentService {
             },
         });
 
-
         const mailOptions = {
             from: process.env.COMPANY_EMAIL!,
             to: validatedRequest.email,
@@ -75,44 +63,34 @@ export class StudentService {
             text: `Kode Autentikasi 5-digit angka: ${auth_digits}`,
         };
 
-        transporter.sendMail(
-            mailOptions,
-            (error: Error | null, info: SentMessageInfo) => {
-                if (error) {
-                    throw new ResponseError(422, "Invalid Email");
-                }
-                console.log(`Email sent ${info.response}`);
+        transporter.sendMail(mailOptions, (error: Error | null, info: SentMessageInfo) => {
+            if (error) {
+                throw new ResponseError(422, "Invalid Email");
             }
-        );
+            console.log(`Email sent ${info.response}`);
+        });
 
         return toStudentResponse(response);
     }
 
-    static async studentEmailVerification( request: { verificationCode: string }, student: Student ): Promise<{ message: string }> {
-		
+    static async studentEmailVerification(request: { verificationCode: string }, student: Student): Promise<{ message: string }> {
         const verificationCode = await bcrypt.compare(request.verificationCode, student.verification_code!);
-		
-        if (!verificationCode) {
-			throw new ResponseError(422, "Verifikasi Gagal");
-        } 
-        
-		await prismaClient.student.update({
-             where: { id: student.id },
-             data: { verified: true },
-         });
 
+        if (!verificationCode) {
+            throw new ResponseError(422, "Verifikasi Gagal");
+        }
+
+        await prismaClient.student.update({
+            where: { id: student.id },
+            data: { verified: true },
+        });
 
         return { message: "Akun berhasil di-verifikasi!" };
     }
 
-    static async loginStudent(
-        request: StudentRequest
-    ): Promise<StudentResponse> {
+    static async loginStudent(request: StudentRequest): Promise<StudentResponse> {
         // validation
-        const validatedRequest = Validation.validate(
-            StudentValidation.LOGIN,
-            request
-        );
+        const validatedRequest = Validation.validate(StudentValidation.LOGIN, request);
 
         const student = await prismaClient.student.findFirst({
             where: {
@@ -125,10 +103,7 @@ export class StudentService {
         }
 
         // check if ppassword is valid
-        const passwordMatch = await bcrypt.compare(
-            validatedRequest.password,
-            student.password
-        );
+        const passwordMatch = await bcrypt.compare(validatedRequest.password, student.password);
 
         if (!passwordMatch) {
             throw new ResponseError(401, "Email or Password incorrect");
@@ -153,15 +128,9 @@ export class StudentService {
         return toStudentResponse(student);
     }
 
-    static async updateStudent(
-        request: StudentUpdateRequest,
-        student: Student
-    ): Promise<{ id: string; avatar: string; message: string }> {
+    static async updateStudent(request: StudentUpdateRequest, student: Student): Promise<{ id: string; avatar: string; message: string }> {
         // validation
-        const validatedRequest = Validation.validate(
-            StudentValidation.UPDATE,
-            request
-        );
+        const validatedRequest = Validation.validate(StudentValidation.UPDATE, request);
 
         if (validatedRequest.username) {
             await prismaClient.student.update({

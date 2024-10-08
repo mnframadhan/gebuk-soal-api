@@ -95,6 +95,8 @@ model Company {
   status String? @default("Free")
   requested_to_update_at String?
   status_updated_at String?
+  verified Boolean? @default(false)
+  verification_code String?
 
   @@map("companies")
 }
@@ -125,7 +127,6 @@ model PackageTestUnit {
   token String?
   created_at String
   package_bundle_id String
-
   packageBundle PackageBundle @relation(fields: [package_bundle_id], references: [id])
   packageTestWorks PackageTestWorks[]
   
@@ -143,7 +144,6 @@ model PackageBundle {
   max_duration Int?
   token String?
   present_n_unit Int? @default(0)
-
   company_id String
   company Company @relation(fields: [company_id], references: [id])
   packageTestUnit PackageTestUnit[]
@@ -164,9 +164,7 @@ model Candidate {
   address String
   phone String
   created_at String
-
   packageTestResults PackageTestResults[]
-  
 
   @@map("candidates")
 
@@ -184,7 +182,6 @@ model PackageTestWorks {
   Student Student @relation(fields: [student_id], references: [id])
   package_bundle_id String
   PackageBundle PackageBundle @relation(fields: [package_bundle_id], references: [id])
-  
   package_test_unit_id String
   packageTestUnit PackageTestUnit @relation(fields: [package_test_unit_id], references: [id])
 
