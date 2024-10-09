@@ -26,15 +26,41 @@ export class CandidateService {
         return response;
     }
 	
-    static async getCurrentCandidates(student: Student) : Promise<CandidateResponse | {message: string}> {
+    static async getCurrentCandidates(student: Student) : Promise<any> {
+		
+		const candidate = await prismaClient.student.findUnique({
+			where: {id: student.id},
+			select: {
+				id: true,
+				candidate: {
+					select: {
+						full_name: true,
+						email: true,
+						address: true,
+						phone: true,
+						packageTestResults: {
+							select: {
+								packageBundle: {
+									select: {
+										id: true,
+										package_name: true,
+										company: {
+											select: {
+												brand_name: true
+											}
+										}
+									}
+								},
+								start_time: true,
+								end_time: true,
+							},
+						},
+					}
+				},
+			}
+		})
 
-        const candidate = await prismaClient.candidate.findFirst({
-            where: {
-                student_id: student.id
-            }
-        })
-
-        if(!candidate) {
+        if(!candidate!.candidate) {
             throw new ResponseError(404, "Kamu belum memiliki kandidat kandidat");
         }
         return candidate;
