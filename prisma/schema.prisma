@@ -97,8 +97,21 @@ model Company {
   status_updated_at String?
   verified Boolean? @default(false)
   verification_code String?
+  logo String?
+  general_preferred_skills PreferredSkills[]
 
   @@map("companies")
+}
+
+model PreferredSkills {
+	
+	id Int @id @default(autoincrement())
+	name String
+	company_id String
+	Company Company @relation(fields: [company_id], references: [id])
+	
+	@@map("preferredSkills")
+
 }
 
 model PackageTestUnit {

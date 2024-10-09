@@ -1,15 +1,14 @@
 import { Company } from "@prisma/client";
 import { prismaClient } from "../application/database";
 import { ResponseError } from "../error/response-error";
-import { CompanyLoginRequest, CompanyRegisterRequest, CompanyResponse } from "../model/company-model";
+import { CompanyLoginRequest, CompanyRegisterRequest, CompanyResponse, CompanyShowedResponse } from "../model/company-model";
 import { CompanyValidation } from "../validation/company-validation";
 import { Validation } from "../validation/Validation";
 import bcrypt from "bcrypt";
 import { v4 as uuid } from "uuid";
 import { packageTestUnitsPagination } from "../model/package-test-unit-model";
 import { get4RandomDigits } from "../helpers/get-4-random-digit";
-import nodemailer, {SentMessageInfo} from "nodemailer";
-
+import nodemailer, { SentMessageInfo } from "nodemailer";
 
 export class CompanyService {
     static async createCompany(request: CompanyRegisterRequest): Promise<CompanyResponse> {
@@ -54,8 +53,7 @@ export class CompanyService {
                 n_applicant: true,
                 token: true,
                 created_at: true,
-				verified: true,
-				verification_code: true,
+                verified: true,
             },
         });
 
@@ -84,25 +82,22 @@ export class CompanyService {
         return response;
     }
 
+    static async companyEmailVerification(request: { verificationCode: string }, company: Company): Promise<{ message: string }> {
+        const correctVerificationCode = await bcrypt.compare(request.verificationCode, company.verification_code!);
 
-	static async companyEmailVerification(request: {verificationCode: string}, company: Company) : Promise<{message: string}> {
-		
-		const correctVerificationCode = await bcrypt.compare(request.verificationCode, company.verification_code!);
-		
-		if(!correctVerificationCode) {
-			throw new ResponseError(422, "Tidak Valid");
-		}
+        if (!correctVerificationCode) {
+            throw new ResponseError(422, "Tidak Valid");
+        }
 
-		await prismaClient.company.update({
-			where: {id: company.id},
-			data: {verified: true}
-		})
-		
-		return {message: "Selamat! Akun berhasil di-verifikasi"}
+        await prismaClient.company.update({
+            where: { id: company.id },
+            data: { verified: true },
+        });
 
-	}
+        return { message: "Selamat! Akun berhasil di-verifikasi" };
+    }
 
-    static async loginCompany(request: CompanyLoginRequest): Promise<CompanyResponse> {
+    static async loginCompany(request: CompanyLoginRequest): Promise<{message: string, token: string}> {
         const validatedRequest = Validation.validate(CompanyValidation.LOGIN, request);
 
         const company = await prismaClient.company.findFirst({
@@ -116,39 +111,22 @@ export class CompanyService {
         }
 
         const comparedPassword = await bcrypt.compare(validatedRequest.password, company.password);
+		const token : string = uuid() as string;
 
         if (!comparedPassword) {
             throw new ResponseError(400, "Username or Password is incorrect");
         }
-
-        const response = await prismaClient.company.update({
+		
+		await prismaClient.company.update({
             where: {
                 email: validatedRequest.email,
             },
             data: {
-                token: uuid(),
-            },
-            select: {
-                id: true,
-                brand_name: true,
-                legal_name: true,
-                email: true,
-                phone: true,
-                address: true,
-                password: false,
-                sector: true,
-                sub_sector: true,
-                n_employee: true,
-                n_package: true,
-                n_applicant: true,
-                token: true,
-                created_at: true,
-				verified: true,
-				verification_code: true,
+                token: token,
             },
         });
 
-        return response;
+        return {message: "OK", token: token};
     }
 
     static async logoutCompany(company: Company): Promise<{ message: string }> {
@@ -162,24 +140,87 @@ export class CompanyService {
         return { message: "OK" };
     }
 
-    static async getCurrentCompany(company: Company): Promise<CompanyResponse> {
-        return {
-            id: company.id,
-            brand_name: company.brand_name,
-            legal_name: company.legal_name,
-            email: company.email,
-            phone: company.phone,
-            address: company.address,
-            sector: company.sector,
-            sub_sector: company.sub_sector,
-            n_employee: company.n_employee,
-            n_package: company.n_package,
-            n_applicant: company.n_applicant,
-            created_at: company.created_at,
-            banner_image: company.banner_image,
-			verified: company.verified,
-			verification_code: company.verification_code,
-        };
+    static async getCurrentCompany(company: Company) : Promise<CompanyResponse> {
+        const companies = await prismaClient.company.findUnique({
+            where: { id: company.id },
+            select: {
+                id: true,
+                brand_name: true,
+                legal_name: true,
+                email: true,
+                phone: true,
+                address: true,
+                sector: true,
+                sub_sector: true,
+                n_employee: true,
+                n_package: true,
+                n_applicant: true,
+                created_at: true,
+                token: true,
+                banner_image: true,
+                verified: true,
+                verification_code: true,
+                general_preferred_skills: {
+                    select: {
+                        name: true,
+                    },
+                },
+				PackageBundle: {
+					select: {
+						package_name: true,
+						n_unit: true,
+						max_duration: true,
+						token: true,
+						id: true,
+						created_at: true,
+						expired_date: true,
+						present_n_unit: true,
+					},
+					orderBy: {
+						created_at: "desc"
+					}
+				}
+            },
+        });
+		
+		if(!companies) {
+			throw new ResponseError(404, "Not Found")
+		}
+
+        return companies;
+    }
+
+    static async setPreferredSkills(request: { name: string }, company: Company): Promise<{ message: string }> {
+		
+        await prismaClient.preferredSkills.create({
+            data: {
+				name: request.name,
+				company_id: company.id,
+            },
+        });
+
+        return { message: "OK" };
+    }
+	
+
+    static async getAllCompanies() {
+        const companiesWithPackageBundles = await prismaClient.company.findMany({
+            select: {
+                brand_name: true,
+                general_preferred_skills: {
+                    select: {
+                        name: true,
+                    },
+                },
+                PackageBundle: {
+                    select: {
+                        package_name: true,
+                    },
+                },
+            },
+        });
+
+        return companiesWithPackageBundles;
     }
 
     static async updateProfileBanner(request: { imageUrl: string }, company: Company): Promise<{ message: string }> {

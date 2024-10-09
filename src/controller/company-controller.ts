@@ -65,6 +65,27 @@ export class CompanyController {
         }
     }
 
+    static async setPreferredSkills(req: CompanyReq, res: Response, next: NextFunction) {
+        try {
+            const request = await req.body as { name: string };
+            const response = await CompanyService.setPreferredSkills(request, req.company!);
+            res.status(201);
+            res.json(response);
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    static async getAllCompanies(req: Request, res: Response, next: NextFunction) {
+        try {
+            const response = await CompanyService.getAllCompanies();
+            res.status(200);
+            res.json(response);
+        } catch (err) {
+            next(err);
+        }
+    }
+
     static async updateProfileBanner(req: CompanyReq, res: Response, next: NextFunction) {
         try {
             const file = req.file;

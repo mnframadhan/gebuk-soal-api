@@ -102,16 +102,14 @@ export class PackageBundleService {
             where: {
                 company_id: company.id
             },
-            orderBy: {
-                created_at: "desc"
-            }
         })
-        
+
+		const responseOrdered = response.sort((a, b) => ( Number(b.created_at) - Number(a.created_at)) )
 
         return {
             message: "Success",
             company_id: company.id,
-            data: response
+            data: responseOrdered
         }
     }
 

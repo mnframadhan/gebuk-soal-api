@@ -136,7 +136,6 @@ export class CandidateService {
     static async createWorks(request: PackageTestUnitsWorksRequest, package_bundle_id: string, package_test_unit_id: string, student: Student ) : Promise<PackageTestUnitWorksResponse> {
 
         const validatedRequest = Validation.validate(CandidateValidation.WORK, request);
-		console.log(validatedRequest)
 
         const end_time : string = String(Date.now());
         const response = await prismaClient.packageTestWorks.create({
@@ -154,8 +153,6 @@ export class CandidateService {
                 end_time: true,
             }
         })
-
-		console.log(response)
 
         return response;
 

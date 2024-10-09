@@ -6,14 +6,6 @@ import { PackageTestUnitValidation } from "../validation/package-test-unit-valid
 
 export class PackageTestUnitService {
     
-    static async createSomething(something: string) {
-        if (something === "valuable") {
-            console.log("Hey this is wonderful!!!")
-        }else {
-
-            console.log("Garbage!!")
-        }
-    } 
 
     static async createPackageTestUnit (package_bundle_id: string, request: PackageTestUnitCreateRequest, company: Company) : Promise<PackageTestUnitCreateRequest> {
 

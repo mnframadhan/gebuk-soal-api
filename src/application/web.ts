@@ -54,6 +54,7 @@ app.post("/api/admin/login", AdministratorController.loginAdmin);
 // companies
 app.post("/api/comp/register", CompanyController.createCompany);
 app.post("/api/comp/login", CompanyController.loginCompany);
+app.get("/api/comp/all", CompanyController.getAllCompanies);
 
 // PRIVATE API
 // contributor api
@@ -100,6 +101,7 @@ app.patch("/api/company/verification", authCompanyMiddleware, CompanyController.
 app.delete("/api/company/current", authCompanyMiddleware, CompanyController.logoutCompany);
 app.patch("/api/company/current/banner", authCompanyMiddleware, upload.single("image"), CompanyController.updateProfileBanner);
 app.patch("/api/company/orders/standard-package", authCompanyMiddleware, CompanyController.orderStandardPackage);
+app.post("/api/company/preferred-skills", authCompanyMiddleware, CompanyController.setPreferredSkills);
 
 // company test-bundle
 app.post("/api/company/bundle-test", authCompanyMiddleware, PackageBundleController.createPackageBundle);
