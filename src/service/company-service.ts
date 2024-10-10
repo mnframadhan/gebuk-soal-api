@@ -36,27 +36,6 @@ export class CompanyService {
             verification_code: hashedAuthDigits,
         };
 
-        const response = await prismaClient.company.create({
-            data: data,
-            select: {
-                id: true,
-                brand_name: true,
-                legal_name: true,
-                email: true,
-                phone: true,
-                address: true,
-                password: false,
-                sector: true,
-                sub_sector: true,
-                n_employee: true,
-                n_package: true,
-                n_applicant: true,
-                token: true,
-                created_at: true,
-                verified: true,
-            },
-        });
-
         const transporter = nodemailer.createTransport({
             service: "gmail",
             auth: {
@@ -78,6 +57,28 @@ export class CompanyService {
             }
             console.log(`Email sent ${info.response}`);
         });
+
+        const response = await prismaClient.company.create({
+            data: data,
+            select: {
+                id: true,
+                brand_name: true,
+                legal_name: true,
+                email: true,
+                phone: true,
+                address: true,
+                password: false,
+                sector: true,
+                sub_sector: true,
+                n_employee: true,
+                n_package: true,
+                n_applicant: true,
+                token: true,
+                created_at: true,
+                verified: true,
+            },
+        });
+
 
         return response;
     }
@@ -207,10 +208,16 @@ export class CompanyService {
         const companiesWithPackageBundles = await prismaClient.company.findMany({
             select: {
                 brand_name: true,
+				legal_name: true,
+				logo: true,
                 general_preferred_skills: {
                     select: {
                         name: true,
                     },
+					take: 4,
+					orderBy: {
+						name: "asc"
+					}
                 },
                 PackageBundle: {
                     select: {
@@ -218,6 +225,9 @@ export class CompanyService {
                     },
                 },
             },
+			orderBy: {
+				n_package: "desc"
+			}
         });
 
         return companiesWithPackageBundles;

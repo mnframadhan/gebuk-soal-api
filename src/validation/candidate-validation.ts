@@ -20,7 +20,7 @@ export class CandidateValidation {
 
     static readonly WORK : ZodType = z.object({
 
-        selected_answer: z.string().optional(),
+        selected_answer: z.string()
 
     })
 

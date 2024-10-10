@@ -83,14 +83,14 @@ export type PackageTestUnitsResponse = {
 
 export type PackageTestUnitsWorksRequest = {
 
-    selected_answer: string | null;
+    selected_answer: string;
 
 }
 
 export type PackageTestUnitWorksResponse = {
 
     id: string;
-    selected_answer: string | null;
+    selected_answer: string;
     end_time: string | null;
 
 }

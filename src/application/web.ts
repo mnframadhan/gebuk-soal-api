@@ -47,6 +47,7 @@ app.post("/api/contrib/login", ContributorController.loginContributor);
 // students
 app.post("/api/stud/register", StudentController.createStudent);
 app.post("/api/stud/login", StudentController.loginStudent);
+
 // admin
 // app.post('/api/admin/register', AdministratorController.createAdmin)
 app.post("/api/admin/login", AdministratorController.loginAdmin);
@@ -68,6 +69,8 @@ app.get("/api/student/current", authStudentMiddleware, StudentController.current
 app.delete("/api/student/current", authStudentMiddleware, StudentController.logoutStudent);
 app.patch("/api/student/current", authStudentMiddleware, StudentController.updateStudent);
 app.patch("/api/student/verification", authStudentMiddleware, StudentController.studentEmailVerification);
+app.patch("/api/student/update", authStudentMiddleware, StudentController.updateStudent);
+app.patch("/api/student/avatar", authStudentMiddleware, upload.single("avatar"),  StudentController.updateAvatar);
 
 app.get("/api/student/works/limit", authStudentMiddleware, WorksController.getRemainingLimit);
 app.post("/api/student/works", authStudentMiddleware, WorksController.createWorks); // query soal (uuid) //

@@ -125,9 +125,4 @@ export class PackageBundleService {
         return response;
     }
 
-    static async simulatePackageBundle(company: Company) {
-
-        
-
-    }
 }

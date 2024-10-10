@@ -3,13 +3,15 @@ import bcrypt from "bcrypt";
 import { v4 as uuid } from "uuid";
 import { prismaClient } from "../application/database";
 import { ResponseError } from "../error/response-error";
-import { StudentRequest, StudentResponse, StudentUpdateRequest, toStudentResponse } from "../model/student-model";
+import { StudentRequest, StudentResponse, StudentUpdateRequest, toStudentResponse, StudentUpdateAvatar } from "../model/student-model";
 import { StudentValidation } from "../validation/student-validation";
 import { Validation } from "../validation/Validation";
 import nodemailer, { SentMessageInfo } from "nodemailer";
 import { get4RandomDigits } from "../helpers/get-4-random-digit";
 
+
 export class StudentService {
+
     static async createStudent(request: StudentRequest): Promise<StudentResponse> {
         // validation
         const validatedRequest = Validation.validate(StudentValidation.CREATE, request);
@@ -128,49 +130,49 @@ export class StudentService {
         return toStudentResponse(student);
     }
 
-    static async updateStudent(request: StudentUpdateRequest, student: Student): Promise<{ id: string; avatar: string; message: string }> {
-        // validation
-        const validatedRequest = Validation.validate(StudentValidation.UPDATE, request);
+    static async updateStudent(request: StudentUpdateRequest, student: Student): Promise<{message: string}> {
+		
+		const validatedRequest = Validation.validate(StudentValidation.UPDATE, request);
 
-        if (validatedRequest.username) {
-            await prismaClient.student.update({
-                where: {
-                    id: student.id,
-                },
-                data: {
-                    username: validatedRequest.username,
-                },
-            });
-        }
+		await prismaClient.student.update({
+			where: {id: student.id},
+			data: {
+              ...(validatedRequest.username !== undefined && { username: validatedRequest.username }),
+              ...(validatedRequest.bio !== undefined  && { bio: validatedRequest.bio }),
+              ...(validatedRequest.full_name !== undefined && { full_name: validatedRequest.full_name }),
+              ...(validatedRequest.date_of_birth !== undefined && { date_of_birth: validatedRequest.date_of_birth }),
+              ...(validatedRequest.education_name !== undefined && { education_name: validatedRequest.education_name }),
+              ...(validatedRequest.is_present_education !== undefined && { is_present_education: validatedRequest.is_present_education }),
+              ...(validatedRequest.start_year_education !== undefined && { start_year_education: validatedRequest.start_year_education }),
+              ...(validatedRequest.end_year_education !== undefined && { end_year_education: validatedRequest.end_year_education }),
+            },
+		});	
 
-        if (validatedRequest.avatar) {
-            await prismaClient.student.update({
-                where: {
-                    id: student.id,
-                },
-                data: {
-                    avatar: validatedRequest.avatar,
-                },
-            });
-        }
+		return {message: "UPDATED"}
+	}
 
-        const response = {
-            id: student.id,
-            message: "Updated",
-            avatar: validatedRequest.avatar!,
-        };
+	static async updateAvatar(request: StudentUpdateAvatar, student: Student) : Promise<{message: string}> {
 
-        return response;
-    }
+		const validatedRequest = Validation.validate(StudentValidation.AVATAR_UPDATE, request);
+		
+		await prismaClient.student.update({
+			where: {id: student.id},
+			data: validatedRequest 
+		})
 
-    static async logoutCurrentStudent(student: Student): Promise<void> {
-        await prismaClient.student.update({
-            where: {
-                username: student.username,
+		return {message: "AVATAR UPDATED"}
+	}
+	
+	static async logoutCurrentStudent(student: Student): Promise<void> {
+
+		await prismaClient.student.update(
+			{ where: { 
+				username: student.username,
             },
             data: {
                 token: null,
             },
         });
     }
+
 }

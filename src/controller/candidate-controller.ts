@@ -80,7 +80,7 @@ export class CandidateController {
         try {
 
             const page = parseInt(req.query.page as string);
-            const response = await CandidateService.getPackageTestUnitByPackageBundleIdPagination(page, req.packageBundle!, req.student!);
+            const response = await CandidateService.getPackageTestUnitByPackageBundleIdPagination(page, req.packageBundle!);
 
             res.status(200);
             res.json(response);
@@ -98,14 +98,11 @@ export class CandidateController {
             const package_bundle_id : string = req.query.package_bundle_id as string;
 			
 			const request: PackageTestUnitsWorksRequest = req.body as PackageTestUnitsWorksRequest;
-			console.log(request);
             const response = await CandidateService.createWorks(request, package_bundle_id, package_test_unit_id, req.student!)
-			console.log(response)
             res.status(201);
             res.json(response);
 
         } catch (err) {
-			console.log(err);
             next(err);
         }
     }

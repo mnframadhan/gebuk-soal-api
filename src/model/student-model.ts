@@ -15,9 +15,16 @@ export type StudentResponse = {
 
     id : string;
     username : string;
-    full_name: String | null;
-    date_of_birth: string | null;
+    full_name?: String | null;
     email : string;
+	date_of_birth?: string | null;
+	bio? : string | null;
+	education_name? : string | null;
+	major? : string | null;
+	education_description? : string | null;
+	is_present_education? : boolean | null;
+	start_year_education? : string | null;
+	end_year_education? : string | null;
     points : number;
     n_soal : number;
     cognitive_point: number;
@@ -35,9 +42,9 @@ export type StudentResponse = {
     created_at : string;
     quota: number;
     membership: string;
-    token : string | null;
-    avatar: string | null;
-	verified: boolean | null;
+    token? : string | null;
+    avatar?: string | null;
+	verified?: boolean | null;
 
 }
 
@@ -52,12 +59,24 @@ export type StudentLeaderboardResponse<LeaderboardStudentData> = {
     data: Array<LeaderboardStudentData>;
 }
 
+export type StudentUpdateAvatar = {
+	avatar: string;
+}
+
 
 export type StudentUpdateRequest = {
 
-    username?: string | null;
-    avatar?: string | null;
-
+    username?: string; 
+	full_name?: string;
+	date_of_birth?: string;
+	bio? : string;
+	education_name? : string;
+	major? : string;
+	education_descripttion? : string;
+	is_present_education? : boolean;
+	start_year_education? : string;
+	end_year_education?: string;
+	
 }
 
 export function toStudentLeaderboardResponse(data: LeaderboardStudentData[], pagination: Paging) : StudentLeaderboardResponse<LeaderboardStudentData> {

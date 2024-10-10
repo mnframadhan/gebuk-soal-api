@@ -113,7 +113,7 @@ export class CandidateService {
         return response;
     }
 
-    static async getPackageTestUnitByPackageBundleIdPagination(page: number, package_bundle: PackageBundle, student: Student) : Promise<packageTestUnitsPagination> {
+    static async getPackageTestUnitByPackageBundleIdPagination(page: number, package_bundle: PackageBundle) : Promise<packageTestUnitsPagination> {
 
         const pageNum : number = page;
         const size : number = 1;
@@ -159,7 +159,7 @@ export class CandidateService {
 
     }
 
-    static async createWorks(request: PackageTestUnitsWorksRequest, package_bundle_id: string, package_test_unit_id: string, student: Student ) : Promise<PackageTestUnitWorksResponse> {
+    static async createWorks(request: PackageTestUnitsWorksRequest, package_bundle_id: string, package_test_unit_id: string, student: Student ) : Promise<{id: string, selected_answer: string, end_time: string | null}> {
 
         const validatedRequest = Validation.validate(CandidateValidation.WORK, request);
 
@@ -169,7 +169,7 @@ export class CandidateService {
             data: {
                 ...validatedRequest,
                 end_time: end_time,
-                student_id: student.id,
+                candidate_id: student.id,
                 package_test_unit_id: package_test_unit_id,
                 package_bundle_id: package_bundle_id
             },
@@ -193,7 +193,7 @@ export class CandidateService {
             by: ["package_test_unit_id"],
             where: {
               package_bundle_id: package_bundle_id,
-              student_id: student.id
+              candidate_id: student.id
             },
             _max: {
               end_time: true,

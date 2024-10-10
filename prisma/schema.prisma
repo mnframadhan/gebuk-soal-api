@@ -41,6 +41,13 @@ model Student {
   date_of_birth String?
   email String @unique
   password String
+  bio String @default("")
+  education_name String?
+  major String? 
+  education_description String?
+  is_present_education Boolean?
+  start_year_education String?
+  end_year_education String? 
   points Int @default(0)
   n_soal Int @default(0)
   cognitive_point Int @default(0)
@@ -65,7 +72,6 @@ model Student {
   works Work[]
   result Result[]
   order Order[]
-  packageTestWorks PackageTestWorks[]
   candidate Candidate? // one to one relationship
   verified Boolean @default(false)
   verification_code String?
@@ -178,7 +184,7 @@ model Candidate {
   phone String
   created_at String
   packageTestResults PackageTestResults[]
-
+  packageTestWorks PackageTestWorks[]
   @@map("candidates")
 
 }
@@ -188,11 +194,11 @@ model PackageTestWorks {
   id String @id @default(uuid())
   text String?
   question String?
-  selected_answer String?
+  selected_answer String
   start_time String?
   end_time String?
-  student_id String
-  Student Student @relation(fields: [student_id], references: [id])
+  candidate_id String
+  Caniddate Candidate @relation(fields: [candidate_id], references: [id])
   package_bundle_id String
   PackageBundle PackageBundle @relation(fields: [package_bundle_id], references: [id])
   package_test_unit_id String
