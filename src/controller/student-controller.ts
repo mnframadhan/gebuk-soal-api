@@ -60,8 +60,10 @@ export class StudentController {
 
 	static async updateStudent(req: StudentReq, res: Response, next: NextFunction) {
 		try {
-			const request = req.body;
+			const request: StudentUpdateRequest = req.body as StudentUpdateRequest;
+			console.log(request)
 			const response = await StudentService.updateStudent(request, req.student!);
+			console.log(response)
 
 			res.status(200);
 			res.json(response);

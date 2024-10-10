@@ -134,6 +134,8 @@ export class StudentService {
 		
 		const validatedRequest = Validation.validate(StudentValidation.UPDATE, request);
 
+		console.log(validatedRequest)
+
 		await prismaClient.student.update({
 			where: {id: student.id},
 			data: {
@@ -142,6 +144,7 @@ export class StudentService {
               ...(validatedRequest.full_name !== undefined && { full_name: validatedRequest.full_name }),
               ...(validatedRequest.date_of_birth !== undefined && { date_of_birth: validatedRequest.date_of_birth }),
               ...(validatedRequest.education_name !== undefined && { education_name: validatedRequest.education_name }),
+			  ...(validatedRequest.major !== undefined && {major: validatedRequest.major}),
               ...(validatedRequest.is_present_education !== undefined && { is_present_education: validatedRequest.is_present_education }),
               ...(validatedRequest.start_year_education !== undefined && { start_year_education: validatedRequest.start_year_education }),
               ...(validatedRequest.end_year_education !== undefined && { end_year_education: validatedRequest.end_year_education }),
