@@ -1,21 +1,32 @@
 export type CandidateCreateRequest = {
 
+	id_number: string;
     full_name: string;
     email: string;
-    address: string;
     phone: string;
+    address: string;
+	city: string;
+	district: string;
+	sub_district: string;
+	postal_code: string;
 
 }
 
 export type CandidateResponse = {
 
+	id_number: string;
     id: string;
     student_id: string;
     full_name: string;
     email: string;
     address: string;
+	city: string;
+	district: string;
+	sub_district: string;
+	postal_code: string;
     phone: string;
     created_at: string;
+	
 
 }
 

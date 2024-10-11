@@ -1,4 +1,5 @@
 import { PackageBundle, Student } from "@prisma/client";
+import bcrypt from "bcrypt";
 import { prismaClient } from "../application/database";
 import { ResponseError } from "../error/response-error";
 import { CandidateCreateRequest, CandidateResponse, CandidateResultRequest, CandidateUpdateRequest } from "../model/candidate-model";
@@ -7,6 +8,8 @@ import { packageTestUnitsPagination, PackageTestUnitsWorksRequest, PackageTestUn
 import { Validation } from "../validation/Validation";
 import { CandidateValidation } from "../validation/candidate-validation";
 import { v4 as uuid } from "uuid"; 
+import nodemailer, { SentMessageInfo } from "nodemailer"
+import { get4RandomDigits } from "../helpers/get-4-random-digit";
 
 export class CandidateService {
 
@@ -14,17 +17,84 @@ export class CandidateService {
 
         const validatedRequest = Validation.validate(CandidateValidation.CREATE, request);
         const created_at = String(Date.now())
+		
+		const isUsedIdNumber = await prismaClient.candidate.count({
+			where: { id_number: validatedRequest.id_number }
+		})
+
+		if (isUsedIdNumber != 0) {
+			throw new ResponseError(400, "NIK telah digunakan");
+		}
+	
+		const auth_digits = get4RandomDigits();
+		const hashed_auth_digits = await bcrypt.hash(auth_digits, 8)
+
         const response = await prismaClient.candidate.create({
         
             data: {
                 ...validatedRequest,
                 email: student.email,
                 student_id: student.id,
-                created_at: created_at
+                created_at: created_at,
+				verification_code: hashed_auth_digits,
             }
         })
+
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.COMPANY_EMAIL!,
+                pass: process.env.EMAIL_PASSWORD!,
+            },
+        });
+
+        const mailOptions = {
+            from: process.env.COMPANY_EMAIL!,
+            to: validatedRequest.email,
+            subject: `[Verifikasi Akun] ${validatedRequest.full_name}, Akun Kandidat Telah Dibuat, Segera Verifikasi`,
+            text: `Kode Autentikasi 4-digit angka: ${auth_digits}`,
+        };
+
+        transporter.sendMail(mailOptions, (error: Error | null, info: SentMessageInfo) => {
+            if (error) {
+                throw new ResponseError(422, "Invalid Email");
+            }
+            console.log(`Email sent ${info.response}`);
+        });
+
         return response;
     }
+
+	static async candidateEmailVerification( request: {verification_code: string}, student: Student) : Promise<{message: string}> {
+
+		const candidate = await prismaClient.candidate.findUnique({
+			where: {
+				student_id: student.id
+			},
+			select: {
+				verification_code: true
+			}
+		})
+
+		if(!candidate) {
+			throw new ResponseError(404, "Kandidat Tidak Ditemukan")
+		}
+
+        const verificationCode = await bcrypt.compare(request.verification_code, candidate.verification_code!);
+
+        if (!verificationCode) {
+            throw new ResponseError(422, "Verifikasi Gagal");
+        }
+
+        await prismaClient.candidate.update({
+            where: { id: student.id },
+            data: { verified: true },
+        });
+
+		return { message: "Berhasil diverifikasi"}
+
+	}
+
 	
     static async getCurrentCandidates(student: Student) : Promise<any> {
 		
@@ -37,6 +107,10 @@ export class CandidateService {
 						full_name: true,
 						email: true,
 						address: true,
+						city: true,
+						district: true,
+						sub_district: true,
+						postal_code: true,
 						phone: true,
 						packageTestResults: {
 							select: {
@@ -86,31 +160,34 @@ export class CandidateService {
 
     static async getPackageBundleById(package_bundle: PackageBundle, student: Student) : Promise<PackageBundleResponseDetails> {
 
-        const company = await prismaClient.company.findFirst({
-            where: {
-                id: package_bundle.company_id
-            },
-            select: {
-                brand_name: true,
-                legal_name: true
-            }
-        })
+		const packageBundle = await prismaClient.packageBundle.findFirst({
+			where: {
+				id: package_bundle.id
+			},
+			select : {
+				package_name: true,
+				company: {
+					select: {
+						brand_name: true,
+						legal_name: true,
+					}
+				},
+				present_n_unit: true,
+				max_duration: true,
+			}
+			
+		})
 
-        if(!company) {
+        if(!packageBundle) {
             throw new ResponseError(404, "Tidak Ditemukan")
         }
 
-        const response = {
-            package_name: package_bundle.package_name!,
-            company_brand_name: company.brand_name,
-            company_legal_name: company.legal_name,
-            present_n_unit: package_bundle.present_n_unit!,
-            max_duration: package_bundle.max_duration!,
-            token: package_bundle.token!,
-            authorized_student: student.username!
-        }
+		const response = {
+			...packageBundle,
+			authorized_student : student.username
+		}
 
-        return response;
+        return response ;
     }
 
     static async getPackageTestUnitByPackageBundleIdPagination(page: number, package_bundle: PackageBundle) : Promise<packageTestUnitsPagination> {

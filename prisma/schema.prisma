@@ -45,7 +45,7 @@ model Student {
   education_name String?
   major String? 
   education_description String?
-  is_present_education Boolean?
+  is_present_education Boolean? @default(false)
   start_year_education String?
   end_year_education String? 
   points Int @default(0)
@@ -175,12 +175,19 @@ model PackageBundle {
 
 model Candidate {
 
-  id String @id @unique @default(uuid())
+  id String  @unique @default(uuid())
+  id_number String @id
   student_id String @unique
   student Student @relation(fields: [student_id], references: [id])
   full_name String
   email String
   address String
+  city String
+  district String
+  sub_district String
+  postal_code String
+  verified Boolean @default(false)
+  verification_code String? 
   phone String
   created_at String
   packageTestResults PackageTestResults[]

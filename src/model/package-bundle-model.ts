@@ -17,19 +17,18 @@ export type PackageBundleResponse = {
     max_duration: number | null;
     n_unit: number | null;
     present_n_unit: number | null;
-
 }
 
 export type PackageBundleResponseDetails = {
 
     package_name: string;
-    company_brand_name: string;
-    company_legal_name : string;
-    present_n_unit: number;
-    max_duration: number;
+    present_n_unit: number | null;
+    max_duration: number | null;
     authorized_student: string;
-    token: string;
-
+	company: {
+		brand_name: string;
+		legal_name: string
+	}
 }
 
 export type PackageBundleUpdateRequest = {
