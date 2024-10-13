@@ -59,7 +59,6 @@ export class CandidateService {
             if (error) {
                 throw new ResponseError(422, "Invalid Email");
             }
-            console.log(`Email sent ${info.response}`);
         });
 
         return response;
@@ -86,12 +85,12 @@ export class CandidateService {
             throw new ResponseError(422, "Verifikasi Gagal");
         }
 
-        await prismaClient.candidate.update({
+        await prismaClient.student.update({
             where: { id: student.id },
             data: { verified: true },
         });
 
-		return { message: "Berhasil diverifikasi"}
+		return { message: "Success"}
 
 	}
 
@@ -107,10 +106,6 @@ export class CandidateService {
 						full_name: true,
 						email: true,
 						address: true,
-						city: true,
-						district: true,
-						sub_district: true,
-						postal_code: true,
 						phone: true,
 						packageTestResults: {
 							select: {
@@ -158,36 +153,33 @@ export class CandidateService {
         }
     }
 
-    static async getPackageBundleById(package_bundle: PackageBundle, student: Student) : Promise<PackageBundleResponseDetails> {
+    static async getPackageBundleById(package_bundle: PackageBundle, student: Student) : Promise<any> {
 
-		const packageBundle = await prismaClient.packageBundle.findFirst({
-			where: {
-				id: package_bundle.id
-			},
-			select : {
-				package_name: true,
-				company: {
-					select: {
-						brand_name: true,
-						legal_name: true,
-					}
-				},
-				present_n_unit: true,
-				max_duration: true,
-			}
-			
-		})
+        const company = await prismaClient.company.findFirst({
+            where: {
+                id: package_bundle.company_id
+            },
+            select: {
+                brand_name: true,
+                legal_name: true
+            }
+        })
 
-        if(!packageBundle) {
+        if(!company) {
             throw new ResponseError(404, "Tidak Ditemukan")
         }
 
-		const response = {
-			...packageBundle,
-			authorized_student : student.username
-		}
+        const response = {
+            package_name: package_bundle.package_name!,
+            brand_name: company.brand_name,
+            legal_name: company.legal_name,
+            present_n_unit: package_bundle.present_n_unit!,
+            max_duration: package_bundle.max_duration!,
+            token: package_bundle.token!,
+            authorized_student: student.username!
+        }
 
-        return response ;
+        return response;
     }
 
     static async getPackageTestUnitByPackageBundleIdPagination(page: number, package_bundle: PackageBundle) : Promise<packageTestUnitsPagination> {
@@ -240,13 +232,23 @@ export class CandidateService {
 
         const validatedRequest = Validation.validate(CandidateValidation.WORK, request);
 
+		const current_candidate = await prismaClient.candidate.findUnique({
+			where: {
+				student_id: student.id
+			}
+		})
+
+		if(!current_candidate) {
+			throw new ResponseError(404, "Tidak ditemukan")
+		}
+
         const end_time : string = String(Date.now());
         const response = await prismaClient.packageTestWorks.create({
 			
             data: {
                 ...validatedRequest,
                 end_time: end_time,
-                candidate_id: student.id,
+                candidate_id: current_candidate.id,
                 package_test_unit_id: package_test_unit_id,
                 package_bundle_id: package_bundle_id
             },
@@ -264,92 +266,77 @@ export class CandidateService {
     static async createResult(request: CandidateResultRequest, student: Student, package_bundle_id: string ) : Promise<any> {
 
         const validatedRequest = Validation.validate(CandidateValidation.DONE, request);
+		
+		// kandidat
+		const currentCandidate = await prismaClient.candidate.findUnique({
+			where: {
+				student_id: student.id
+			},
+		})
 
-        // find the last works
-        const latestTestUnits = await prismaClient.packageTestWorks.groupBy({
-            by: ["package_test_unit_id"],
-            where: {
-              package_bundle_id: package_bundle_id,
-              candidate_id: student.id
-            },
-            _max: {
-              end_time: true,
-            }
-          });
-          
+		if(!currentCandidate) {
+			throw new ResponseError(404, "Tidak Ditemukan")
+		}
 
-        if(!latestTestUnits) {
-            throw new ResponseError(404, "Records not found");
-        }
+		const latestWorks = await prismaClient.packageTestWorks.groupBy({
+			where: {
+				candidate_id: currentCandidate.id,
+				package_bundle_id: package_bundle_id
+			},
+			by: ['id'],
+			_max: {
+				end_time: true
+			},
+		})
 
-        const detailedRecords = await prismaClient.packageTestWorks.findMany({
-            where: {
-              OR: latestTestUnits.map(unit => ({
-                package_test_unit_id: unit.package_test_unit_id,
-                end_time: unit._max.end_time
-              }))
-            },
-            select: {
-              package_test_unit_id: true,
-              end_time: true,
-              selected_answer: true,
-              package_bundle_id: true,
-            }
-          });
+		const works = await prismaClient.packageTestWorks.findMany({
+			where: {
+				candidate_id: currentCandidate.id,
+				package_bundle_id: package_bundle_id,
+				id: {
+					in: latestWorks.map(i => i.id)
+				}
+			},
+			select: {
+				package_test_unit_id: true,
+				selected_answer : true,
+				end_time : true,
+			}
+		})
 
-        const units = await prismaClient.packageTestUnit.findMany({
+		const testUnit = await prismaClient.packageTestUnit.findMany({
+			where: {
+				package_bundle_id: package_bundle_id,
+				id: {
+					in: works.map(i => i.package_test_unit_id)
+				},
+			},
+			select: {
+				id: true,
+				unique_answer: true
+			}
+		})
 
-            where: {
-                OR: latestTestUnits.map(unit => ({
-                    id: unit.package_test_unit_id,
-                }))
-            },
-            select: {
-                id: true,
-                unique_answer: true,
-            }
-        })
+		const truth = testUnit.map(t => {
+			const findWorks = works.find(w => w.selected_answer === t.unique_answer);
+			return findWorks ? t.unique_answer === findWorks.selected_answer : false;
+		})
 
-        type Res = Array<{
-            package_test_unit: string;
-            selected_answer: string;
-            correct_answer: string;
-            correct: boolean;
-            end_time: string;
-        }>
+		const n_records = truth.length;
+		const n_true = truth.filter(t => t === true).length;
+		const n_false = n_records - n_true;
+		const points = n_true/n_records;
 
-        // results
-        const results : Res = units.map((u) => {
 
-            const unitItem = detailedRecords.find(d => d.package_test_unit_id  === u.id );
-
-            return {
-                package_test_unit : u.id!,
-                selected_answer: unitItem?.selected_answer!,
-                correct_answer: u.unique_answer!,
-                correct: unitItem ? unitItem.selected_answer === u.unique_answer : false,
-                end_time: unitItem!.end_time!
-            }
-        })
-
-        const candidate = await prismaClient.candidate.findFirst({
-
-            where: {student_id: student.id},
-            select: {
-                id: true
-            }
-        })
-
-        const duration = Number(validatedRequest.end_time) - Number(validatedRequest.start_time);
-
+		const duration = Number(validatedRequest.end_time) - Number(validatedRequest.start_time);
         const end_results = {
             id: String(uuid()),
-            candidate_id: candidate!.id,
-            total_records : results.length,
+            candidate_id: currentCandidate!.id,
+            total_records : n_records,
             duration: duration,
-            n_true : results.filter((r) => r.correct ).length,
-            n_false : results.length - results.filter((r) => r.correct ).length,
-            points: results.filter((r) => r.correct ).length/results.length,
+            n_true : n_true, 
+            n_false : n_false, 
+            points: points, 
             package_bundle_id: package_bundle_id,
             start_time: String(validatedRequest.start_time),
             end_time: String(validatedRequest.end_time)

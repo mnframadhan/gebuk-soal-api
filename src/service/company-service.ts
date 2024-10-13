@@ -1,7 +1,7 @@
 import { Company } from "@prisma/client";
 import { prismaClient } from "../application/database";
 import { ResponseError } from "../error/response-error";
-import { CompanyLoginRequest, CompanyRegisterRequest, CompanyResponse, CompanyShowedResponse } from "../model/company-model";
+import { CompanyLoginRequest, CompanyRegisterRequest, CompanyResponse} from "../model/company-model";
 import { CompanyValidation } from "../validation/company-validation";
 import { Validation } from "../validation/Validation";
 import bcrypt from "bcrypt";
@@ -303,6 +303,50 @@ export class CompanyService {
 
         return response;
     }
+
+	static async getPackageBundleResults(company: Company, package_bundle_id: string) : Promise<any>{
+
+		const result = await prismaClient.company.findMany({
+			where: {
+				id: company.id
+			},
+			select: {
+				PackageBundle: {
+					where: {
+						id: package_bundle_id
+					},
+					select: {
+						package_name: true,
+						n_unit: true,
+						max_duration: true,
+						packageTestResult: {
+							where: {
+								package_bundle_id: package_bundle_id
+							},
+							select: {
+								Candidate: {
+									select: {
+										full_name: true,
+										email: true,
+										city: true,
+										district: true,
+									}
+								},
+								points: true,
+								start_time: true,
+								end_time: true,
+								duration: true
+							}
+						}
+					}
+				},
+			}
+		})
+
+		const response = result[0].PackageBundle.map((item) => item.packageTestResult)[0]
+		return response;
+	}
+
 
     static async orderStandardPackage(company: Company): Promise<{ message: string }> {
         await prismaClient.company.update({

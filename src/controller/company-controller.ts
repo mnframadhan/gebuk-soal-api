@@ -152,4 +152,19 @@ export class CompanyController {
             next(err);
         }
     }
+
+	static async getResultOfPackageBundle(req: CompanyReq, res: Response, next: NextFunction) {
+
+		try {
+			const package_bundle_id: string = req.query.id as string;
+			const response = await CompanyService.getPackageBundleResults(req.company!, package_bundle_id);
+
+			res.status(200);
+			res.json(response);
+
+		} catch (err) {
+			next(err)
+		}
+
+	}
 }

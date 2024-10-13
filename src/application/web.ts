@@ -122,15 +122,19 @@ app.delete("/api/company/bundle-test/test-unit", authCompanyMiddleware, PackageT
 app.get("/api/company/bundle-test/:package_bundle_id/test-unit", authCompanyMiddleware, PackageTestUnitController.getPackageTestUnitByPackageBundleId); // query package_bundle_test_id
 app.get("/api/company/bundle-test/works/:package_bundle_id", authCompanyMiddleware, CompanyController.getPackageTestUnitByPackageBundleIdPagination); // query page // query package_bundle_id
 
+// company package-bundle-candidate-result
+app.get("/api/company/bundle-result", authCompanyMiddleware, CompanyController.getResultOfPackageBundle);
+
 // candidate (one-to-one relation with students)
 app.post("/api/candidate/register", authStudentMiddleware, CandidateController.createCandidate);
 app.get("/api/candidate/current", authStudentMiddleware, CandidateController.getCurrentCandidate);
 app.get("/api/candidate/token", authStudentMiddleware, CandidateController.checkPackageBundleToken); // query package_bundle_token
 app.get("/api/candidate/bundle-test", authStudentMiddleware, packageBundleMiddleware, CandidateController.getPackageBundleById); // params package_bundle_id
+app.patch("/api/candidate/verification", authStudentMiddleware, CandidateController.candidateEmailVerification)
 
 // candidate works
 app.get("/api/candidate/bundle-test/works", authStudentMiddleware, packageBundleMiddleware, CandidateController.getPackageTestUnitsByPackageBundleIdPagination); // query page
-app.post("/api/candidate/bundle-test/test-unit/works", authStudentMiddleware, CandidateController.createWorks); // query package_test_unit_id // query package_bundle_id
+app.post("/api/candidate/bundle-test/test-unit/works", authStudentMiddleware, packageBundleMiddleware, CandidateController.createWorks); // query package_test_unit_id // query package_bundle_id
 app.post("/api/candidate/bundle-test/results", authStudentMiddleware, packageBundleMiddleware, CandidateController.createResults); // query package_bundle_id
 app.get("/api/candidate/bundle-test/results", authStudentMiddleware, CandidateController.getResults);
 

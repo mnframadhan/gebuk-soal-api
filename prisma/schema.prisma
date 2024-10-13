@@ -205,7 +205,7 @@ model PackageTestWorks {
   start_time String?
   end_time String?
   candidate_id String
-  Caniddate Candidate @relation(fields: [candidate_id], references: [id])
+  Candidate Candidate @relation(fields: [candidate_id], references: [id])
   package_bundle_id String
   PackageBundle PackageBundle @relation(fields: [package_bundle_id], references: [id])
   package_test_unit_id String
