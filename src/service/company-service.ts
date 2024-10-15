@@ -163,6 +163,7 @@ export class CompanyService {
                 verification_code: true,
                 general_preferred_skills: {
                     select: {
+						id: true,
                         name: true,
                     },
                 },
@@ -192,6 +193,18 @@ export class CompanyService {
     }
 
     static async setPreferredSkills(request: { name: string }, company: Company): Promise<{ message: string }> {
+
+		// check if preferred skills already exist
+		const preferredSkill = await prismaClient.preferredSkills.findFirst({
+			where: {
+				name: request.name,
+				company_id: company.id
+			}
+		})
+
+		if (preferredSkill) {
+			throw new ResponseError(400, "Already Exist");
+		}
 		
         await prismaClient.preferredSkills.create({
             data: {
@@ -202,7 +215,23 @@ export class CompanyService {
 
         return { message: "OK" };
     }
+
+
+	static async deletePreferredSkills(request: {id: number, company_id: string} ) : Promise<{message: string}> {
 	
+		await prismaClient.preferredSkills.delete({
+			where : {
+				id: request.id,
+				company_id: request.company_id,
+			}
+		})
+		console.log("Deleted")
+
+		return { message: "Success" };
+
+	}
+
+
 
     static async getAllCompanies() {
         const companiesWithPackageBundles = await prismaClient.company.findMany({
@@ -214,7 +243,7 @@ export class CompanyService {
                     select: {
                         name: true,
                     },
-					take: 4,
+					take: 3,
 					orderBy: {
 						name: "asc"
 					}

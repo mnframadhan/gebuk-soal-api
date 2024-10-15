@@ -3,8 +3,7 @@ import bcrypt from "bcrypt";
 import { prismaClient } from "../application/database";
 import { ResponseError } from "../error/response-error";
 import { CandidateCreateRequest, CandidateResponse, CandidateResultRequest, CandidateUpdateRequest } from "../model/candidate-model";
-import { PackageBundleResponseDetails } from "../model/package-bundle-model";
-import { packageTestUnitsPagination, PackageTestUnitsWorksRequest, PackageTestUnitWorksResponse } from "../model/package-test-unit-model";
+import { packageTestUnitsPagination, PackageTestUnitsWorksRequest} from "../model/package-test-unit-model";
 import { Validation } from "../validation/Validation";
 import { CandidateValidation } from "../validation/candidate-validation";
 import { v4 as uuid } from "uuid"; 
@@ -57,6 +56,7 @@ export class CandidateService {
 
         transporter.sendMail(mailOptions, (error: Error | null, info: SentMessageInfo) => {
             if (error) {
+				console.log(`Error: ${info}`)
                 throw new ResponseError(422, "Invalid Email");
             }
         });
@@ -122,6 +122,7 @@ export class CandidateService {
 								},
 								start_time: true,
 								end_time: true,
+								duration: true,
 							},
 						},
 					}
@@ -347,61 +348,6 @@ export class CandidateService {
         })
 
         return response;
-
-    }
-
-    static async getResultsForCandidate(student: Student ) {
-
-        const candidate = await prismaClient.candidate.findFirst({where: {email: student.email}})
-        
-
-        if (!candidate) {
-            throw new ResponseError(404, "Kandidat tidak ditemukan / belum dibuat");
-        }
-        
-        const packageResults = await prismaClient.packageTestResults.findMany({
-
-            where: {
-                candidate_id: candidate.id
-            }
-        })
-
-        const resultsPackageBundleID = packageResults.map((res) => res.package_bundle_id);
-
-        const packageBundles = await prismaClient.packageBundle.findMany({
-            where: {
-                id: {
-                    in: resultsPackageBundleID
-                }
-            },
-        });
-
-        const packageBundlesCompanyID = packageBundles.map((res) => res.company_id);
-
-        const companies = await prismaClient.company.findMany({
-            where: {
-                id: {
-                    in: packageBundlesCompanyID
-                }
-            }
-        })
-
-        const result = packageResults.map((r) => {
-
-            const pakcageBundlesFind = packageBundles.find((pb) => pb.id === r.package_bundle_id);
-            const companiesFind = companies.find((c) => c.id === pakcageBundlesFind?.company_id);
-
-            return {
-                id: r.id,
-                package_name: pakcageBundlesFind ? pakcageBundlesFind.package_name : null,
-                company: companiesFind ? companiesFind.brand_name : null,
-                duration : r.duration,
-                start_time: r.start_time,
-                end_time: r.end_time
-            }
-        })
-
-        return result;
 
     }
 

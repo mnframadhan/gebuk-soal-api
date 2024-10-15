@@ -76,7 +76,7 @@ app.get("/api/student/works/limit", authStudentMiddleware, WorksController.getRe
 app.post("/api/student/works", authStudentMiddleware, WorksController.createWorks); // query soal (uuid) //
 
 // student api works by membership
-app.get("/api/student/works", authStudentMiddleware, limiter, WorksController.getWorks); //  query page, remaining_limit,
+app.get("/api/student/works/basic", authStudentMiddleware, limiter, WorksController.getWorks); //  query page, remaining_limit,
 app.get("/api/student/works/limit-plus", authStudentMiddleware, plusLimiter, WorksController.getWorks); //  category, query page, remaining_limit,
 app.get("/api/student/works/premium", authStudentMiddleware, WorksController.getWorks); //  category, query page, remaining_limit,
 
@@ -105,6 +105,7 @@ app.delete("/api/company/current", authCompanyMiddleware, CompanyController.logo
 app.patch("/api/company/current/banner", authCompanyMiddleware, upload.single("image"), CompanyController.updateProfileBanner);
 app.patch("/api/company/orders/standard-package", authCompanyMiddleware, CompanyController.orderStandardPackage);
 app.post("/api/company/preferred-skills", authCompanyMiddleware, CompanyController.setPreferredSkills);
+app.delete("/api/company/preferred-skills", authCompanyMiddleware, CompanyController.deletePreferredSkills);
 
 // company test-bundle
 app.post("/api/company/bundle-test", authCompanyMiddleware, PackageBundleController.createPackageBundle);
@@ -136,6 +137,5 @@ app.patch("/api/candidate/verification", authStudentMiddleware, CandidateControl
 app.get("/api/candidate/bundle-test/works", authStudentMiddleware, packageBundleMiddleware, CandidateController.getPackageTestUnitsByPackageBundleIdPagination); // query page
 app.post("/api/candidate/bundle-test/test-unit/works", authStudentMiddleware, packageBundleMiddleware, CandidateController.createWorks); // query package_test_unit_id // query package_bundle_id
 app.post("/api/candidate/bundle-test/results", authStudentMiddleware, packageBundleMiddleware, CandidateController.createResults); // query package_bundle_id
-app.get("/api/candidate/bundle-test/results", authStudentMiddleware, CandidateController.getResults);
 
 app.use(errorMiddleware);

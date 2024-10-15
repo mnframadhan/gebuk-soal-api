@@ -109,16 +109,6 @@ export class CandidateController {
         }
     }
 
-    static async getResults(req: StudentReq, res: Response, next: NextFunction) {
-        try {
-            const response = await CandidateService.getResultsForCandidate(req.student!);
-            res.status(200);
-            res.json(response);
-        } catch (err) {
-            next(err);
-        }
-    }
-
     static async updateCandidate(req: StudentReq, res: Response, next: NextFunction) {
         try {
             const request: CandidateUpdateRequest = req.body as CandidateUpdateRequest;

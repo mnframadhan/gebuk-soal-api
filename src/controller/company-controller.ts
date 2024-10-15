@@ -76,6 +76,21 @@ export class CompanyController {
         }
     }
 
+	static async deletePreferredSkills(req: CompanyReq, res: Response, next: NextFunction) {
+		try {
+			const request = req.body as {id: number, company_id: string};
+			const response = await CompanyService.deletePreferredSkills(request);
+
+			console.log(request);
+
+			res.status(200);
+			res.json(response);
+
+		} catch (err) {
+			next(err);
+		}
+	}
+
     static async getAllCompanies(req: Request, res: Response, next: NextFunction) {
         try {
             const response = await CompanyService.getAllCompanies();
@@ -156,7 +171,7 @@ export class CompanyController {
 	static async getResultOfPackageBundle(req: CompanyReq, res: Response, next: NextFunction) {
 
 		try {
-			const package_bundle_id: string = req.query.id as string;
+			const package_bundle_id: string = req.query.package_bundle_id as string;
 			const response = await CompanyService.getPackageBundleResults(req.company!, package_bundle_id);
 
 			res.status(200);

@@ -15,11 +15,11 @@ export class WorksService {
 
     }
 
-    static async getWorks(student: Student, category: string, page: number, remaining_limit: number) {
+    static async getWorks(student: Student, category: string, page: number) {
 
         const pagination: Paging = {
             size: 1,
-            total_page: remaining_limit,
+            total_page: student.quota,
             current_page: page
         }
 

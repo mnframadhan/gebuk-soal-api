@@ -25,9 +25,7 @@ export class WorksController {
 
             const category : string = req.query.category as string;
             const page : number = Number(req.query.page);
-
-            const remaining_limit : number = Number(req.query.remaining_limit);
-            const response = await WorksService.getWorks(req.student!, category, page, remaining_limit)
+            const response = await WorksService.getWorks(req.student!, category, page)
             
             res.status(200);
             res.json(response);

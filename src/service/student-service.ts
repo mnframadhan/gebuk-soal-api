@@ -134,8 +134,6 @@ export class StudentService {
 		
 		const validatedRequest = Validation.validate(StudentValidation.UPDATE, request);
 
-		console.log(validatedRequest)
-
 		await prismaClient.student.update({
 			where: {id: student.id},
 			data: {
