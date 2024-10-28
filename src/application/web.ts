@@ -106,6 +106,7 @@ app.patch("/api/company/current/banner", authCompanyMiddleware, upload.single("i
 app.patch("/api/company/orders/standard-package", authCompanyMiddleware, CompanyController.orderStandardPackage);
 app.post("/api/company/preferred-skills", authCompanyMiddleware, CompanyController.setPreferredSkills);
 app.delete("/api/company/preferred-skills", authCompanyMiddleware, CompanyController.deletePreferredSkills);
+app.post("/api/company/touch", authCompanyMiddleware, CompanyController.touchCandidateController); // query candidate_id
 
 // company test-bundle
 app.post("/api/company/bundle-test", authCompanyMiddleware, PackageBundleController.createPackageBundle);

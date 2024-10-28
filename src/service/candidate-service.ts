@@ -314,6 +314,16 @@ export class CandidateService {
 			},
 			select: {
 				id: true,
+				packageBundle: {
+					select: {
+						package_name: true,
+						company: {
+							select: {
+								brand_name: true
+							}
+						}
+					}
+				},
 				unique_answer: true
 			}
 		})
@@ -327,7 +337,6 @@ export class CandidateService {
 		const n_true = truth.filter(t => t === true).length;
 		const n_false = n_records - n_true;
 		const points = n_true/n_records;
-
 
 		const duration = Number(validatedRequest.end_time) - Number(validatedRequest.start_time);
         const end_results = {
@@ -347,6 +356,27 @@ export class CandidateService {
             data: end_results
         })
 
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.COMPANY_EMAIL!,
+                pass: process.env.EMAIL_PASSWORD!,
+            },
+        });
+
+        const mailOptions = {
+            from: process.env.COMPANY_EMAIL!,
+            to: currentCandidate.email,
+            subject: `Berhasil Menyelesaikan Test`,
+            text: `Anda Telah Menyelesaikan Test ${testUnit[0].packageBundle.package_name} untuk ${testUnit[0].packageBundle.company.brand_name}`,
+        };
+
+        transporter.sendMail(mailOptions, (error: Error | null, info: SentMessageInfo) => {
+            if (error) {
+				console.log(`Error: ${info}`)
+                throw new ResponseError(422, "Invalid Email");
+            }
+        });
         return response;
 
     }

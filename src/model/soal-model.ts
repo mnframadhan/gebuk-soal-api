@@ -10,6 +10,7 @@ export type SoalRequest = {
     sub_category: string | null;
     cpns_category: string | null;
     label: string | null;
+	difficulty: "Easy" | "Medium" | "Hard";
     text: string;
     question: string;
     option1: string | null;
@@ -34,6 +35,7 @@ export type SoalResponse = {
     sub_category: string | null;
     cpns_category: string | null;
     label: string | null;
+	difficulty: "Easy" | "Medium" | "Hard";
     text: string;
     question: string;
     option1: string | null;
@@ -85,6 +87,7 @@ export function toSoalResponse(soal: Soal) : SoalResponse {
         sub_category: soal.sub_category,
         cpns_category: soal.cpns_category,
         label: soal.label,
+		difficulty: soal.difficulty,
         text: soal.text,
         option1: soal.option1,
         option2: soal.option2,

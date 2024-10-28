@@ -105,6 +105,7 @@ model Company {
   verification_code String?
   logo String?
   general_preferred_skills PreferredSkills[]
+  Touch Touch[]
 
   @@map("companies")
 }
@@ -117,6 +118,18 @@ model PreferredSkills {
 	Company Company @relation(fields: [company_id], references: [id])
 	
 	@@map("preferredSkills")
+
+}
+
+model Touch {
+	
+	id String @id @default(uuid())
+	company_id String
+	Company Company @relation(fields: [company_id], references: [id])
+	message String @db.LongText
+	candidate_id String
+	Candidate Candidate @relation(fields: [candidate_id], references: [id])
+	created_at String
 
 }
 
@@ -192,6 +205,8 @@ model Candidate {
   created_at String
   packageTestResults PackageTestResults[]
   packageTestWorks PackageTestWorks[]
+  Touch Touch[]
+  
   @@map("candidates")
 
 }
@@ -249,6 +264,12 @@ model Order {
 
 }
 
+enum Difficulty {
+  Easy
+  Medium
+  Hard
+}
+
 model Soal {
 
   id String @id @unique
@@ -256,6 +277,7 @@ model Soal {
   sub_category String?
   cpns_category String?
   label String? 
+  difficulty Difficulty
   text String @db.LongText
   question String
   option1 String? 

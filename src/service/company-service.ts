@@ -1,7 +1,7 @@
 import { Company } from "@prisma/client";
 import { prismaClient } from "../application/database";
 import { ResponseError } from "../error/response-error";
-import { CompanyLoginRequest, CompanyRegisterRequest, CompanyResponse} from "../model/company-model";
+import { CompanyLoginRequest, CompanyRegisterRequest, CompanyResponse } from "../model/company-model";
 import { CompanyValidation } from "../validation/company-validation";
 import { Validation } from "../validation/Validation";
 import bcrypt from "bcrypt";
@@ -53,9 +53,8 @@ export class CompanyService {
 
         transporter.sendMail(mailOptions, (error: Error | null, info: SentMessageInfo) => {
             if (error) {
-                throw new ResponseError(422, "Invalid Email");
+                throw new ResponseError(422, `Error: ${info}`);
             }
-            console.log(`Email sent ${info.response}`);
         });
 
         const response = await prismaClient.company.create({
@@ -79,11 +78,13 @@ export class CompanyService {
             },
         });
 
-
         return response;
     }
 
-    static async companyEmailVerification(request: { verificationCode: string }, company: Company): Promise<{ message: string }> {
+    static async companyEmailVerification(
+        request: { verificationCode: string },
+        company: Company
+    ): Promise<{ message: string }> {
         const correctVerificationCode = await bcrypt.compare(request.verificationCode, company.verification_code!);
 
         if (!correctVerificationCode) {
@@ -98,7 +99,7 @@ export class CompanyService {
         return { message: "Selamat! Akun berhasil di-verifikasi" };
     }
 
-    static async loginCompany(request: CompanyLoginRequest): Promise<{message: string, token: string}> {
+    static async loginCompany(request: CompanyLoginRequest): Promise<{ message: string; token: string }> {
         const validatedRequest = Validation.validate(CompanyValidation.LOGIN, request);
 
         const company = await prismaClient.company.findFirst({
@@ -112,13 +113,13 @@ export class CompanyService {
         }
 
         const comparedPassword = await bcrypt.compare(validatedRequest.password, company.password);
-		const token : string = uuid() as string;
+        const token: string = uuid() as string;
 
         if (!comparedPassword) {
             throw new ResponseError(400, "Username or Password is incorrect");
         }
-		
-		await prismaClient.company.update({
+
+        await prismaClient.company.update({
             where: {
                 email: validatedRequest.email,
             },
@@ -127,7 +128,7 @@ export class CompanyService {
             },
         });
 
-        return {message: "OK", token: token};
+        return { message: "OK", token: token };
     }
 
     static async logoutCompany(company: Company): Promise<{ message: string }> {
@@ -141,7 +142,7 @@ export class CompanyService {
         return { message: "OK" };
     }
 
-    static async getCurrentCompany(company: Company) : Promise<CompanyResponse> {
+    static async getCurrentCompany(company: Company): Promise<CompanyResponse> {
         const companies = await prismaClient.company.findUnique({
             where: { id: company.id },
             select: {
@@ -160,93 +161,85 @@ export class CompanyService {
                 token: true,
                 banner_image: true,
                 verified: true,
-                verification_code: true,
                 general_preferred_skills: {
                     select: {
-						id: true,
+                        id: true,
                         name: true,
                     },
                 },
-				PackageBundle: {
-					select: {
-						package_name: true,
-						n_unit: true,
-						max_duration: true,
-						token: true,
-						id: true,
-						created_at: true,
-						expired_date: true,
-						present_n_unit: true,
-					},
-					orderBy: {
-						created_at: "desc"
-					}
-				}
+                PackageBundle: {
+                    select: {
+                        package_name: true,
+                        n_unit: true,
+                        max_duration: true,
+                        token: true,
+                        id: true,
+                        created_at: true,
+                        expired_date: true,
+                        present_n_unit: true,
+                    },
+                    orderBy: {
+                        created_at: "desc",
+                    },
+                },
             },
         });
-		
-		if(!companies) {
-			throw new ResponseError(404, "Not Found")
-		}
+
+        if (!companies) {
+            throw new ResponseError(404, "Not Found");
+        }
 
         return companies;
     }
 
     static async setPreferredSkills(request: { name: string }, company: Company): Promise<{ message: string }> {
+        // check if preferred skills already exist
+        const preferredSkill = await prismaClient.preferredSkills.findFirst({
+            where: {
+                name: request.name,
+                company_id: company.id,
+            },
+        });
 
-		// check if preferred skills already exist
-		const preferredSkill = await prismaClient.preferredSkills.findFirst({
-			where: {
-				name: request.name,
-				company_id: company.id
-			}
-		})
+        if (preferredSkill) {
+            throw new ResponseError(400, "Already Exist");
+        }
 
-		if (preferredSkill) {
-			throw new ResponseError(400, "Already Exist");
-		}
-		
         await prismaClient.preferredSkills.create({
             data: {
-				name: request.name,
-				company_id: company.id,
+                name: request.name,
+                company_id: company.id,
             },
         });
 
         return { message: "OK" };
     }
 
+    static async deletePreferredSkills(request: { id: number; company_id: string }): Promise<{ message: string }> {
+        await prismaClient.preferredSkills.delete({
+            where: {
+                id: request.id,
+                company_id: request.company_id,
+            },
+        });
 
-	static async deletePreferredSkills(request: {id: number, company_id: string} ) : Promise<{message: string}> {
-	
-		await prismaClient.preferredSkills.delete({
-			where : {
-				id: request.id,
-				company_id: request.company_id,
-			}
-		})
-		console.log("Deleted")
-
-		return { message: "Success" };
-
-	}
-
-
+        return { message: "Success" };
+    }
 
     static async getAllCompanies() {
         const companiesWithPackageBundles = await prismaClient.company.findMany({
             select: {
                 brand_name: true,
-				legal_name: true,
-				logo: true,
+                legal_name: true,
+                logo: true,
                 general_preferred_skills: {
                     select: {
                         name: true,
                     },
-					take: 3,
-					orderBy: {
-						name: "asc"
-					}
+                    take: 3,
+                    orderBy: {
+                        name: "asc",
+                    },
                 },
                 PackageBundle: {
                     select: {
@@ -254,9 +247,9 @@ export class CompanyService {
                     },
                 },
             },
-			orderBy: {
-				n_package: "desc"
-			}
+            orderBy: {
+                n_package: "desc",
+            },
         });
 
         return companiesWithPackageBundles;
@@ -290,7 +283,11 @@ export class CompanyService {
         return { message: "Success" };
     }
 
-    static async getPackageTestUnitByPackageBundleIdPagination(page: number, package_bundle_id: string, company: Company): Promise<packageTestUnitsPagination> {
+    static async getPackageTestUnitByPackageBundleIdPagination(
+        page: number,
+        package_bundle_id: string,
+        company: Company
+    ): Promise<packageTestUnitsPagination> {
         const pageNum: number = page;
         const size: number = 1;
 
@@ -333,49 +330,47 @@ export class CompanyService {
         return response;
     }
 
-	static async getPackageBundleResults(company: Company, package_bundle_id: string) : Promise<any>{
+    static async getPackageBundleResults(company: Company, package_bundle_id: string): Promise<any> {
+        const result = await prismaClient.company.findMany({
+            where: {
+                id: company.id,
+            },
+            select: {
+                PackageBundle: {
+                    where: {
+                        id: package_bundle_id,
+                    },
+                    select: {
+                        package_name: true,
+                        n_unit: true,
+                        max_duration: true,
+                        packageTestResult: {
+                            where: {
+                                package_bundle_id: package_bundle_id,
+                            },
+                            select: {
+                                Candidate: {
+                                    select: {
+                                        full_name: true,
+                                        email: true,
+                                        city: true,
+                                        district: true,
+                                    },
+                                },
+                                points: true,
+                                start_time: true,
+                                end_time: true,
+                                duration: true,
+                            },
+                        },
+                    },
+                },
+            },
+        });
 
-		const result = await prismaClient.company.findMany({
-			where: {
-				id: company.id
-			},
-			select: {
-				PackageBundle: {
-					where: {
-						id: package_bundle_id
-					},
-					select: {
-						package_name: true,
-						n_unit: true,
-						max_duration: true,
-						packageTestResult: {
-							where: {
-								package_bundle_id: package_bundle_id
-							},
-							select: {
-								Candidate: {
-									select: {
-										full_name: true,
-										email: true,
-										city: true,
-										district: true,
-									}
-								},
-								points: true,
-								start_time: true,
-								end_time: true,
-								duration: true
-							}
-						}
-					}
-				},
-			}
-		})
-
-		const response = result[0].PackageBundle.map((item) => item.packageTestResult)[0]
-		return response;
-	}
-
+        const response = result[0].PackageBundle.map((item) => item.packageTestResult)[0];
+        return response;
+    }
 
     static async orderStandardPackage(company: Company): Promise<{ message: string }> {
         await prismaClient.company.update({
@@ -387,4 +382,23 @@ export class CompanyService {
 
         return { message: "Success" };
     }
-}
+
+
+	static async touchCandidate(candidate_id: string, request: {message: string}, company: Company) : Promise<{message: string}> {
+
+		const data = {
+			candidate_id: candidate_id,
+			company_id: company.id,
+			message: request.message,
+			created_at: String(Date.now())
+		}
+	
+		await prismaClient.touch.create({
+			data: data
+		})
+		
+		return {message: "Berhasil Melakukan Touch"}	
+
+	}
+
+} 

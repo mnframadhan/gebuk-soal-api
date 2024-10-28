@@ -9,6 +9,7 @@ export class SoalValidation {
         cpns_category: z.string().optional(),
         label: z.string().max(100).optional(),
         text: z.string(),
+		difficulty: z.string(),
         question: z.string().max(10000).optional(),
         option1: z.string().max(500).optional(),
         option2: z.string().max(500).optional(),

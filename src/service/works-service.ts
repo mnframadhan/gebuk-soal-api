@@ -5,6 +5,7 @@ import { getSoalWithExcludedIds, getSoalWithExcludedIdsbyCat } from "../helpers/
 import { Paging } from "../model/pages";
 import { ResultsResponse, toWorkResponse, toWorksResultsResponse, WorksRequest, WorksResultsResponse } from "../model/works-model";
 import { updateStudentNSoal, updateStudentNSoalBySubCategory, updateStudentNSoalByCPNSCategory } from "../helpers/create-works-update";
+import { ResponseError } from "../error/response-error";
 
 export class WorksService {
 
@@ -15,7 +16,7 @@ export class WorksService {
 
     }
 
-    static async getWorks(student: Student, category: string, page: number) {
+    static async getWorks(student: Student, category: string, page: number) : Promise<{pagination: Paging, data: any}> {
 
         const pagination: Paging = {
             size: 1,
@@ -26,10 +27,12 @@ export class WorksService {
         if (category==="none") {
             const soals = await getSoalWithExcludedIds(student.username)
             return {pagination: pagination, data: [soals]}
-        } else {
+        } else if (category != "none") {
             const soals = await getSoalWithExcludedIdsbyCat(student.username, category!)
             return {pagination: pagination, data: [soals]}
-        }
+        } else {
+			throw new ResponseError(404, "Tidak ada hasil")
+		}
     }
 
     static async createWorks(request: WorksRequest, student: Student, soal_id: string) {

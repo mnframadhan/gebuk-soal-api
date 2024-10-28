@@ -45,7 +45,6 @@ export class CompanyController {
     static async logoutCompany(req: CompanyReq, res: Response, next: NextFunction) {
         try {
             const response = await CompanyService.logoutCompany(req.company!);
-
             res.clearCookie("X-API-TOKEN-COMPANY", { path: "/" });
 
             res.status(200);
@@ -81,8 +80,6 @@ export class CompanyController {
 			const request = req.body as {id: number, company_id: string};
 			const response = await CompanyService.deletePreferredSkills(request);
 
-			console.log(request);
-
 			res.status(200);
 			res.json(response);
 
@@ -93,6 +90,7 @@ export class CompanyController {
 
     static async getAllCompanies(req: Request, res: Response, next: NextFunction) {
         try {
+
             const response = await CompanyService.getAllCompanies();
             res.status(200);
             res.json(response);
@@ -140,7 +138,6 @@ export class CompanyController {
                 blobStream.end(file.buffer);
             }
         } catch (error) {
-            console.log(error);
             next(error);
         }
     }
@@ -180,6 +177,21 @@ export class CompanyController {
 		} catch (err) {
 			next(err)
 		}
+	}
 
+	static async touchCandidateController(req: CompanyReq, res: Response, next: NextFunction) {
+
+		try {
+
+			const candidate_id = req.query.candidate_id as string;
+			const request = req.body as {message: string}
+			const response = await CompanyService.touchCandidate(candidate_id, request, req.company!)
+
+			res.status(201);
+			res.json(response)
+
+		} catch (err) {
+			next(err)
+		}
 	}
 }
