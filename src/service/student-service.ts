@@ -3,15 +3,19 @@ import bcrypt from "bcrypt";
 import { v4 as uuid } from "uuid";
 import { prismaClient } from "../application/database";
 import { ResponseError } from "../error/response-error";
-import { StudentRequest, StudentResponse, StudentUpdateRequest, toStudentResponse, StudentUpdateAvatar } from "../model/student-model";
+import {
+    StudentRequest,
+    StudentResponse,
+    StudentUpdateRequest,
+    toStudentResponse,
+    StudentUpdateAvatar,
+} from "../model/student-model";
 import { StudentValidation } from "../validation/student-validation";
 import { Validation } from "../validation/Validation";
 import nodemailer, { SentMessageInfo } from "nodemailer";
 import { get4RandomDigits } from "../helpers/get-4-random-digit";
 
-
 export class StudentService {
-
     static async createStudent(request: StudentRequest): Promise<StudentResponse> {
         // validation
         const validatedRequest = Validation.validate(StudentValidation.CREATE, request);
@@ -75,7 +79,10 @@ export class StudentService {
         return toStudentResponse(response);
     }
 
-    static async studentEmailVerification(request: { verificationCode: string }, student: Student): Promise<{ message: string }> {
+    static async studentEmailVerification(
+        request: { verificationCode: string },
+        student: Student
+    ): Promise<{ message: string }> {
         const verificationCode = await bcrypt.compare(request.verificationCode, student.verification_code!);
 
         if (!verificationCode) {
@@ -130,50 +137,54 @@ export class StudentService {
         return toStudentResponse(student);
     }
 
-    static async updateStudent(request: StudentUpdateRequest, student: Student): Promise<{message: string}> {
-		
-		const validatedRequest = Validation.validate(StudentValidation.UPDATE, request);
+    static async updateStudent(request: StudentUpdateRequest, student: Student): Promise<{ message: string }> {
+        const validatedRequest = Validation.validate(StudentValidation.UPDATE, request);
 
-		await prismaClient.student.update({
-			where: {id: student.id},
-			data: {
-              ...(validatedRequest.username !== undefined && { username: validatedRequest.username }),
-              ...(validatedRequest.bio !== undefined  && { bio: validatedRequest.bio }),
-              ...(validatedRequest.full_name !== undefined && { full_name: validatedRequest.full_name }),
-              ...(validatedRequest.date_of_birth !== undefined && { date_of_birth: validatedRequest.date_of_birth }),
-              ...(validatedRequest.education_name !== undefined && { education_name: validatedRequest.education_name }),
-			  ...(validatedRequest.major !== undefined && {major: validatedRequest.major}),
-              ...(validatedRequest.is_present_education !== undefined && { is_present_education: validatedRequest.is_present_education }),
-              ...(validatedRequest.start_year_education !== undefined && { start_year_education: validatedRequest.start_year_education }),
-              ...(validatedRequest.end_year_education !== undefined && { end_year_education: validatedRequest.end_year_education }),
+        await prismaClient.student.update({
+            where: { id: student.id },
+            data: {
+                ...(validatedRequest.username !== undefined && { username: validatedRequest.username }),
+                ...(validatedRequest.bio !== undefined && { bio: validatedRequest.bio }),
+                ...(validatedRequest.full_name !== undefined && { full_name: validatedRequest.full_name }),
+                ...(validatedRequest.date_of_birth !== undefined && { date_of_birth: validatedRequest.date_of_birth }),
+                ...(validatedRequest.education_name !== undefined && {
+                    education_name: validatedRequest.education_name,
+                }),
+                ...(validatedRequest.major !== undefined && { major: validatedRequest.major }),
+                ...(validatedRequest.is_present_education !== undefined && {
+                    is_present_education: validatedRequest.is_present_education,
+                }),
+                ...(validatedRequest.start_year_education !== undefined && {
+                    start_year_education: validatedRequest.start_year_education,
+                }),
+                ...(validatedRequest.end_year_education !== undefined && {
+                    end_year_education: validatedRequest.end_year_education,
+                }),
             },
-		});	
+        });
 
-		return {message: "UPDATED"}
-	}
+        return { message: "UPDATED" };
+    }
 
-	static async updateAvatar(request: StudentUpdateAvatar, student: Student) : Promise<{message: string}> {
+    static async updateAvatar(request: StudentUpdateAvatar, student: Student): Promise<{ message: string }> {
+        const validatedRequest = Validation.validate(StudentValidation.AVATAR_UPDATE, request);
 
-		const validatedRequest = Validation.validate(StudentValidation.AVATAR_UPDATE, request);
-		
-		await prismaClient.student.update({
-			where: {id: student.id},
-			data: validatedRequest 
-		})
+        await prismaClient.student.update({
+            where: { id: student.id },
+            data: validatedRequest,
+        });
 
-		return {message: "AVATAR UPDATED"}
-	}
-	
-	static async logoutCurrentStudent(student: Student): Promise<void> {
+        return { message: "AVATAR UPDATED" };
+    }
 
-		await prismaClient.student.update(
-			{ where: { 
-				username: student.username,
+    static async logoutCurrentStudent(student: Student): Promise<void> {
+        await prismaClient.student.update({
+            where: {
+                username: student.username,
             },
             data: {
                 token: null,
             },
         });
     }
-
 }

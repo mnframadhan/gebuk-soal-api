@@ -1,4 +1,5 @@
 import { prismaClient } from "../application/database"
+import { ResponseError } from "../error/response-error"
 import { shuffleArray } from "./fisher-yates-shuffle-array"
 
 export async function getSoalWithExcludedIdsbyCat(username: string, category: string) {
@@ -34,9 +35,15 @@ export async function getSoalWithExcludedIdsbyCat(username: string, category: st
 			option5: true,
 		},
 	})
-
+	
 	const shuffled = shuffleArray(soals)
-	return shuffled[0]
+	
+	if(!shuffled){
+		return new ResponseError(404, "Kumpulan Soal telah habis")
+	} else {
+		return shuffled[0]
+	}
+
 
 }
 
@@ -74,6 +81,11 @@ export async function getSoalWithExcludedIds(username: string) {
 	})
 
 	const shuffled = shuffleArray(soals)
-	return shuffled[0]
+	
+	if(!shuffled){
+		return new ResponseError(404, "Kumpulan Soal telah habis")
+	} else {
+		return shuffled[0]
+	}
 
 }

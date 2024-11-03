@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Response } from "express";
 import { WorksRequest } from "../model/works-model";
 import { WorksService } from "../service/works-service";
 import { StudentReq } from "../types/student-request";
@@ -74,4 +74,13 @@ export class WorksController {
         }
     }
 
+	static async getWorksDateStreak(req: StudentReq, res: Response, next: NextFunction) {
+		try {
+			const response = await WorksService.getWorksDateStreak(req.student!)
+			res.status(200);
+			res.json(response)
+		} catch (err) {
+			next(err)
+		}
+	}
 }
