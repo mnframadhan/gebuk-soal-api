@@ -51,14 +51,13 @@ model Student {
   points Int @default(0)
   n_soal Int @default(0)
   cognitive_point Int @default(0)
-  math_point Int @default(0)
-  analytical_point Int @default(0)
-  logical_point Int @default(0)
-  text_understanding_point Int @default(0)
-  analogical_accuracy_point Int @default(0)
-  leadership_point Int @default(0)
-  integrity_point Int @default(0)
-  loyalty_point Int @default(0)
+  verbal_analogi Int @default(0)
+  verbal_silogisme Int @default(0)
+  verbal_analitik Int @default(0)
+  numerik_deret_angka Int @default(0)
+  numerik_perbandingan_kuantitatif Int @default(0)
+  numerik_soal_cerita Int @default(0)
+  numerik_berhitung Int @default(0)
   cpns_tiu_point Int @default(0)
   cpns_twk_point Int @default(0)
   cpns_tkp_point Int @default(0)
@@ -292,6 +291,7 @@ model Soal {
   option5_point Int?
   correct_answer String
   explanation String? @db.LongText
+  explanation_url_youtube_video String?
   created_by String?
   contributor Contributor? @relation(fields: [created_by], references: [username], onDelete: SetNull, onUpdate: Cascade)
   created_at String

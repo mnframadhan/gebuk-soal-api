@@ -37,11 +37,10 @@ export class WorksService {
         if (category === "none") {
             const soals = await getSoalWithExcludedIds(student.username);
 
-			if(!soals) {
-				throw new ResponseError(404, "Sudah Habis")
-			}
+            if (!soals) {
+                throw new ResponseError(404, "Sudah Habis");
+            }
             return { pagination: pagination, data: [soals] };
-
         } else if (category != "none") {
             const soals = await getSoalWithExcludedIdsbyCat(student.username, category!);
             return { pagination: pagination, data: [soals] };
@@ -84,16 +83,29 @@ export class WorksService {
             },
         });
 
-        await prismaClient.student.update({
-            where: {
-                id: student.id,
-            },
-            data: {
-                n_soal: student.n_soal + 1,
-                points: student.points + 10,
-                quota: student.quota - 1,
-            },
-        });
+        if (result) {
+            await prismaClient.student.update({
+                where: {
+                    id: student.id,
+                },
+                data: {
+                    n_soal: student.n_soal + 1,
+                    points: student.points + 10,
+                    quota: student.quota - 1,
+                },
+            });
+        } else {
+            await prismaClient.student.update({
+                where: {
+                    id: student.id,
+                },
+                data: {
+                    n_soal: student.n_soal + 1,
+                    points: student.points - 10,
+                    quota: student.quota - 1,
+                },
+            });
+        }
 
         const current_soal = await prismaClient.soal.findUnique({
             where: {
@@ -191,6 +203,7 @@ export class WorksService {
                 soal_id: soal?.id,
                 label: soal?.label,
                 category: soal?.category,
+                sub_category: soal?.sub_category,
                 text: soal?.text,
                 question: soal?.question,
                 correct_answer: soal?.correct_answer,
@@ -219,7 +232,7 @@ export class WorksService {
         return toWorksResultsResponse(response);
     }
 
-    static async getWorksDateStreak(student: Student): Promise<any> {
+    static async getDashboardData(student: Student): Promise<any> {
         const createdAt = await prismaClient.work.findMany({
             where: {
                 username: student.username,
@@ -254,13 +267,12 @@ export class WorksService {
             for (let i = 0; i < days; i++) {
                 const date = new Date(today);
                 date.setDate(today.getDate() - i);
-                dates.push(date.toISOString().split("T")[0]); // Format as YYYY-MM-DD
+                dates.push(date.toISOString().split("T")[0]);
             }
 
-            return dates.reverse(); // Order dates from earliest to latest
+            return dates.reverse();
         };
 
-        // Map dateCountsArray into an object for easier lookup
         const countsMap: Record<string, number> = dateCountsArray.reduce((acc, obj) => {
             const date = Object.keys(obj)[0];
             acc[date] = obj[date];
@@ -271,7 +283,89 @@ export class WorksService {
             return { [date]: countsMap[date] || 0 };
         });
 
-        const data = { streak: dates, data: filledDateCounts };
+        const uniqueDates = Array.from(new Set(dates)).sort();
+        const dateObjects = uniqueDates.map((date) => {
+            const d = new Date(date);
+            d.setHours(0, 0, 0, 0); // Normalize to midnight
+            return d;
+        });
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const includesToday = dateObjects.some((date) => date.getTime() === today.getTime());
+        let maxStreak = 0;
+        let streakCount = 1;
+        let streakDate = includesToday ? today : new Date(dateObjects[dateObjects.length - 1]);
+        let currentStreak = 1;
+
+        for (let i = 1; i < dateObjects.length; i++) {
+            const difference = (dateObjects[i].getTime() - dateObjects[i - 1].getTime()) / (1000 * 60 * 60 * 24);
+
+            if (difference === 1) {
+                // Consecutive day found, increase streak
+                currentStreak++;
+            } else {
+                // Not consecutive, reset current streak
+                maxStreak = Math.max(maxStreak, currentStreak);
+                currentStreak = 1;
+            }
+        }
+
+        for (let i = dateObjects.length - 2; i >= 0; i--) {
+            const difference = (streakDate.getTime() - dateObjects[i].getTime()) / (1000 * 60 * 60 * 24);
+
+            if (difference === 1) {
+                streakCount++;
+                streakDate = dateObjects[i];
+            } else {
+                break;
+            }
+        }
+
+        // Radar Chart Data
+        const cognitive_data = {
+            "Verbal Analogi": student.verbal_analogi,
+            "Verbal Silogisme": student.verbal_silogisme,
+            "Verbal Analitik": student.verbal_analitik,
+            "Numerik Deret Angka": student.numerik_deret_angka,
+            "Numerik Perbandingan Kuantitatif": student.numerik_perbandingan_kuantitatif,
+            "Numerik Soal Cerita": student.numerik_soal_cerita,
+            "Numerik Berhitung": student.numerik_berhitung,
+        };
+
+		// points change
+        const oneWeekAgo = Math.floor(new Date(new Date().setHours(0, 0, 0, 0)).getTime() / 1000) - 604800; // Unix time at 00:00:00
+        const thisDay = Math.floor(new Date(new Date().setHours(23, 59, 59, 999)).getTime() / 1000); // Unix time at 23:59:59
+
+        const worksFromAWeekAgo = await prismaClient.work.findMany({
+            where: {
+                username: student.username,
+                created_at: {
+                    gte: oneWeekAgo.toString(),
+                    lte: thisDay.toString(),
+                },
+            },
+            orderBy: {
+                created_at: "asc",
+            },
+			select: {
+				result: true
+			}
+        });
+
+		const n_increases = worksFromAWeekAgo.map((item) => item.result ? 1 : 0).filter((item) => item === 1).length * 10;
+		const n_decreases = worksFromAWeekAgo.map((item) => item.result ? 1 : 0).filter((item) => item === 0).length * (-10);
+
+		const change = n_increases + n_decreases;
+	
+        const data = {
+            streak: dates,
+            n_streak: streakCount,
+            max_streak: maxStreak,
+            streak_data: filledDateCounts,
+            cognitive_data: cognitive_data,
+			points_change: change,
+        };
 
         return data;
     }

@@ -139,6 +139,10 @@ export class StudentService {
 
     static async updateStudent(request: StudentUpdateRequest, student: Student): Promise<{ message: string }> {
         const validatedRequest = Validation.validate(StudentValidation.UPDATE, request);
+		
+		if(validatedRequest.is_present_education === null) {
+			validatedRequest.is_present_education = false
+		}
 
         await prismaClient.student.update({
             where: { id: student.id },
@@ -151,6 +155,9 @@ export class StudentService {
                     education_name: validatedRequest.education_name,
                 }),
                 ...(validatedRequest.major !== undefined && { major: validatedRequest.major }),
+                ...(validatedRequest.education_description !== undefined && {
+                    education_description: validatedRequest.education_description,
+                }),
                 ...(validatedRequest.is_present_education !== undefined && {
                     is_present_education: validatedRequest.is_present_education,
                 }),

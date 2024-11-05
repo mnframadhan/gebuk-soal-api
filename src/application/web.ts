@@ -74,7 +74,7 @@ app.patch("/api/student/avatar", authStudentMiddleware, upload.single("avatar"),
 
 app.get("/api/student/works/limit", authStudentMiddleware, WorksController.getRemainingLimit);
 app.post("/api/student/works", authStudentMiddleware, WorksController.createWorks); // query soal (uuid) //
-app.get("/api/student/works-streak", authStudentMiddleware, WorksController.getWorksDateStreak)
+app.get("/api/student/dashboard-data", authStudentMiddleware, WorksController.getDashboardData)
 
 // student api works by membership
 app.get("/api/student/works/basic", authStudentMiddleware, limiter, WorksController.getWorks); //  query page, remaining_limit,

@@ -74,9 +74,9 @@ export class WorksController {
         }
     }
 
-	static async getWorksDateStreak(req: StudentReq, res: Response, next: NextFunction) {
+	static async getDashboardData(req: StudentReq, res: Response, next: NextFunction) {
 		try {
-			const response = await WorksService.getWorksDateStreak(req.student!)
+			const response = await WorksService.getDashboardData(req.student!)
 			res.status(200);
 			res.json(response)
 		} catch (err) {
