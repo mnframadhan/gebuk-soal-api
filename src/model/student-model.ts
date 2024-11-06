@@ -32,12 +32,17 @@ export type StudentResponse = {
     numerik_perbandingan_kuantitatif: number;
     numerik_soal_cerita: number;
     numerik_berhitung: number;
+	nasionalisme: number;
+	pilar_negara: number;
+	bela_negara: number;
+	bahasa_negara: number;
     cpns_tiu_point: number;
     cpns_twk_point: number;
     cpns_tkp_point: number;
     created_at: string;
-    quota: number;
+    quota: number | null;
     membership: string;
+	premium_request: string;
     token?: string | null;
     avatar?: string | null;
     verified?: boolean | null;
@@ -104,12 +109,17 @@ export function toStudentResponse(student: Student): StudentResponse {
         numerik_perbandingan_kuantitatif: student.numerik_perbandingan_kuantitatif,
         numerik_soal_cerita: student.numerik_soal_cerita,
         numerik_berhitung: student.numerik_berhitung,
+		nasionalisme: student.nasionalisme,
+		bela_negara: student.bela_negara,
+		pilar_negara: student.pilar_negara,
+		bahasa_negara: student.bahasa_negara,
         cpns_tiu_point: student.cpns_tiu_point,
         cpns_twk_point: student.cpns_twk_point,
         cpns_tkp_point: student.cpns_tkp_point,
         created_at: student.created_at,
         quota: student.quota,
         membership: student.membership,
+		premium_request: student.premium_request,
         token: student.token,
         avatar: student.avatar,
         verified: student.verified,

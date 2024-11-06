@@ -51,7 +51,7 @@ export class PublicInfoServices {
             orderBy: {
                 points: "desc"
             },
-            take: 5
+            take: 10
         });
 
         if(!student) {

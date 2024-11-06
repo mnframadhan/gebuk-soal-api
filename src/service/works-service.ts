@@ -19,7 +19,7 @@ import { ResponseError } from "../error/response-error";
 
 export class WorksService {
     static async getRemainingLimit(student: Student): Promise<{ remaining_limit: number; membership: string }> {
-        const response = { remaining_limit: student.quota, membership: student.membership };
+        const response = { remaining_limit: student.quota!, membership: student.membership };
         return response;
     }
 
@@ -30,7 +30,7 @@ export class WorksService {
     ): Promise<{ pagination: Paging; data: any }> {
         const pagination: Paging = {
             size: 1,
-            total_page: student.quota,
+            total_page: student.quota!,
             current_page: page,
         };
 
@@ -91,7 +91,7 @@ export class WorksService {
                 data: {
                     n_soal: student.n_soal + 1,
                     points: student.points + 10,
-                    quota: student.quota - 1,
+                    quota: student.quota! - 1,
                 },
             });
         } else {
@@ -102,7 +102,7 @@ export class WorksService {
                 data: {
                     n_soal: student.n_soal + 1,
                     points: student.points - 10,
-                    quota: student.quota - 1,
+                    quota: student.quota! - 1,
                 },
             });
         }
@@ -113,9 +113,9 @@ export class WorksService {
             },
         });
 
-        updateStudentNSoal(student.id, current_soal?.category!);
-        updateStudentNSoalBySubCategory(student.id, currentSoal?.sub_category!);
-        updateStudentNSoalByCPNSCategory(student.id, currentSoal?.cpns_category!);
+        updateStudentNSoal(student.id, current_soal?.category!, result);
+        updateStudentNSoalBySubCategory(student.id, currentSoal?.sub_category!, result);
+        updateStudentNSoalByCPNSCategory(student.id, currentSoal?.cpns_category!, result);
 
         return toWorkResponse(works);
     }
@@ -219,6 +219,7 @@ export class WorksService {
                 option4: soal?.option4,
                 option5: soal?.option5,
                 explanation: soal?.explanation,
+				explanation_url_youtube_video: soal?.explanation_url_youtube_video,
                 created_at: soal?.created_at,
                 created_by: soal?.created_by,
             };
@@ -324,14 +325,21 @@ export class WorksService {
 
         // Radar Chart Data
         const cognitive_data = {
-            "Verbal Analogi": student.verbal_analogi,
-            "Verbal Silogisme": student.verbal_silogisme,
-            "Verbal Analitik": student.verbal_analitik,
-            "Numerik Deret Angka": student.numerik_deret_angka,
-            "Numerik Perbandingan Kuantitatif": student.numerik_perbandingan_kuantitatif,
-            "Numerik Soal Cerita": student.numerik_soal_cerita,
-            "Numerik Berhitung": student.numerik_berhitung,
+            "Verbal Analogi": student.verbal_analogi < 0 ? 0 : student.verbal_analogi,
+            "Verbal Silogisme": student.verbal_silogisme < 0 ? 0 : student.verbal_silogisme,
+            "Verbal Analitik": student.verbal_analitik < 0 ? 0 : student.verbal_analitik,
+            "Numerik Deret Angka": student.numerik_deret_angka < 0 ? 0 : student.numerik_deret_angka,
+            "Numerik Perbandingan Kuantitatif": student.numerik_perbandingan_kuantitatif < 0 ? 0 : student.numerik_perbandingan_kuantitatif,
+            "Numerik Soal Cerita": student.numerik_soal_cerita < 0 ? 0 : student.numerik_soal_cerita,
+            "Numerik Berhitung": student.numerik_berhitung < 0 ? 0 : student.numerik_berhitung,
         };
+
+		const wawasan_kebangsaan_data = {
+			"Nasionalisme" : student.nasionalisme < 0 ? 0 : student.nasionalisme,
+			"Pilar Negara" : student.pilar_negara < 0 ? 0 : student.pilar_negara,
+			"Bela Negara" : student.bela_negara < 0 ? 0 : student.bela_negara,
+			"Bahasa Negara" : student.bahasa_negara < 0 ? 0 : student.bahasa_negara,
+		}
 
 		// points change
         const oneWeekAgo = Math.floor(new Date(new Date().setHours(0, 0, 0, 0)).getTime() / 1000) - 604800; // Unix time at 00:00:00
@@ -364,6 +372,7 @@ export class WorksService {
             max_streak: maxStreak,
             streak_data: filledDateCounts,
             cognitive_data: cognitive_data,
+			wawasan_kebangsaan_data: wawasan_kebangsaan_data,
 			points_change: change,
         };
 

@@ -1,15 +1,13 @@
 import { z, ZodType } from "zod";
 
 export class SoalValidation {
-
-    static readonly CREATE : ZodType = z.object({
-
+    static readonly CREATE: ZodType = z.object({
         category: z.string().min(2),
         sub_category: z.string().optional(),
         cpns_category: z.string().optional(),
         label: z.string().max(100).optional(),
         text: z.string(),
-		difficulty: z.string(),
+        difficulty: z.string(),
         question: z.string().max(10000).optional(),
         option1: z.string().max(500).optional(),
         option2: z.string().max(500).optional(),
@@ -18,5 +16,6 @@ export class SoalValidation {
         option5: z.string().max(500).optional(),
         correct_answer: z.string().min(1),
         explanation: z.string().min(4).max(10000).optional(),
+        explanation_url_youtube_video: z.string().max(1000).optional()
     });
-};
+}

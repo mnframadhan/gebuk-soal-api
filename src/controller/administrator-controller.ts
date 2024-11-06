@@ -73,10 +73,19 @@ export class AdministratorController {
             res.status(200);
             res.json(response);
         } catch (error) {
-            console.log(error);
             next(error);
         }
     }
+
+	static async getPremiumOrder(req: Request, res: Response, next: NextFunction) {
+		try {
+			const response = await AdministratorService.getPremiumOrder()
+			res.status(200);
+			res.json(response);
+		} catch (error) {
+			next(error)
+		}
+	}
 
     static async updatePremiumStudent(req: Request, res: Response, next: NextFunction) {
 
@@ -88,11 +97,9 @@ export class AdministratorController {
             res.json(response);
 
         } catch (error) {
-            console.log(error);
             next(error);
 
         }
-
     }
 
     static async returnLimit(req: Request, res: Response, next: NextFunction) {

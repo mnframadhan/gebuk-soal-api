@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Response } from "express";
 import { StudentReq } from "../types/student-request";
 import { OrderRequest } from "../model/order-model";
 import { OrderService } from "../service/order-service";
@@ -15,7 +15,6 @@ export class OrderController {
             res.status(201);
             res.json(response); 
         } catch (err) {
-            console.log(err)
             next(err)
         }
     }
@@ -48,8 +47,6 @@ export class OrderController {
             res.json(response)
 
         } catch (err) {
-
-            console.log(err)
             next(err);
         }
     }
@@ -57,13 +54,23 @@ export class OrderController {
     static async premiumOrder(req: StudentReq, res: Response, next: NextFunction) {
 
         try {
-            const response = await OrderService.premiumOrder(req.student!)
+			const request : {password: string} = req.body as {password: string};
+            const response = await OrderService.premiumOrder(request, req.student!)
             res.status(200);
             res.json(response);
         } catch (err) {
-            console.log(err)
             next(err);
         }
-
     }
+
+	static async getPremiumOrderId(req: StudentReq, res: Response, next: NextFunction) {
+
+		try {
+			const response : { premium_order_id: string, url: string } = await OrderService.getPremiumOrderId(req.student!);
+			res.status(200);
+			res.json(response)
+		} catch (err) {
+			next(err);
+		}
+	}
 }

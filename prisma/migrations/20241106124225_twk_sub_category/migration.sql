@@ -1,0 +1,6 @@
+-- AlterTable
+ALTER TABLE `students` ADD COLUMN `bahasa_negara` INTEGER NOT NULL DEFAULT 0,
+    ADD COLUMN `bela_negara` INTEGER NOT NULL DEFAULT 0,
+    ADD COLUMN `integritas` INTEGER NOT NULL DEFAULT 0,
+    ADD COLUMN `nasionalisme` INTEGER NOT NULL DEFAULT 0,
+    ADD COLUMN `pilar_negara` INTEGER NOT NULL DEFAULT 0;

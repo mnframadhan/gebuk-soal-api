@@ -1,16 +1,15 @@
-// model berlaku untuk soal-soal Analogi, Silogisme, 
+// model berlaku untuk soal-soal Analogi, Silogisme,
 // Analitis, dan Deret Angka.
 
-import { Soal } from "@prisma/client"
+import { Soal } from "@prisma/client";
 import { Paging } from "./pages";
 
 export type SoalRequest = {
-
     category: string;
     sub_category: string | null;
     cpns_category: string | null;
     label: string | null;
-	difficulty: "Easy" | "Medium" | "Hard";
+    difficulty: "Easy" | "Medium" | "Hard";
     text: string;
     question: string;
     option1: string | null;
@@ -25,17 +24,16 @@ export type SoalRequest = {
     option5_point: number | null;
     correct_answer: string;
     explanation: string | null;
-
-}
+    explanation_url_youtube_video: string | null;
+};
 
 export type SoalResponse = {
-
-    id : string;
+    id: string;
     category: string;
     sub_category: string | null;
     cpns_category: string | null;
     label: string | null;
-	difficulty: "Easy" | "Medium" | "Hard";
+    difficulty: "Easy" | "Medium" | "Hard";
     text: string;
     question: string;
     option1: string | null;
@@ -50,14 +48,13 @@ export type SoalResponse = {
     option5_point: number | null;
     correct_answer: string;
     explanation: string | null;
+    explanation_url_youtube_video: string | null;
     created_at: string;
     created_by: string | null;
-
-}
+};
 
 export type ShowedSoalResponse = {
-
-    id : string;
+    id: string;
     category: string;
     sub_category: string | null;
     cpns_category: string | null;
@@ -75,19 +72,16 @@ export type ShowedSoalResponse = {
     option3_point: number | null;
     option4_point: number | null;
     option5_point: number | null;
+};
 
-}
-
-export function toSoalResponse(soal: Soal) : SoalResponse {
-
+export function toSoalResponse(soal: Soal): SoalResponse {
     return {
-        
         id: soal.id,
         category: soal.category,
         sub_category: soal.sub_category,
         cpns_category: soal.cpns_category,
         label: soal.label,
-		difficulty: soal.difficulty,
+        difficulty: soal.difficulty,
         text: soal.text,
         option1: soal.option1,
         option2: soal.option2,
@@ -102,18 +96,15 @@ export function toSoalResponse(soal: Soal) : SoalResponse {
         question: soal.question,
         correct_answer: soal.correct_answer,
         explanation: soal.explanation,
+		explanation_url_youtube_video : soal.explanation_url_youtube_video,
         created_at: soal.created_at,
-        created_by: soal.created_by
-    }
+        created_by: soal.created_by,
+    };
 }
 
 export function toSoalResponsePagination(soal: ShowedSoalResponse[], pagination: Paging) {
-
     return {
-
         data: soal as Array<ShowedSoalResponse>,
-        pagination: pagination
-
-    }
-
+        pagination: pagination,
+    };
 }

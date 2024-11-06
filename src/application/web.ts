@@ -90,14 +90,16 @@ app.post("/api/student/order", authStudentMiddleware, OrderController.createOrde
 app.patch("/api/student/order", authStudentMiddleware, OrderController.cancelOrder);
 app.get("/api/student/order", authStudentMiddleware, OrderController.getOrderHistory);
 app.patch("/api/student/order/premium", authStudentMiddleware, OrderController.premiumOrder);
+app.get("/api/student/order/premium", authStudentMiddleware, OrderController.getPremiumOrderId);
 
 // administrator
 app.get("/api/admin/all-students", authAdminMiddleware, AdministratorController.getAllStudents); // query page and limit
 app.get("/api/admin/all-students/orders", authAdminMiddleware, AdministratorController.getAllOrders); // query page and limit
+app.get("/api/admin/student/premium-request", authAdminMiddleware, AdministratorController.getPremiumOrder )
 app.patch("/api/admin/student", authAdminMiddleware, AdministratorController.updateStudentLimit); // query student_id and order_id
 app.patch("/api/admin/student/return", authAdminMiddleware, AdministratorController.returnLimit); // query student_id and order_id
 app.delete("/api/admin/logout", authAdminMiddleware, AdministratorController.logoutAdmin);
-app.patch("/api/admin/student/membership", authAdminMiddleware, AdministratorController.updatePremiumStudent); // query student_id
+app.patch("/api/admin/student/premium/approve", authAdminMiddleware, AdministratorController.updatePremiumStudent); // query student_id
 
 // company
 app.get("/api/company/current", authCompanyMiddleware, CompanyController.getCurrentCompany);

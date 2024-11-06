@@ -6,245 +6,252 @@ import { ResponseError } from "../error/response-error";
 import { StudentResponse } from "../model/student-model";
 import { Paging } from "../model/pages";
 import { OrderListPagination } from "../model/order-model";
-import { Administrator, Company } from "@prisma/client";
+import { Administrator } from "@prisma/client";
 
 export class AdministratorService {
-
-    static async createAdmin(request: AdministratorRequest) : Promise<AdministratorResponse> {
-
+    static async createAdmin(request: AdministratorRequest): Promise<AdministratorResponse> {
         // prepare data
         const encryptedPassword = await bcrypt.hash(request.password, 10);
 
         const data = {
             id: uuid(),
             username: request.username,
-            password: encryptedPassword
-        }
+            password: encryptedPassword,
+        };
 
         // insert into database
         const administrator = await prismaClient.administrator.create({
-            data: data
-        })
+            data: data,
+        });
 
-        const response : AdministratorResponse = {
-            username: administrator.username
-        }
+        const response: AdministratorResponse = {
+            username: administrator.username,
+        };
         // return response
-        return response
+        return response;
     }
 
-    static async loginAdmin(request: AdministratorRequest) : Promise<AdministratorResponse> {
-
+    static async loginAdmin(request: AdministratorRequest): Promise<AdministratorResponse> {
         let administrator = await prismaClient.administrator.findFirst({
             where: {
-                username: request.username
-            }
-        })
+                username: request.username,
+            },
+        });
 
         if (!administrator) {
-            throw new ResponseError(401, "Email or Password incorret")
+            throw new ResponseError(401, "Unauthorized");
         }
 
-        const passwordMatch= await bcrypt.compare(request.password, administrator.password)
+        const passwordMatch = await bcrypt.compare(request.password, administrator.password);
 
         if (!passwordMatch) {
-            throw new ResponseError(401, "Email or Password incorret")
+            throw new ResponseError(401, "");
         }
 
         const token = String(uuid());
         administrator = await prismaClient.administrator.update({
             where: {
-                username: request.username
+                username: request.username,
             },
             data: {
-                token: token
-            }
-        })
+                token: token,
+            },
+        });
 
-        const response : AdministratorResponse = {
+        const response: AdministratorResponse = {
             username: administrator.username,
-            token: administrator.token
-        }
+            token: administrator.token,
+        };
 
-        return response
+        return response;
     }
 
-    static async getAllStudents(page: number, limit: number) : Promise<StudentPagination<StudentResponse>> {
-
+    static async getAllStudents(page: number, limit: number): Promise<StudentPagination<StudentResponse>> {
         const skip = (page - 1) * limit;
         const pagination: Paging = {
             size: limit,
             total_page: Math.ceil(Number(await prismaClient.student.count({})) / limit),
-            current_page: page
-        }
+            current_page: page,
+        };
 
         const student = await prismaClient.student.findMany({
             skip: skip,
             take: limit,
             orderBy: {
-                created_at: 'desc'
-            }
-        })
+                created_at: "desc",
+            },
+        });
 
         return {
             pagination: pagination,
-            data: student
-        }
+            data: student,
+        };
     }
 
-    static async getAllOrders(page: number, limit: number) : Promise<OrderListPagination> {
-
+    static async getAllOrders(page: number, limit: number): Promise<OrderListPagination> {
         const skip = (page - 1) * limit;
         const pagination: Paging = {
             size: limit,
             total_page: Math.ceil(Number(await prismaClient.order.count({})) / limit),
-            current_page: page
-        }
+            current_page: page,
+        };
 
         const student = await prismaClient.order.findMany({
             skip: skip,
             take: limit,
             orderBy: {
-                order_date: 'desc'
-            }
-        })
+                order_date: "desc",
+            },
+        });
 
         return {
             pagination: pagination,
-            data: student
-        }
+            data: student,
+        };
     }
 
-    static async updateStudentLimit(request: {limit: number} , student_id: string, order_id: string) : Promise<{message: string, id: string}> {
-
+    static async updateStudentLimit(
+        request: { limit: number },
+        student_id: string,
+        order_id: string
+    ): Promise<{ message: string; id: string }> {
         const student = await prismaClient.student.update({
             where: {
-                id: student_id
+                id: student_id,
             },
             data: {
                 quota: {
-                    increment: request.limit
+                    increment: request.limit,
                 },
-                membership: "Plus"
+                membership: "Plus",
             },
-        })
+        });
 
         await prismaClient.order.update({
             where: {
                 id: order_id,
-                student_id: student_id
+                student_id: student_id,
             },
-            data : {
-                status: "Completed"
-            }
-        })
+            data: {
+                status: "Completed",
+            },
+        });
 
         const response = {
             message: "updated",
-            id: student.id
-        }
+            id: student.id,
+        };
 
-        return response
+        return response;
     }
 
-    static async returnLimit(request: { limit: number }, student_id: string, order_id: string) : Promise<{message: string, id: string}> {
-
+    static async returnLimit(
+        request: { limit: number },
+        student_id: string,
+        order_id: string
+    ): Promise<{ message: string; id: string }> {
         const student = await prismaClient.student.update({
             where: {
-                id: student_id
+                id: student_id,
             },
             data: {
                 quota: {
-                    decrement: request.limit
-                }
+                    decrement: request.limit,
+                },
             },
-        })
+        });
 
         await prismaClient.order.update({
             where: {
                 id: order_id,
-                student_id: student_id
+                student_id: student_id,
             },
-            data : {
-                status: "Returned"
-            }
-        })
+            data: {
+                status: "Returned",
+            },
+        });
 
         const response = {
             message: "Returned",
-            id: student.id
-        }
+            id: student.id,
+        };
 
-        return response
+        return response;
     }
 
-    static async updatePremiumStudent(student_id: string) : Promise<void> {
+    static async getPremiumOrder(): Promise<any> {
+        const premiumRequest = await prismaClient.student.findMany({
+            where: {
+                premium_request: "Menunggu Pembayaran",
+            },
+            select: {
+                id: true,
+                premium_order_id: true,
+                premium_request: true,
+            },
+        });
+        return { data: premiumRequest };
+    }
 
-        const date = String(Date.now())
-
+    static async updatePremiumStudent(student_id: string): Promise<void> {
+        const date = String(Date.now());
         await prismaClient.student.update({
             where: {
-                id: student_id
+                id: student_id,
             },
             data: {
                 membership: "Premium",
                 premium_at: date,
-                premium_request: "Completed"
+                premium_request: "Completed",
+				quota: null
             },
-        })
+        });
     }
 
     static async getAllCompanies(page: number, limit: number) {
-
-
         const skip = (page - 1) * limit;
         const pagination: Paging = {
             size: limit,
             total_page: Math.ceil(Number(await prismaClient.company.count({})) / limit),
-            current_page: page
-        }
+            current_page: page,
+        };
 
         const student = await prismaClient.company.findMany({
             skip: skip,
             take: limit,
             orderBy: {
-                created_at: 'desc'
-            }
-        })
+                created_at: "desc",
+            },
+        });
 
         return {
             pagination: pagination,
-            data: student
-        }
+            data: student,
+        };
     }
 
-    static async updatePremiumCompany(company_id: string ) : Promise<void> {
-
-        const statusUpdatedAt = String(Date.now())
+    static async updatePremiumCompany(company_id: string): Promise<void> {
+        const statusUpdatedAt = String(Date.now());
 
         await prismaClient.company.update({
-
             where: {
-                id: company_id
+                id: company_id,
             },
             data: {
                 status: "Premium",
-                status_updated_at: statusUpdatedAt
-            }
-        })
+                status_updated_at: statusUpdatedAt,
+            },
+        });
     }
-	
 
-    static async logoutCurrentAdmin(admin: Administrator) : Promise<void> {
-
+    static async logoutCurrentAdmin(admin: Administrator): Promise<void> {
         await prismaClient.administrator.update({
             where: {
-                username: admin.username
+                username: admin.username,
             },
             data: {
-                token: null
-            }
-        })
+                token: null,
+            },
+        });
     }
-	
 }

@@ -58,14 +58,20 @@ model Student {
   numerik_perbandingan_kuantitatif Int @default(0)
   numerik_soal_cerita Int @default(0)
   numerik_berhitung Int @default(0)
+  nasionalisme Int @default(0)
+  bela_negara Int @default(0)
+  pilar_negara Int @default(0)
+  integritas Int @default(0)
+  bahasa_negara Int @default(0)
   cpns_tiu_point Int @default(0)
   cpns_twk_point Int @default(0)
   cpns_tkp_point Int @default(0)
-  quota Int @default(5)
+  quota Int? @default(5)
   created_at String // unix time
   token String?
   membership String @default("Basic")
   avatar String?
+  premium_order_id String?
   premium_request String @default("None")
   premium_at String?
   works Work[]
