@@ -73,4 +73,14 @@ export class OrderController {
 			next(err);
 		}
 	}
+
+	static async cancelPremiumOrder(req: StudentReq, res: Response, next: NextFunction) {
+		try {
+			const response : {message: string} = await OrderService.cancelPremiumOrder(req.student!)
+			res.status(200);
+			res.json(response);
+		} catch (err) {
+			next(err)
+		}
+	}
 }

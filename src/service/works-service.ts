@@ -336,6 +336,7 @@ export class WorksService {
 
 		const wawasan_kebangsaan_data = {
 			"Nasionalisme" : student.nasionalisme < 0 ? 0 : student.nasionalisme,
+			"Integritas" : student.integritas < 0  ? 0 : student.integritas,
 			"Pilar Negara" : student.pilar_negara < 0 ? 0 : student.pilar_negara,
 			"Bela Negara" : student.bela_negara < 0 ? 0 : student.bela_negara,
 			"Bahasa Negara" : student.bahasa_negara < 0 ? 0 : student.bahasa_negara,

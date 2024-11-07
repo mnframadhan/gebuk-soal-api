@@ -76,8 +76,26 @@ export class OrderService {
 		}
 		return {
 			premium_order_id: student.premium_order_id!,
-			url: `https://wa.me/${process.env.ADMINISTRATOR_NUMBER!}?text=Halo, Admin. Kode order ${student.premium_order_id} dengan nominal Rp. 200.000,-. Mohon informasi tujuan pembayaran. Terimakasih.`
+			url: `https://wa.me/${process.env.ADMINISTRATOR_NUMBER!}?text=Halo, Admin. Kode order ${student.premium_order_id} dengan nominal Rp. 100.000,-. Mohon informasi tujuan pembayaran. Terimakasih.`
 		}
+	}
+
+	static async cancelPremiumOrder(student: Student) : Promise<{message: string}> {
+		
+		await prismaClient.student.update({
+			where: {
+				id: student.id
+			},
+			data: {
+				premium_request : "None",
+				premium_order_id: null
+			}
+		})
+		
+		return {
+			message: "Order Cancelled"
+		}
+		
 	}
 
     static async cancelOrder(orderID: string, student: Student) {

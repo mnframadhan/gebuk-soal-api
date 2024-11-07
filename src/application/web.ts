@@ -91,6 +91,7 @@ app.patch("/api/student/order", authStudentMiddleware, OrderController.cancelOrd
 app.get("/api/student/order", authStudentMiddleware, OrderController.getOrderHistory);
 app.patch("/api/student/order/premium", authStudentMiddleware, OrderController.premiumOrder);
 app.get("/api/student/order/premium", authStudentMiddleware, OrderController.getPremiumOrderId);
+app.delete("/api/student/order/premium", authStudentMiddleware, OrderController.cancelPremiumOrder);
 
 // administrator
 app.get("/api/admin/all-students", authAdminMiddleware, AdministratorController.getAllStudents); // query page and limit
