@@ -182,6 +182,7 @@ export class WorksService {
         const data = {
             id: String(uuid()),
             username: student.username,
+			membership: student.membership,
             today_works: Number(works.length),
             number_of_true: countTrue,
             number_of_false: works.length - countTrue,

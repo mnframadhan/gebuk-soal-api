@@ -3,6 +3,7 @@ import { bucket } from "../application/firebase";
 import { SoalRequest } from "../model/soal-model";
 import { SoalService } from "../service/soal-service";
 import { ContributorReq } from "../types/contributor-request";
+import { ContributorServices } from "../service/contributor-service";
 
 export class SoalController {
 
@@ -53,8 +54,21 @@ export class SoalController {
             }
 
         } catch (err) {
-            console.log(err)
             next(err)
         }
     }
+
+	static async createManySoal(req: ContributorReq, res: Response, next: NextFunction) {
+
+		try {
+			const request: SoalRequest[] = req.body as SoalRequest[];
+			const response = await SoalService.createManySoal(request, req.contributor!)
+
+			res.status(201);
+			res.json(response)
+
+		} catch (err) {
+			next(err)
+		}
+	}
 }

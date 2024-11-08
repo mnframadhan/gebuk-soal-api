@@ -10,6 +10,7 @@ export type ResultsResponse<T> = {
 
     id: string;
     username: string;
+	membership: string;
     today_works : number;
     created_at: string;
     number_of_true: number;
@@ -42,6 +43,7 @@ export function toWorksResultsResponse(result: ResultsResponse<WorksResultsRespo
     return {
         id: result.id,
         username: result.username,
+		membership: result.membership,
         today_works: result.today_works,
         created_at: result.created_at,
         number_of_true: result.number_of_true,

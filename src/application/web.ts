@@ -63,6 +63,7 @@ app.get("/api/contributor/current", authMiddleware, ContributorController.curren
 app.delete("/api/contributor/current", authMiddleware, ContributorController.logoutContributor);
 app.post("/api/contributor/soal", upload.single("image1"), authMiddleware, SoalController.createSoal);
 app.get("/api/contributor/current/soal", authMiddleware, ContributorController.getSoalCreated);
+app.post("/api/contributor/soal/many", authMiddleware, SoalController.createManySoal)
 
 // student api
 app.get("/api/student/current", authStudentMiddleware, StudentController.currentStudent);

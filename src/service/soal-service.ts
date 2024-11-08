@@ -41,4 +41,29 @@ export class SoalService {
 
         return toSoalResponse(soal)
     }
+	
+	static async createManySoal(request: SoalRequest[], contributor: Contributor ) : Promise<{message: string}> {
+
+		const completeData = request.map(item => ({
+			id: uuid(),
+			created_at: String(Date.now()),
+			created_by: contributor.username,
+			...item
+		}))
+
+		await prismaClient.soal.createMany({
+			data: completeData
+		})
+
+        await prismaClient.contributor.update({
+            where: {
+                username: contributor.username
+            },
+            data: {
+                n_soal: contributor.n_soal + completeData.length,
+                contribution_points: contributor.contribution_points + 10*completeData.length
+            }
+        })
+		return {message: "Success"}
+	}
 }
