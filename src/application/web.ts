@@ -19,6 +19,7 @@ import { errorMiddleware } from "../middleware/error-middleware";
 import { packageBundleMiddleware } from "../middleware/package-bundle-middleware";
 import { globalLimiter, limiter, plusLimiter } from "../middleware/request-limiter";
 import { upload } from "../middleware/upload-file-middleware";
+import { CompletePackageControllers } from "../controller/complete-package-controller";
 
 export const app = express();
 app.use(express.json());
@@ -63,7 +64,9 @@ app.get("/api/contributor/current", authMiddleware, ContributorController.curren
 app.delete("/api/contributor/current", authMiddleware, ContributorController.logoutContributor);
 app.post("/api/contributor/soal", upload.single("image1"), authMiddleware, SoalController.createSoal);
 app.get("/api/contributor/current/soal", authMiddleware, ContributorController.getSoalCreated);
-app.post("/api/contributor/soal/many", authMiddleware, SoalController.createManySoal)
+app.post("/api/contributor/soal/many", authMiddleware, SoalController.createManySoal);
+app.post("/api/contributor/soal/complete-package", authMiddleware, CompletePackageControllers.createCompletePackage);
+app.get("/api/contributor/complete-package", authMiddleware, CompletePackageControllers.getCompletePackage)
 
 // student api
 app.get("/api/student/current", authStudentMiddleware, StudentController.currentStudent);

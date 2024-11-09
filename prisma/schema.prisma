@@ -27,6 +27,7 @@ model Contributor {
   n_soal Int @default(0)
   created_at String
   soals Soal[]
+  CompletePackage CompletePackage[]
   token String?
 
   @@map("contributors")
@@ -191,6 +192,31 @@ model PackageBundle {
 
 }
 
+model CompletePackage {
+	
+	id String @id @default(uuid())
+	package_name String
+	expired_date String
+	created_at String
+	created_by String
+	n_unit String
+	Contributor Contributor @relation(fields: [created_by], references: [username])
+	Soal Soal[]
+	Separator Separator[]
+	
+	@@map("completePackages")
+}
+
+model Separator {
+	
+	id String @id @default(uuid())
+	complete_package_id String
+	CompletePackage CompletePackage @relation(fields: [complete_package_id], references: [id])
+	text String @db.LongText
+
+	@@map("separators")
+}
+
 model Candidate {
 
   id String  @unique @default(uuid())
@@ -298,6 +324,10 @@ model Soal {
   correct_answer String
   explanation String? @db.LongText
   explanation_url_youtube_video String?
+  is_protected Boolean @default(false)
+  complete_package_id String?
+  orders Int?
+  CompletePackage CompletePackage? @relation(fields: [complete_package_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
   created_by String?
   contributor Contributor? @relation(fields: [created_by], references: [username], onDelete: SetNull, onUpdate: Cascade)
   created_at String

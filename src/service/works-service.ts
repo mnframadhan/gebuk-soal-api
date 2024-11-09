@@ -182,7 +182,7 @@ export class WorksService {
         const data = {
             id: String(uuid()),
             username: student.username,
-			membership: student.membership,
+            membership: student.membership,
             today_works: Number(works.length),
             number_of_true: countTrue,
             number_of_false: works.length - countTrue,
@@ -220,7 +220,7 @@ export class WorksService {
                 option4: soal?.option4,
                 option5: soal?.option5,
                 explanation: soal?.explanation,
-				explanation_url_youtube_video: soal?.explanation_url_youtube_video,
+                explanation_url_youtube_video: soal?.explanation_url_youtube_video,
                 created_at: soal?.created_at,
                 created_by: soal?.created_by,
             };
@@ -330,20 +330,21 @@ export class WorksService {
             "Verbal Silogisme": student.verbal_silogisme < 0 ? 0 : student.verbal_silogisme,
             "Verbal Analitik": student.verbal_analitik < 0 ? 0 : student.verbal_analitik,
             "Numerik Deret Angka": student.numerik_deret_angka < 0 ? 0 : student.numerik_deret_angka,
-            "Numerik Perbandingan Kuantitatif": student.numerik_perbandingan_kuantitatif < 0 ? 0 : student.numerik_perbandingan_kuantitatif,
+            "Numerik Perbandingan Kuantitatif":
+                student.numerik_perbandingan_kuantitatif < 0 ? 0 : student.numerik_perbandingan_kuantitatif,
             "Numerik Soal Cerita": student.numerik_soal_cerita < 0 ? 0 : student.numerik_soal_cerita,
             "Numerik Berhitung": student.numerik_berhitung < 0 ? 0 : student.numerik_berhitung,
         };
 
-		const wawasan_kebangsaan_data = {
-			"Nasionalisme" : student.nasionalisme < 0 ? 0 : student.nasionalisme,
-			"Integritas" : student.integritas < 0  ? 0 : student.integritas,
-			"Pilar Negara" : student.pilar_negara < 0 ? 0 : student.pilar_negara,
-			"Bela Negara" : student.bela_negara < 0 ? 0 : student.bela_negara,
-			"Bahasa Negara" : student.bahasa_negara < 0 ? 0 : student.bahasa_negara,
-		}
+        const wawasan_kebangsaan_data = {
+            Nasionalisme: student.nasionalisme < 0 ? 0 : student.nasionalisme,
+            Integritas: student.integritas < 0 ? 0 : student.integritas,
+            "Pilar Negara": student.pilar_negara < 0 ? 0 : student.pilar_negara,
+            "Bela Negara": student.bela_negara < 0 ? 0 : student.bela_negara,
+            "Bahasa Negara": student.bahasa_negara < 0 ? 0 : student.bahasa_negara,
+        };
 
-		// points change
+        // points change
         const oneWeekAgo = Math.floor(new Date(new Date().setHours(0, 0, 0, 0)).getTime() / 1000) - 604800; // Unix time at 00:00:00
         const thisDay = Math.floor(new Date(new Date().setHours(23, 59, 59, 999)).getTime() / 1000); // Unix time at 23:59:59
 
@@ -358,24 +359,26 @@ export class WorksService {
             orderBy: {
                 created_at: "asc",
             },
-			select: {
-				result: true
-			}
+            select: {
+                result: true,
+            },
         });
 
-		const n_increases = worksFromAWeekAgo.map((item) => item.result ? 1 : 0).filter((item) => item === 1).length * 10;
-		const n_decreases = worksFromAWeekAgo.map((item) => item.result ? 1 : 0).filter((item) => item === 0).length * (-10);
+        const n_increases =
+            worksFromAWeekAgo.map((item) => (item.result ? 1 : 0)).filter((item) => item === 1).length * 10;
+        const n_decreases =
+            worksFromAWeekAgo.map((item) => (item.result ? 1 : 0)).filter((item) => item === 0).length * -10;
 
-		const change = n_increases + n_decreases;
-	
+        const change = n_increases + n_decreases;
+
         const data = {
             streak: dates,
             n_streak: streakCount,
             max_streak: maxStreak,
             streak_data: filledDateCounts,
             cognitive_data: cognitive_data,
-			wawasan_kebangsaan_data: wawasan_kebangsaan_data,
-			points_change: change,
+            wawasan_kebangsaan_data: wawasan_kebangsaan_data,
+            points_change: change,
         };
 
         return data;

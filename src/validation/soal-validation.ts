@@ -16,6 +16,19 @@ export class SoalValidation {
         option5: z.string().max(500).optional(),
         correct_answer: z.string().min(1),
         explanation: z.string().min(4).max(10000).optional(),
-        explanation_url_youtube_video: z.string().max(1000).optional()
+        explanation_url_youtube_video: z.string().max(1000).optional(),
+		complete_package_id: z.string().optional(),
+		orders: z.string().optional(),
+		is_protected: z.boolean().optional()
     });
+}
+
+export class CompletePackageValidation {
+
+	static readonly CREATE: ZodType = z.object({
+		package_name: z.string(),
+		expired_date: z.string(),
+		n_unit: z.string(),
+	})
+
 }
