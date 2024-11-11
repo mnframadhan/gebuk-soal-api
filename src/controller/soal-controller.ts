@@ -3,7 +3,6 @@ import { bucket } from "../application/firebase";
 import { SoalRequest } from "../model/soal-model";
 import { SoalService } from "../service/soal-service";
 import { ContributorReq } from "../types/contributor-request";
-import { ContributorServices } from "../service/contributor-service";
 
 export class SoalController {
 
@@ -70,5 +69,18 @@ export class SoalController {
 		} catch (err) {
 			next(err)
 		}
+	}
+	
+	static async getSoalsByCompletePackageId(req: ContributorReq, res: Response, next: NextFunction) {
+		
+		try {
+			const completePackageId: string = req.params.id as string
+			const response = await SoalService.getSoalsByCompletePackageId(completePackageId, req.contributor!)
+			res.status(200);
+			res.json(response);
+		} catch (err) {
+			next(err)
+		}
+
 	}
 }

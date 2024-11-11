@@ -28,7 +28,8 @@ export class CompletePackageValidation {
 	static readonly CREATE: ZodType = z.object({
 		package_name: z.string(),
 		expired_date: z.string(),
-		n_unit: z.string(),
+		n_unit: z.number(),
+		difficulty: z.number()
 	})
 
 }

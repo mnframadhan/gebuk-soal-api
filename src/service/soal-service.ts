@@ -4,6 +4,7 @@ import { SoalRequest, SoalResponse, toSoalResponse } from "../model/soal-model";
 import { SoalValidation } from "../validation/soal-validation";
 import { Validation } from "../validation/Validation";
 import { v4 as uuid } from "uuid";
+import { ResponseError } from "../error/response-error";
 
 export class SoalService {
 
@@ -65,5 +66,24 @@ export class SoalService {
             }
         })
 		return {message: "Success"}
+	}
+	
+	static async getSoalsByCompletePackageId(complete_package_id: string, contributor: Contributor) : Promise<SoalResponse[]> {
+
+		const soalById = await prismaClient.soal.findMany({
+			where: {
+				created_by: contributor.username,
+				complete_package_id: complete_package_id,
+			},
+			orderBy: {
+				orders: "asc"
+			}
+		})
+		
+		if (!soalById){
+			throw new ResponseError(404, "Soal Tidak Ditemukan")
+
+		}
+		return soalById 
 	}
 }

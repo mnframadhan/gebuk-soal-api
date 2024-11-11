@@ -199,7 +199,8 @@ model CompletePackage {
 	expired_date String
 	created_at String
 	created_by String
-	n_unit String
+	difficulty Int
+	n_unit Int
 	Contributor Contributor @relation(fields: [created_by], references: [username])
 	Soal Soal[]
 	Separator Separator[]

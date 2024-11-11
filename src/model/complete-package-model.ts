@@ -3,7 +3,8 @@ export type CompletePackageRequest = {
     expired_date: string;
     created_at: string;
     created_by: string;
-    n_unit: string;
+    n_unit: number;
+	difficulty: number;
 };
 
 export type CompletePackageResponse = {
@@ -12,7 +13,8 @@ export type CompletePackageResponse = {
     expired_date: string;
     created_at: string;
     created_by: string;
-    n_unit: string;
+    n_unit: number;
+	difficulty: number;
 }
 
 export type SoalBundle = {

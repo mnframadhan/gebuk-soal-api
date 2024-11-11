@@ -66,7 +66,8 @@ app.post("/api/contributor/soal", upload.single("image1"), authMiddleware, SoalC
 app.get("/api/contributor/current/soal", authMiddleware, ContributorController.getSoalCreated);
 app.post("/api/contributor/soal/many", authMiddleware, SoalController.createManySoal);
 app.post("/api/contributor/soal/complete-package", authMiddleware, CompletePackageControllers.createCompletePackage);
-app.get("/api/contributor/complete-package", authMiddleware, CompletePackageControllers.getCompletePackage)
+app.get("/api/contributor/complete-package", authMiddleware, CompletePackageControllers.getCompletePackage);
+app.get("/api/contributor/complete-package/:id", authMiddleware, SoalController.getSoalsByCompletePackageId);
 
 // student api
 app.get("/api/student/current", authStudentMiddleware, StudentController.currentStudent);
