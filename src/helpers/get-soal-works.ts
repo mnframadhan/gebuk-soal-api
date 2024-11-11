@@ -18,6 +18,7 @@ export async function getSoalWithExcludedIdsbyCat(username: string, category: st
 	const soals = await prismaClient.soal.findMany({
 		where: {
 			id: { notIn: ids },
+			is_protected: false,
 			category: category
 		},
 		select: {
@@ -63,6 +64,7 @@ export async function getSoalWithExcludedIds(username: string) {
 	const soals = await prismaClient.soal.findMany({
 		where: {
 			id: { notIn: ids },
+			is_protected: false,
 		},
 		select: {
 			id: true,
