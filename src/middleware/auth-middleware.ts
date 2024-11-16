@@ -4,7 +4,7 @@ import { ContributorReq } from "../types/contributor-request";
 
 export const authMiddleware = async (req: ContributorReq, res: Response, next: NextFunction) => {
 
-    const token = req.get('X-API-TOKEN');
+    const token = req.get("X-API-TOKEN");
 
     if(token) {
         const contributor = await prismaClient.contributor.findFirst({

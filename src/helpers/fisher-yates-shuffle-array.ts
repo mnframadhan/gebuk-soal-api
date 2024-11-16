@@ -11,7 +11,10 @@ export function shuffleArray(array: any[]) {
         currentIndex--;
 
         // Swap it with the current element
-        [shuffledArray[currentIndex], shuffledArray[randomIndex]] = [shuffledArray[randomIndex], shuffledArray[currentIndex]];
+        [shuffledArray[currentIndex], shuffledArray[randomIndex]] = [
+            shuffledArray[randomIndex],
+            shuffledArray[currentIndex],
+        ];
     }
 
     return shuffledArray;

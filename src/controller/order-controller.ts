@@ -2,6 +2,7 @@ import { NextFunction, Response } from "express";
 import { StudentReq } from "../types/student-request";
 import { OrderRequest } from "../model/order-model";
 import { OrderService } from "../service/order-service";
+import jwt from "jsonwebtoken";
 
 export class OrderController {
 
@@ -64,11 +65,15 @@ export class OrderController {
     }
 
 	static async getPremiumOrderId(req: StudentReq, res: Response, next: NextFunction) {
+		const SECRET_KEY = process.env.SECRET_KEY! 
+		try { 
 
-		try {
-			const response : { premium_order_id: string, url: string } = await OrderService.getPremiumOrderId(req.student!);
+			const response : { premium_order_id: string, url: string } = await OrderService.getPremiumOrderId(req.student!); 
+			const token = jwt.sign(response, SECRET_KEY ,{expiresIn: '1h'}) 
+			
 			res.status(200);
-			res.json(response)
+			res.json({token})
+
 		} catch (err) {
 			next(err);
 		}

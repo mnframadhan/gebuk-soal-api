@@ -27,9 +27,13 @@ export class CompletePackageValidation {
 
 	static readonly CREATE: ZodType = z.object({
 		package_name: z.string(),
+		category: z.string(),
 		expired_date: z.string(),
 		n_unit: z.number(),
-		difficulty: z.number()
+		difficulty: z.number(),
+		price: z.number(),
+		unique_selling_point1: z.string(),
+		unique_selling_point2: z.string(),
+		unique_selling_point3: z.string(),
 	})
-
 }

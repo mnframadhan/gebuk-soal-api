@@ -51,22 +51,22 @@ model Student {
   end_year_education String? 
   points Int @default(0)
   n_soal Int @default(0)
-  cognitive_point Int @default(0)
-  verbal_analogi Int @default(0)
-  verbal_silogisme Int @default(0)
-  verbal_analitik Int @default(0)
-  numerik_deret_angka Int @default(0)
-  numerik_perbandingan_kuantitatif Int @default(0)
-  numerik_soal_cerita Int @default(0)
-  numerik_berhitung Int @default(0)
-  nasionalisme Int @default(0)
-  bela_negara Int @default(0)
-  pilar_negara Int @default(0)
-  integritas Int @default(0)
-  bahasa_negara Int @default(0)
-  cpns_tiu_point Int @default(0)
-  cpns_twk_point Int @default(0)
-  cpns_tkp_point Int @default(0)
+  cognitive_point Int @default(10)
+  verbal_analogi Int @default(10)
+  verbal_silogisme Int @default(10)
+  verbal_analitik Int @default(10)
+  numerik_deret_angka Int @default(10)
+  numerik_perbandingan_kuantitatif Int @default(10)
+  numerik_soal_cerita Int @default(10)
+  numerik_berhitung Int @default(10)
+  nasionalisme Int @default(10)
+  bela_negara Int @default(10)
+  pilar_negara Int @default(10)
+  integritas Int @default(10)
+  bahasa_negara Int @default(10)
+  cpns_tiu_point Int @default(10)
+  cpns_twk_point Int @default(10)
+  cpns_tkp_point Int @default(10)
   quota Int? @default(5)
   created_at String // unix time
   token String?
@@ -81,6 +81,7 @@ model Student {
   candidate Candidate? // one to one relationship
   verified Boolean @default(false)
   verification_code String?
+  StudentCompletePackages StudentCompletePackage[]
 
   @@map("students")
 
@@ -195,17 +196,38 @@ model PackageBundle {
 model CompletePackage {
 	
 	id String @id @default(uuid())
+	category String
 	package_name String
 	expired_date String
 	created_at String
 	created_by String
 	difficulty Int
+	price Int?
+	unique_selling_point1 String?
+	unique_selling_point2 String?
+	unique_selling_point3 String?
 	n_unit Int
 	Contributor Contributor @relation(fields: [created_by], references: [username])
 	Soal Soal[]
 	Separator Separator[]
+	StudentCompletePackage StudentCompletePackage[]
 	
 	@@map("completePackages")
+}
+
+model StudentCompletePackage {
+
+	id String @id @default(uuid())
+	student_id String
+	Student Student @relation(fields: [student_id], references: [id])
+	complete_package_id String
+	CompletePackage CompletePackage @relation(fields: [complete_package_id], references: [id])
+	created_at String
+	status String @default("Menunggu Pembayaran")
+	validity Boolean @default(false)
+	result Int?
+	
+	@@map("StudentCompletePackage")
 }
 
 model Separator {

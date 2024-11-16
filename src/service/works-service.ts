@@ -10,12 +10,8 @@ import {
     WorksRequest,
     WorksResultsResponse,
 } from "../model/works-model";
-import {
-    updateStudentNSoal,
-    updateStudentNSoalBySubCategory,
-    updateStudentNSoalByCPNSCategory,
-} from "../helpers/create-works-update";
 import { ResponseError } from "../error/response-error";
+import { updateStudentNSoal, updateStudentNSoalByCPNSCategory, updateStudentNSoalBySubCategory } from "../helpers/create-works-update";
 
 export class WorksService {
     static async getRemainingLimit(student: Student): Promise<{ remaining_limit: number; membership: string }> {
@@ -50,6 +46,7 @@ export class WorksService {
     }
 
     static async createWorks(request: WorksRequest, student: Student, soal_id: string) {
+
         // get currentSoal
         const currentSoal = await prismaClient.soal.findFirst({
             where: {
@@ -57,7 +54,11 @@ export class WorksService {
             },
         });
 
-        const currentAnswer = currentSoal?.correct_answer as string;
+		if(!currentSoal) {
+			throw new ResponseError(404, "Soal Tidak Ditemukan")
+		}
+
+        const currentAnswer = currentSoal.correct_answer as string;
 
         // set result
         let result: boolean;
@@ -107,15 +108,9 @@ export class WorksService {
             });
         }
 
-        const current_soal = await prismaClient.soal.findUnique({
-            where: {
-                id: soal_id,
-            },
-        });
-
-        updateStudentNSoal(student.id, current_soal?.category!, result);
-        updateStudentNSoalBySubCategory(student.id, currentSoal?.sub_category!, result);
-        updateStudentNSoalByCPNSCategory(student.id, currentSoal?.cpns_category!, result);
+		await updateStudentNSoal(student.id, currentSoal.category!, result )
+		await updateStudentNSoalBySubCategory(student.id, currentSoal.sub_category!, result)
+		await updateStudentNSoalByCPNSCategory(student.id, currentSoal.cpns_category!, result)
 
         return toWorkResponse(works);
     }
@@ -368,10 +363,27 @@ export class WorksService {
             worksFromAWeekAgo.map((item) => (item.result ? 1 : 0)).filter((item) => item === 1).length * 10;
         const n_decreases =
             worksFromAWeekAgo.map((item) => (item.result ? 1 : 0)).filter((item) => item === 0).length * -10;
-
         const change = n_increases + n_decreases;
 
+        // Tryout
+        const tryout = await prismaClient.studentCompletePackage.findMany({
+            where: {
+                student_id: student.id,
+            },
+            select: {
+                status: true,
+                CompletePackage: {
+                    select: {
+                        id: true,
+                        package_name: true,
+                        price: true,
+                    },
+                },
+            },
+        });
+
         const data = {
+            tryout: tryout,
             streak: dates,
             n_streak: streakCount,
             max_streak: maxStreak,

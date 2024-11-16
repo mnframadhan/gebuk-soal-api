@@ -1,6 +1,6 @@
 import { prismaClient } from "../application/database";
 
-export const updateStudentNSoal = async (id: string, category: string, result: boolean) => {
+export const updateStudentNSoal = async (id: string, category: string, result: boolean) : Promise<void> => {
     let points;
     if (result) {
         points = 10;
@@ -15,12 +15,20 @@ export const updateStudentNSoal = async (id: string, category: string, result: b
                 data: { cognitive_point: { increment: points } },
             });
             break;
+        case "Wawasan Kebangsaan":
+            await prismaClient.student.update({
+                where: {
+                    id: id,
+                },
+                data: { cpns_twk_point: { increment: points } },
+            });
+            break;
         default:
             console.log("No matching case found");
     }
 };
 
-export const updateStudentNSoalBySubCategory = async (id: string, sub_category: string, result: boolean) => {
+export const updateStudentNSoalBySubCategory = async (id: string, sub_category: string, result: boolean) : Promise<void> => {
     let points;
     if (result) {
         points = 10;
@@ -106,7 +114,7 @@ export const updateStudentNSoalBySubCategory = async (id: string, sub_category: 
     }
 };
 
-export const updateStudentNSoalByCPNSCategory = async (id: string, cpns_category: string, result: boolean) => {
+export const updateStudentNSoalByCPNSCategory = async (id: string, cpns_category: string, result: boolean) : Promise<void>=> {
     let points;
     if (result) {
         points = 10;
@@ -115,21 +123,18 @@ export const updateStudentNSoalByCPNSCategory = async (id: string, cpns_category
     }
     switch (cpns_category) {
         case "Tes Intelegensi Umum":
-            // Case 1: Update student's name
             await prismaClient.student.update({
                 where: { id: id },
                 data: { cpns_tiu_point: { increment: points } },
             });
             break;
         case "Tes Wawasan Kebangsaan":
-            // Case 2: Update student's limit
             await prismaClient.student.update({
                 where: { id: id },
                 data: { cpns_twk_point: { increment: points } },
             });
             break;
         case "Tes Karakteristik Pribadi":
-            // Case 3: Update both name and limit
             await prismaClient.student.update({
                 where: { id: id },
                 data: { cpns_tkp_point: { increment: points } },

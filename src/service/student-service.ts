@@ -65,8 +65,8 @@ export class StudentService {
         const mailOptions = {
             from: process.env.COMPANY_EMAIL!,
             to: validatedRequest.email,
-            subject: `[Verifikasi Akun] Terimakasih ${validatedRequest.username}, Kamu Telah Melakukan Registrasi Akun Cipta Talenta`,
-            text: `Kode Autentikasi 5-digit angka: ${auth_digits}`,
+            subject: `[Verifikasi Akun] Terimakasih ${validatedRequest.username}, Kamu Telah Melakukan Registrasi Akun Ruang Ujian`,
+            text: `Kode Autentikasi 4-digit angka: ${auth_digits}`,
         };
 
         transporter.sendMail(mailOptions, (error: Error | null, info: SentMessageInfo) => {

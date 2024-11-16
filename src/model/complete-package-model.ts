@@ -1,24 +1,33 @@
 export type CompletePackageRequest = {
     package_name: string;
+    category: string;
     expired_date: string;
     created_at: string;
     created_by: string;
     n_unit: number;
-	difficulty: number;
+    difficulty: number;
+    price: number;
+    unique_selling_point1: string;
+    unique_selling_point2: string;
+    unique_selling_point3: string;
 };
 
 export type CompletePackageResponse = {
-	id: string;
+    id: string;
     package_name: string;
+    category: string;
     expired_date: string;
     created_at: string;
     created_by: string;
     n_unit: number;
-	difficulty: number;
-}
+    difficulty: number;
+    price: number | null;
+    unique_selling_point1: string | null;
+    unique_selling_point2: string | null;
+    unique_selling_point3: string | null;
+};
 
 export type SoalBundle = {
-
     category: string;
     sub_category: string | null;
     cpns_category: string | null;
@@ -39,8 +48,7 @@ export type SoalBundle = {
     correct_answer: string;
     explanation: string | null;
     explanation_url_youtube_video: string | null;
-	complete_package_id: string | null;
-	orders: number | null;
-	is_protected: boolean
-	
-}
+    complete_package_id: string | null;
+    orders: number | null;
+    is_protected: boolean;
+};

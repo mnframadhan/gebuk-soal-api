@@ -1,0 +1,17 @@
+-- AlterTable
+ALTER TABLE `students` MODIFY `cognitive_point` INTEGER NOT NULL DEFAULT 10,
+    MODIFY `cpns_tiu_point` INTEGER NOT NULL DEFAULT 10,
+    MODIFY `cpns_tkp_point` INTEGER NOT NULL DEFAULT 10,
+    MODIFY `cpns_twk_point` INTEGER NOT NULL DEFAULT 10,
+    MODIFY `numerik_deret_angka` INTEGER NOT NULL DEFAULT 10,
+    MODIFY `numerik_perbandingan_kuantitatif` INTEGER NOT NULL DEFAULT 10,
+    MODIFY `numerik_soal_cerita` INTEGER NOT NULL DEFAULT 10,
+    MODIFY `verbal_analitik` INTEGER NOT NULL DEFAULT 10,
+    MODIFY `verbal_analogi` INTEGER NOT NULL DEFAULT 10,
+    MODIFY `verbal_silogisme` INTEGER NOT NULL DEFAULT 10,
+    MODIFY `numerik_berhitung` INTEGER NOT NULL DEFAULT 10,
+    MODIFY `bahasa_negara` INTEGER NOT NULL DEFAULT 10,
+    MODIFY `bela_negara` INTEGER NOT NULL DEFAULT 10,
+    MODIFY `integritas` INTEGER NOT NULL DEFAULT 10,
+    MODIFY `nasionalisme` INTEGER NOT NULL DEFAULT 10,
+    MODIFY `pilar_negara` INTEGER NOT NULL DEFAULT 10;

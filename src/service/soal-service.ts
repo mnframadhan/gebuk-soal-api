@@ -74,9 +74,6 @@ export class SoalService {
 			where: {
 				created_by: contributor.username,
 				complete_package_id: complete_package_id,
-			},
-			orderBy: {
-				orders: "asc"
 			}
 		})
 		
