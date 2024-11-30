@@ -88,4 +88,16 @@ export class OrderController {
 			next(err)
 		}
 	}
+
+	static async getCompletePackageOrder(req: StudentReq, res: Response, next: NextFunction) {
+		try {
+			const response = await OrderService.getCompletePackageOrder()
+			res.status(200);
+			res.json(response);
+		} catch (err) {
+			next(err)
+		}
+	}
+
+
 }

@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.1.x"]
 }
 
 datasource db {
@@ -226,6 +227,7 @@ model StudentCompletePackage {
 	status String @default("Menunggu Pembayaran")
 	validity Boolean @default(false)
 	result Int?
+	Work Work[]
 	
 	@@map("StudentCompletePackage")
 }
@@ -363,6 +365,8 @@ model Soal {
 model Work {
 
   id String @id @unique
+  student_complete_package_id String?
+  StudentCompletePackage StudentCompletePackage? @relation(fields: [student_complete_package_id], references: [id], onDelete: Cascade)
   username String
   students Student @relation(fields: [username], references: [username], onDelete: Cascade)
   soal_id String

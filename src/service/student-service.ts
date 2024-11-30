@@ -3,13 +3,7 @@ import bcrypt from "bcrypt";
 import { v4 as uuid } from "uuid";
 import { prismaClient } from "../application/database";
 import { ResponseError } from "../error/response-error";
-import {
-    StudentRequest,
-    StudentResponse,
-    StudentUpdateRequest,
-    toStudentResponse,
-    StudentUpdateAvatar,
-} from "../model/student-model";
+import { StudentRequest, StudentResponse, StudentUpdateRequest, toStudentResponse, StudentUpdateAvatar } from "../model/student-model";
 import { StudentValidation } from "../validation/student-validation";
 import { Validation } from "../validation/Validation";
 import nodemailer, { SentMessageInfo } from "nodemailer";
@@ -73,28 +67,89 @@ export class StudentService {
             if (error) {
                 throw new ResponseError(422, "Invalid Email");
             }
-            console.log(`Email sent ${info.response}`);
+
+            console.log(info);
         });
 
         return toStudentResponse(response);
     }
 
-    static async studentEmailVerification(
-        request: { verificationCode: string },
-        student: Student
-    ): Promise<{ message: string }> {
+    static async studentEmailVerification(request: { verificationCode: string }, student: Student): Promise<{ message: string }> {
         const verificationCode = await bcrypt.compare(request.verificationCode, student.verification_code!);
 
         if (!verificationCode) {
             throw new ResponseError(422, "Verifikasi Gagal");
         }
 
-        await prismaClient.student.update({
+        const updateStudent = await prismaClient.student.update({
             where: { id: student.id },
             data: { verified: true },
         });
 
+        if (!updateStudent) {
+            throw new ResponseError(401, "Gagal diupdate");
+        }
+
+        const mailOptions = {
+            from: process.env.COMPANY_EMAIL!,
+            to: student.email,
+            subject: `[BERHASIL VERIFIKASI] Terimakasih ${student.username}, akun berhasil di-verifikasi`,
+            text: `Selamat, akun berhasil di-verifikasi. Ayo mulai rutin menjawab soal-soal ujian. Semakin banyak latihan, semakin pandai kamu menjawab soal.`,
+        };
+
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.COMPANY_EMAIL!,
+                pass: process.env.EMAIL_PASSWORD!,
+            },
+        });
+        transporter.sendMail(mailOptions, (error: Error | null, info: SentMessageInfo) => {
+            if (error) {
+                throw new ResponseError(422, "Invalid Email");
+            }
+            console.log(`${info}`);
+        });
+
         return { message: "Akun berhasil di-verifikasi!" };
+    }
+
+    static async resendEmailVerification(student: Student): Promise<{ message: string }> {
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.COMPANY_EMAIL!,
+                pass: process.env.EMAIL_PASSWORD!,
+            },
+        });
+
+        const auth_digits = get4RandomDigits();
+        const hashed_auth_digits = await bcrypt.hash(auth_digits, 8);
+
+        const mailOptions = {
+            from: process.env.COMPANY_EMAIL!,
+            to: student.email,
+            subject: `[Re-send Verifikasi] Terimakasih ${student.username}, Kamu Telah Melakukan Registrasi Akun Ruang Ujian`,
+            text: `Kode Autentikasi 4-digit angka: ${auth_digits}`,
+        };
+
+        await prismaClient.student.update({
+            where: {
+                username: student.username,
+            },
+            data: {
+                verification_code: hashed_auth_digits,
+            },
+        });
+
+        transporter.sendMail(mailOptions, (error: Error | null, info: SentMessageInfo) => {
+            if (error) {
+                throw new ResponseError(422, "Invalid Email");
+            }
+            console.log(`${info}`);
+        });
+
+        return { message: "Resend Success" };
     }
 
     static async loginStudent(request: StudentRequest): Promise<StudentResponse> {
@@ -139,10 +194,10 @@ export class StudentService {
 
     static async updateStudent(request: StudentUpdateRequest, student: Student): Promise<{ message: string }> {
         const validatedRequest = Validation.validate(StudentValidation.UPDATE, request);
-		
-		if(validatedRequest.is_present_education === null) {
-			validatedRequest.is_present_education = false
-		}
+
+        if (validatedRequest.is_present_education === null) {
+            validatedRequest.is_present_education = false;
+        }
 
         await prismaClient.student.update({
             where: { id: student.id },

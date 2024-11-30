@@ -243,6 +243,17 @@ export class AdministratorService {
             },
         });
     }
+	
+	static async updateStudentCompletePackage(id: string): Promise<void> {
+		await prismaClient.studentCompletePackage.update({
+			where: {
+				id: id
+			},
+			data: {
+				status: "Complete"
+			}
+		})
+	}
 
     static async logoutCurrentAdmin(admin: Administrator): Promise<void> {
         await prismaClient.administrator.update({

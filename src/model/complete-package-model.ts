@@ -52,3 +52,12 @@ export type SoalBundle = {
     orders: number | null;
     is_protected: boolean;
 };
+
+
+export type StudentCompleteModelResponse = {
+	id: string;
+	student_id: string;
+	complete_package_id: string;
+	created_at: string;
+	status: string;
+}

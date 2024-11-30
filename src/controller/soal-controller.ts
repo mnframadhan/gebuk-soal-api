@@ -49,7 +49,6 @@ export class SoalController {
 
     static async createManySoal(req: ContributorReq, res: Response, next: NextFunction) {
         try {
-			
             const request: SoalRequest[] = req.body as SoalRequest[];
             const response = await SoalService.createManySoal(request, req.contributor!);
             res.status(201);
@@ -63,6 +62,17 @@ export class SoalController {
         try {
             const completePackageId: string = req.params.id as string;
             const response = await SoalService.getSoalsByCompletePackageId(completePackageId, req.contributor!);
+            res.status(200);
+            res.json(response);
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    static async deleteSoalById(req: ContributorReq, res: Response, next: NextFunction) {
+        try {
+            const soal_id = req.query.soal_id as string;
+            const response = await SoalService.deleteSoalById(soal_id);
             res.status(200);
             res.json(response);
         } catch (err) {

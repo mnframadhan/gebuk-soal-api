@@ -69,6 +69,7 @@ app.post("/api/contributor/soal/complete-package", authMiddleware, CompletePacka
 app.get("/api/contributor/complete-package", authMiddleware, CompletePackageControllers.getCompletePackage);
 app.get("/api/contributor/complete-package/:id", authMiddleware, SoalController.getSoalsByCompletePackageId);
 app.post("/api/contributor/complete-package/:id/upload-many", authMiddleware, SoalController.createManySoal);
+app.delete("/api/contributor/soal/delete", authMiddleware, SoalController.deleteSoalById); // query soal_id
 
 // student api
 app.get("/api/student/current", authStudentMiddleware, StudentController.currentStudent);
@@ -80,7 +81,7 @@ app.patch("/api/student/avatar", authStudentMiddleware, upload.single("avatar"),
 app.get("/api/student/works/limit", authStudentMiddleware, WorksController.getRemainingLimit);
 app.post("/api/student/works", authStudentMiddleware, WorksController.createWorks); // query soal (uuid) //
 app.get("/api/student/dashboard-data", authStudentMiddleware, WorksController.getDashboardData);
-app.get("/api/student/complete-package/:id", authStudentMiddleware, CompletePackageControllers.getCompletePackageById); 
+app.get("/api/student/complete-package/:id", authStudentMiddleware, CompletePackageControllers.getCompletePackageById);
 
 // student api works by membership
 app.get("/api/student/works/basic", authStudentMiddleware, limiter, WorksController.getWorks); //  query page, remaining_limit,
@@ -100,7 +101,8 @@ app.get("/api/student/order/premium", authStudentMiddleware, OrderController.get
 app.delete("/api/student/order/premium", authStudentMiddleware, OrderController.cancelPremiumOrder);
 
 // student order completePackage
-app.post("/api/student/order/complete-package/:id", authStudentMiddleware, CompletePackageControllers.orderCompletePackageId)
+app.post("/api/student/order/complete-package/:id", authStudentMiddleware, CompletePackageControllers.orderCompletePackageId);
+app.delete("/api/student/order/complete-package/delete", authStudentMiddleware, CompletePackageControllers.cancelCompletePackageOrder); // query complete_package_id
 
 // administrator
 app.get("/api/admin/all-students", authAdminMiddleware, AdministratorController.getAllStudents); // query page and limit
@@ -110,17 +112,14 @@ app.patch("/api/admin/student", authAdminMiddleware, AdministratorController.upd
 app.patch("/api/admin/student/return", authAdminMiddleware, AdministratorController.returnLimit); // query student_id and order_id
 app.delete("/api/admin/logout", authAdminMiddleware, AdministratorController.logoutAdmin);
 app.patch("/api/admin/student/premium/approve", authAdminMiddleware, AdministratorController.updatePremiumStudent); // query student_id
+app.get("/api/admin/student/complete-package-order", authAdminMiddleware, OrderController.getCompletePackageOrder);
+app.patch("/api/admin/student/complete-package-order/approve", authAdminMiddleware, AdministratorController.updateStudentCompletePackage); // query id
 
 // company
 app.get("/api/company/current", authCompanyMiddleware, CompanyController.getCurrentCompany);
 app.patch("/api/company/verification", authCompanyMiddleware, CompanyController.companyEmailVerification);
 app.delete("/api/company/current", authCompanyMiddleware, CompanyController.logoutCompany);
-app.patch(
-    "/api/company/current/banner",
-    authCompanyMiddleware,
-    upload.single("image"),
-    CompanyController.updateProfileBanner
-);
+app.patch("/api/company/current/banner", authCompanyMiddleware, upload.single("image"), CompanyController.updateProfileBanner);
 app.patch("/api/company/orders/standard-package", authCompanyMiddleware, CompanyController.orderStandardPackage);
 app.post("/api/company/preferred-skills", authCompanyMiddleware, CompanyController.setPreferredSkills);
 app.delete("/api/company/preferred-skills", authCompanyMiddleware, CompanyController.deletePreferredSkills);
@@ -130,11 +129,7 @@ app.post("/api/company/touch", authCompanyMiddleware, CompanyController.touchCan
 app.post("/api/company/bundle-test", authCompanyMiddleware, PackageBundleController.createPackageBundle);
 app.get("/api/company/bundle-test", authCompanyMiddleware, PackageBundleController.getPackageBundle);
 app.patch("/api/company/bundle-test", authCompanyMiddleware, PackageBundleController.updatePackageBundle);
-app.get(
-    "/api/company/bundle-test/:package_bundle_id",
-    authCompanyMiddleware,
-    PackageBundleController.getPackageBundlebyId
-); // params package_bundle_id
+app.get("/api/company/bundle-test/:package_bundle_id", authCompanyMiddleware, PackageBundleController.getPackageBundlebyId); // params package_bundle_id
 app.patch("/api/company/bundle-test/token", authCompanyMiddleware, PackageBundleController.generateToken); // query package_bundle_id
 app.delete("/api/company/bundle-test/token", authCompanyMiddleware, PackageBundleController.deleteToken);
 
@@ -146,26 +141,14 @@ app.post(
     authCompanyMiddleware,
     PackageTestUnitController.createPackageTestUnitWithImage
 ); // query package_bundle_id
-app.patch(
-    "/api/company/bundle-test/test-unit/:package_test_unit_id",
-    authCompanyMiddleware,
-    PackageTestUnitController.updatePackageTestUnit
-); // params package_test_unit_id
-app.delete(
-    "/api/company/bundle-test/test-unit",
-    authCompanyMiddleware,
-    PackageTestUnitController.deletePackageTestUnit
-);
+app.patch("/api/company/bundle-test/test-unit/:package_test_unit_id", authCompanyMiddleware, PackageTestUnitController.updatePackageTestUnit); // params package_test_unit_id
+app.delete("/api/company/bundle-test/test-unit", authCompanyMiddleware, PackageTestUnitController.deletePackageTestUnit);
 app.get(
     "/api/company/bundle-test/:package_bundle_id/test-unit",
     authCompanyMiddleware,
     PackageTestUnitController.getPackageTestUnitByPackageBundleId
 ); // query package_bundle_test_id
-app.get(
-    "/api/company/bundle-test/works/:package_bundle_id",
-    authCompanyMiddleware,
-    CompanyController.getPackageTestUnitByPackageBundleIdPagination
-); // query page // query package_bundle_id
+app.get("/api/company/bundle-test/works/:package_bundle_id", authCompanyMiddleware, CompanyController.getPackageTestUnitByPackageBundleIdPagination); // query page // query package_bundle_id
 
 // company package-bundle-candidate-result
 app.get("/api/company/bundle-result", authCompanyMiddleware, CompanyController.getResultOfPackageBundle);
@@ -174,12 +157,7 @@ app.get("/api/company/bundle-result", authCompanyMiddleware, CompanyController.g
 app.post("/api/candidate/register", authStudentMiddleware, CandidateController.createCandidate);
 app.get("/api/candidate/current", authStudentMiddleware, CandidateController.getCurrentCandidate);
 app.get("/api/candidate/token", authStudentMiddleware, CandidateController.checkPackageBundleToken); // query package_bundle_token
-app.get(
-    "/api/candidate/bundle-test",
-    authStudentMiddleware,
-    packageBundleMiddleware,
-    CandidateController.getPackageBundleById
-); // params package_bundle_id
+app.get("/api/candidate/bundle-test", authStudentMiddleware, packageBundleMiddleware, CandidateController.getPackageBundleById); // params package_bundle_id
 app.patch("/api/candidate/verification", authStudentMiddleware, CandidateController.candidateEmailVerification);
 
 // candidate works
@@ -189,17 +167,7 @@ app.get(
     packageBundleMiddleware,
     CandidateController.getPackageTestUnitsByPackageBundleIdPagination
 ); // query page
-app.post(
-    "/api/candidate/bundle-test/test-unit/works",
-    authStudentMiddleware,
-    packageBundleMiddleware,
-    CandidateController.createWorks
-); // query package_test_unit_id // query package_bundle_id
-app.post(
-    "/api/candidate/bundle-test/results",
-    authStudentMiddleware,
-    packageBundleMiddleware,
-    CandidateController.createResults
-); // query package_bundle_id
+app.post("/api/candidate/bundle-test/test-unit/works", authStudentMiddleware, packageBundleMiddleware, CandidateController.createWorks); // query package_test_unit_id // query package_bundle_id
+app.post("/api/candidate/bundle-test/results", authStudentMiddleware, packageBundleMiddleware, CandidateController.createResults); // query package_bundle_id
 
 app.use(errorMiddleware);

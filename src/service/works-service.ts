@@ -11,7 +11,11 @@ import {
     WorksResultsResponse,
 } from "../model/works-model";
 import { ResponseError } from "../error/response-error";
-import { updateStudentNSoal, updateStudentNSoalByCPNSCategory, updateStudentNSoalBySubCategory } from "../helpers/create-works-update";
+import {
+    updateStudentNSoal,
+    updateStudentNSoalByCPNSCategory,
+    updateStudentNSoalBySubCategory,
+} from "../helpers/create-works-update";
 
 export class WorksService {
     static async getRemainingLimit(student: Student): Promise<{ remaining_limit: number; membership: string }> {
@@ -19,11 +23,8 @@ export class WorksService {
         return response;
     }
 
-    static async getWorks(
-        student: Student,
-        category: string,
-        page: number
-    ): Promise<{ pagination: Paging; data: any }> {
+    static async getWorks(student: Student, category: string, page: number): Promise<{ pagination: Paging; data: any }> {
+
         const pagination: Paging = {
             size: 1,
             total_page: student.quota!,
@@ -46,7 +47,6 @@ export class WorksService {
     }
 
     static async createWorks(request: WorksRequest, student: Student, soal_id: string) {
-
         // get currentSoal
         const currentSoal = await prismaClient.soal.findFirst({
             where: {
@@ -54,9 +54,9 @@ export class WorksService {
             },
         });
 
-		if(!currentSoal) {
-			throw new ResponseError(404, "Soal Tidak Ditemukan")
-		}
+        if (!currentSoal) {
+            throw new ResponseError(404, "Soal Tidak Ditemukan");
+        }
 
         const currentAnswer = currentSoal.correct_answer as string;
 
@@ -108,9 +108,9 @@ export class WorksService {
             });
         }
 
-		await updateStudentNSoal(student.id, currentSoal.category!, result )
-		await updateStudentNSoalBySubCategory(student.id, currentSoal.sub_category!, result)
-		await updateStudentNSoalByCPNSCategory(student.id, currentSoal.cpns_category!, result)
+        await updateStudentNSoal(student.id, currentSoal.category!, result);
+        await updateStudentNSoalBySubCategory(student.id, currentSoal.sub_category!, result);
+        await updateStudentNSoalByCPNSCategory(student.id, currentSoal.cpns_category!, result);
 
         return toWorkResponse(works);
     }

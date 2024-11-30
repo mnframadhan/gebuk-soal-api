@@ -13,6 +13,7 @@ import { v4 as uuid } from "uuid";
 import { Paging } from "../model/pages";
 import bcrypt from "bcrypt";
 import { ResponseError } from "../error/response-error";
+import { StudentCompleteModelResponse } from "../model/complete-package-model";
 
 export class OrderService {
     static async createOrder(request: OrderRequest, student: Student): Promise<OrderResponse> {
@@ -147,4 +148,23 @@ export class OrderService {
 
         return toOrderResponsePagination(order, pagination);
     }
+
+	static async getCompletePackageOrder() : Promise<StudentCompleteModelResponse[]> {
+		
+		const response = await prismaClient.studentCompletePackage.findMany({
+			where: {
+				status : "Menunggu Pembayaran"
+			},
+			orderBy: {
+				created_at: "desc"
+			}
+		})
+		
+		if(!response) {
+			throw new ResponseError(404, "Tidak Ditemukan")
+		}
+
+		return response;
+
+	}
 }

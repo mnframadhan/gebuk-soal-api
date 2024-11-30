@@ -47,16 +47,28 @@ export class CompletePackageControllers {
         }
     }
 
-	static async orderCompletePackageId(req: StudentReq, res: Response, next: NextFunction) {
-		try {
+    static async orderCompletePackageId(req: StudentReq, res: Response, next: NextFunction) {
+        try {
             const complete_package_id = req.params.id as string;
-			const request: {password: string} = req.body as {password: string};
+
+            const request: { password: string } = req.body as { password: string };
             const response = await CompletePackageServices.orderCompletePackage(request, complete_package_id, req.student!);
-			
+
             res.status(200);
             res.json(response);
-		} catch (err) {
-			next(err)
-		}
-	}
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    static async cancelCompletePackageOrder(req: StudentReq, res: Response, next: NextFunction) {
+        try {
+            const completePackageId: string = req.query.complete_package_id as string;
+            const response = await CompletePackageServices.cancelOrderCompletePackage(req.student!, completePackageId);
+            res.status(200);
+            res.json(response);
+        } catch (err) {
+            next(err);
+        }
+    }
 }

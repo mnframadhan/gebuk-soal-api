@@ -74,6 +74,9 @@ export class SoalService {
 			where: {
 				created_by: contributor.username,
 				complete_package_id: complete_package_id,
+			},
+			orderBy: {
+				orders: "asc"
 			}
 		})
 		
@@ -82,5 +85,16 @@ export class SoalService {
 
 		}
 		return soalById 
+	}
+
+	static async deleteSoalById(soal_id: string) : Promise<{message: string}> {
+
+		await prismaClient.soal.delete({
+			where: {
+				id: soal_id
+			}
+		})
+
+		return {message: "Deleted"}
 	}
 }
