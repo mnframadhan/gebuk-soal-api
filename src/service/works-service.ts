@@ -1,21 +1,11 @@
 import { Student } from "@prisma/client";
 import { v4 as uuid } from "uuid";
 import { prismaClient } from "../application/database";
-import { getSoalWithExcludedIds, getSoalWithExcludedIdsbyCat } from "../helpers/get-soal-works";
+import { getSoalByCompletePackageId, getSoalWithExcludedIds, getSoalWithExcludedIdsbyCat } from "../helpers/get-soal-works";
 import { Paging } from "../model/pages";
-import {
-    ResultsResponse,
-    toWorkResponse,
-    toWorksResultsResponse,
-    WorksRequest,
-    WorksResultsResponse,
-} from "../model/works-model";
+import { ResultsResponse, toWorkResponse, toWorksResultsResponse, WorksRequest, WorksResultsResponse } from "../model/works-model";
 import { ResponseError } from "../error/response-error";
-import {
-    updateStudentNSoal,
-    updateStudentNSoalByCPNSCategory,
-    updateStudentNSoalBySubCategory,
-} from "../helpers/create-works-update";
+import { updateStudentNSoal, updateStudentNSoalByCPNSCategory, updateStudentNSoalBySubCategory } from "../helpers/create-works-update";
 
 export class WorksService {
     static async getRemainingLimit(student: Student): Promise<{ remaining_limit: number; membership: string }> {
@@ -24,7 +14,6 @@ export class WorksService {
     }
 
     static async getWorks(student: Student, category: string, page: number): Promise<{ pagination: Paging; data: any }> {
-
         const pagination: Paging = {
             size: 1,
             total_page: student.quota!,
@@ -44,6 +33,45 @@ export class WorksService {
         } else {
             throw new ResponseError(404, "Tidak ada hasil");
         }
+    }
+
+    static async getWorksByCompletePackage(student: Student, completePackageId: string, page: number): Promise<{ pagination: Paging; data: any }> {
+        const studentCompletePackage = await prismaClient.studentCompletePackage.findFirst({
+            where: {
+                student_id: student.id,
+                complete_package_id: completePackageId,
+            },
+        });
+
+		const completePackage = await prismaClient.completePackage.findFirst({
+			where: {
+				id: completePackageId
+			}
+		})
+
+
+        if (!studentCompletePackage || !completePackage) {
+            throw new ResponseError(401, "Unauthorized");
+        }
+
+        const showedData = await getSoalByCompletePackageId(completePackageId, page);
+
+        if (!showedData) {
+            throw new ResponseError(400, "Soal Tidak Tersedia");
+        }
+
+        const pagination: Paging = {
+            size: 1,
+            total_page: completePackage.n_unit,
+            current_page: page,
+        };
+
+        const response = {
+            pagination: pagination,
+            data: showedData,
+        };
+
+        return response;
     }
 
     static async createWorks(request: WorksRequest, student: Student, soal_id: string) {
@@ -325,8 +353,7 @@ export class WorksService {
             "Verbal Silogisme": student.verbal_silogisme < 0 ? 0 : student.verbal_silogisme,
             "Verbal Analitik": student.verbal_analitik < 0 ? 0 : student.verbal_analitik,
             "Numerik Deret Angka": student.numerik_deret_angka < 0 ? 0 : student.numerik_deret_angka,
-            "Numerik Perbandingan Kuantitatif":
-                student.numerik_perbandingan_kuantitatif < 0 ? 0 : student.numerik_perbandingan_kuantitatif,
+            "Numerik Perbandingan Kuantitatif": student.numerik_perbandingan_kuantitatif < 0 ? 0 : student.numerik_perbandingan_kuantitatif,
             "Numerik Soal Cerita": student.numerik_soal_cerita < 0 ? 0 : student.numerik_soal_cerita,
             "Numerik Berhitung": student.numerik_berhitung < 0 ? 0 : student.numerik_berhitung,
         };
@@ -359,10 +386,8 @@ export class WorksService {
             },
         });
 
-        const n_increases =
-            worksFromAWeekAgo.map((item) => (item.result ? 1 : 0)).filter((item) => item === 1).length * 10;
-        const n_decreases =
-            worksFromAWeekAgo.map((item) => (item.result ? 1 : 0)).filter((item) => item === 0).length * -10;
+        const n_increases = worksFromAWeekAgo.map((item) => (item.result ? 1 : 0)).filter((item) => item === 1).length * 10;
+        const n_decreases = worksFromAWeekAgo.map((item) => (item.result ? 1 : 0)).filter((item) => item === 0).length * -10;
         const change = n_increases + n_decreases;
 
         // Tryout

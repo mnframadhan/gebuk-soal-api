@@ -104,6 +104,9 @@ app.delete("/api/student/order/premium", authStudentMiddleware, OrderController.
 app.post("/api/student/order/complete-package/:id", authStudentMiddleware, CompletePackageControllers.orderCompletePackageId);
 app.delete("/api/student/order/complete-package/delete", authStudentMiddleware, CompletePackageControllers.cancelCompletePackageOrder); // query complete_package_id
 
+// student get soal for completePackage
+app.get("/api/student/tryout", authStudentMiddleware, WorksController.getWorksByCompletePackage) // query page, complete_package_id
+
 // administrator
 app.get("/api/admin/all-students", authAdminMiddleware, AdministratorController.getAllStudents); // query page and limit
 app.get("/api/admin/all-students/orders", authAdminMiddleware, AdministratorController.getAllOrders); // query page and limit

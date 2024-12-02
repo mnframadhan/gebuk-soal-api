@@ -90,3 +90,30 @@ export async function getSoalWithExcludedIds(username: string) {
         return shuffled;
     }
 }
+
+export async function getSoalByCompletePackageId(completePackageId: string, order: number) {
+    const soals = await prismaClient.soal.findMany({
+        where: {
+            complete_package_id: completePackageId,
+			orders: order,
+        },
+        orderBy: {
+            orders: "asc",
+        },
+        select: {
+            id: true,
+            text: true,
+            category: true,
+            sub_category: true,
+            label: true,
+            difficulty: true,
+            question: true,
+            option1: true,
+            option2: true,
+            option3: true,
+            option4: true,
+            option5: true,
+        },
+    });
+    return soals;
+}

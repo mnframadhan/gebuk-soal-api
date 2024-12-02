@@ -63,13 +63,13 @@ export class StudentService {
             text: `Kode Autentikasi 4-digit angka: ${auth_digits}`,
         };
 
-        transporter.sendMail(mailOptions, (error: Error | null, info: SentMessageInfo) => {
-            if (error) {
-                throw new ResponseError(422, "Invalid Email");
-            }
-
-            console.log(info);
-        });
+        try {
+            transporter.sendMail(mailOptions, (info: SentMessageInfo) => {
+                console.log(`${info}`);
+            });
+        } catch {
+			throw new ResponseError(400, "Terjadi Kesalahan")
+		}
 
         return toStudentResponse(response);
     }
@@ -104,12 +104,14 @@ export class StudentService {
                 pass: process.env.EMAIL_PASSWORD!,
             },
         });
-        transporter.sendMail(mailOptions, (error: Error | null, info: SentMessageInfo) => {
-            if (error) {
-                throw new ResponseError(422, "Invalid Email");
-            }
-            console.log(`${info}`);
-        });
+
+        try {
+            transporter.sendMail(mailOptions, (info: SentMessageInfo) => {
+                console.log(`${info}`);
+            });
+        } catch {
+			throw new ResponseError(400, "Terjadi Kesalahan")
+		}
 
         return { message: "Akun berhasil di-verifikasi!" };
     }
@@ -142,12 +144,13 @@ export class StudentService {
             },
         });
 
-        transporter.sendMail(mailOptions, (error: Error | null, info: SentMessageInfo) => {
-            if (error) {
-                throw new ResponseError(422, "Invalid Email");
-            }
-            console.log(`${info}`);
-        });
+        try {
+            transporter.sendMail(mailOptions, (info: SentMessageInfo) => {
+                console.log(`${info}`);
+            });
+        } catch {
+            throw new ResponseError(400, "Terjadi Kesalahan");
+        }
 
         return { message: "Resend Success" };
     }
