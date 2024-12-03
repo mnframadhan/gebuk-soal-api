@@ -115,6 +115,17 @@ export class StudentController {
         }
     }
 
+	static async resendEmailVerification(req: StudentReq, res: Response, next: NextFunction) {
+		try {
+			const response = await StudentService.resendEmailVerification(req.student!);
+			res.status(200);
+			res.json(response)
+
+		} catch (err) {
+			next(err)
+		}
+	}
+
     static async logoutStudent(req: StudentReq, res: Response, next: NextFunction) {
         try {
             await StudentService.logoutCurrentStudent(req.student!);

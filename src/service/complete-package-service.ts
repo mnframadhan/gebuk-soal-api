@@ -1,4 +1,5 @@
 import { Contributor, Student } from "@prisma/client";
+import nodemailer, { SentMessageInfo } from "nodemailer";
 import { CompletePackageRequest, CompletePackageResponse } from "../model/complete-package-model";
 import { Validation } from "../validation/Validation";
 import { CompletePackageValidation } from "../validation/soal-validation";
@@ -85,7 +86,8 @@ export class CompletePackageServices {
         return completePackage;
     }
 
-    static async orderCompletePackage(request: { password: string }, complete_package_id: string, student: Student): Promise<{ message: string }> {
+    static async orderCompletePackage(request: { phoneNumber: string, password: string }, complete_package_id: string, student: Student): Promise<{ message: string }> {
+
         const isMatched = await bcrypt.compare(request.password, student.password);
         if (!isMatched) {
             throw new ResponseError(401, "Password Salah");
@@ -112,6 +114,49 @@ export class CompletePackageServices {
         await prismaClient.studentCompletePackage.create({
             data: data,
         });
+
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.COMPANY_EMAIL!,
+                pass: process.env.EMAIL_PASSWORD!,
+            },
+        });
+        const mailOptions = {
+            from: process.env.COMPANY_EMAIL!,
+            to: student.email,
+            subject: `[Pembelian Paket Tryout] Terimakasih ${student.username}, Order Berhasil!`,
+            text: `
+
+Halo, ${student.username},
+
+Terimakasih telah melakukan pemesanan paket dengan id: 
+
+${complete_package_id}
+
+Mohon untuk segera melakukan pembayaran sesuai dengan petunjuk yang diberikan pada saat melakukan pemesanan.
+
+Best regards,
+Fitrah Ramadhan
+			`,
+        };
+
+        try {
+            transporter.sendMail(mailOptions, (info: SentMessageInfo) => {
+                console.log(`${info}`);
+            });
+        } catch {
+            throw new ResponseError(400, "Terjadi Kesalahan");
+        }
+
+		await prismaClient.student.update({
+			where: {
+				username: student.username
+			},
+			data: {
+				phone_number: request.phoneNumber
+			}
+		})
 
         return {
             message: "Success",
@@ -147,22 +192,20 @@ export class CompletePackageServices {
         return completePackage;
     }
 
-	static async getCompletePackageOwnedById(student: Student, completePackageId: string) : Promise<any> {
+    static async getCompletePackageOwnedById(student: Student, completePackageId: string): Promise<any> {
+        const completePackage = await prismaClient.studentCompletePackage.findFirst({
+            where: {
+                student_id: student.id,
+                id: completePackageId,
+            },
+        });
 
-		const completePackage = await prismaClient.studentCompletePackage.findFirst({
-			where: {
-				student_id: student.id,
-				id:completePackageId 
-			}
-		})
-		
-		if(!completePackage) {
-			throw new ResponseError(404, "Tidak Ditemukan")
-		}
+        if (!completePackage) {
+            throw new ResponseError(404, "Tidak Ditemukan");
+        }
 
-		return completePackage
-
-	}
+        return completePackage;
+    }
 
     static async getWorks(student: Student, completePackageId: string, page: number): Promise<{ pagination: Paging; data: any }> {
         const soals = await prismaClient.soal.findMany({

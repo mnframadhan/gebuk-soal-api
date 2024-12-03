@@ -44,6 +44,7 @@ model Student {
   email String @unique
   password String
   bio String @default("")
+  phone_number String?
   education_name String?
   major String? 
   education_description String?

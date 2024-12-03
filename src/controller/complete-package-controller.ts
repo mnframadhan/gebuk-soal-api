@@ -51,7 +51,7 @@ export class CompletePackageControllers {
         try {
             const complete_package_id = req.params.id as string;
 
-            const request: { password: string } = req.body as { password: string };
+            const request: { phoneNumber: string, password: string } = req.body as { phoneNumber: string, password: string };
             const response = await CompletePackageServices.orderCompletePackage(request, complete_package_id, req.student!);
 
             res.status(200);
